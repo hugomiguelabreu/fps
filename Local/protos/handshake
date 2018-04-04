@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package protos;
+
+message Handshake {
+
+    string address = 1;
+    string fileName = 2;
+    int32 fileSize = 3;
+    int32 nBlocos = 4;
+}
