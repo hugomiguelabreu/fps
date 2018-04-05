@@ -14,13 +14,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Sender {
 
     private ArrayList<String> ips;
-    private HashMap<String, Peer> peers;
+    private ConcurrentHashMap<String, Peer> peers;
 
-    public Sender(ArrayList<String> ips, HashMap<String, Peer> peers) {
+    public Sender(ArrayList<String> ips, ConcurrentHashMap<String, Peer> peers) {
 
         this.ips = ips;
         this.peers = peers;

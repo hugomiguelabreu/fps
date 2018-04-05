@@ -15,14 +15,15 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Receiver {
 
     private ArrayList<String> ipsAux;
     private ArrayList<String> ips;
-    private HashMap<String, Peer> peers;
+    private ConcurrentHashMap<String, Peer> peers;
 
-    public Receiver(ArrayList<String> ips, HashMap<String, Peer> peers) {
+    public Receiver(ArrayList<String> ips, ConcurrentHashMap<String, Peer> peers) {
         this.ips = ips;
         this.peers = peers;
         ipsAux = new ArrayList<>();

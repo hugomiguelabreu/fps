@@ -7,22 +7,27 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.*;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Listener extends Thread {
-
-    private HashMap<String, Peer> peers;
+    //private ConcurrentHashMap<String, Peer> kappa;
+    private ConcurrentHashMap<String, Peer> peers;
     private final int sendPort = 5556; // porta de onde saem os multicasts
     private final int receivePort = 5557; // porta de destino dos multicasts
 
     public Listener(ArrayList<String> ips){
 
-        peers = new HashMap<>();
+        peers = new ConcurrentHashMap<>();
 
         for(String addr : ips){
             //Peer p = new Peer(addr, 5555); // put null ??
-            peers.put(addr,null);
+            peers.put(addr,null); // TODO tirar os nulls nos values
         }
 
         //Peer p = new Peer(ip,5555);
@@ -30,12 +35,14 @@ public class Listener extends Thread {
 
     }
 
-    public HashMap<String, Peer> getPeers() {
+    public ConcurrentHashMap<String, Peer> getPeers() {
         return peers;
     }
 
     @Override
     public void run(){
+
+        checkPeers();
 
         //DatagramSocket socket = null;
         String ip;
@@ -122,6 +129,33 @@ public class Listener extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+    }
+
+    private void checkPeers() {
+
+        // -------------- Para verificar se o timestamp ja antigo ou nao ------------------
+
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool ( 1 );
+
+        Runnable r = new Runnable () {
+            @Override
+            public void run () {
+                try {  // Always wrap your Runnable with a try-catch as any uncaught Exception causes the ScheduledExecutorService to silently terminate.
+                    System.out.println ( "Now: " + Instant.now () );  // Our task at hand in this example: Capturing the current moment in UTC.
+
+
+
+                } catch ( Exception e ) {
+                    System.out.println ( "Oops, uncaught Exception surfaced at Runnable in ScheduledExecutorService." );
+                }
+            }
+        };
+
+        executor.scheduleAtFixedRate ( r , 4000 , 4000 , TimeUnit.MILLISECONDS ); // ( runnable , initialDelay , period , TimeUnit )
+        // Let things run a minute to witness the background thread working.
+
+        // ------------
 
     }
 
