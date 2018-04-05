@@ -40,7 +40,6 @@ public class Listener extends Thread {
         //DatagramSocket socket = null;
         String ip;
         int port;
-        Peer tmp;
 
         try { // passar o try para dentro do while
 
@@ -62,17 +61,20 @@ public class Listener extends Thread {
                     ip = addr.getAddr();
                     port = addr.getPortNumber();
 
-                    tmp = peers.get(ip);
-
-                    if(tmp == null){
+                    if(! peers.containsKey(ip)){
 
                         peers.put(ip,new Peer(ip,port, new Timestamp(System.currentTimeMillis())));
                         System.out.println( "\u001B[32m" + "new dude : " + "\u001B[0m" + ip);
-
                     }
+
                     else{
 
-                        tmp.setLast(new Timestamp(System.currentTimeMillis()));
+                        Peer tmp = peers.get(ip);
+
+                        if(tmp != null){
+
+                            tmp.setLast(new Timestamp(System.currentTimeMillis()));
+                        }
                     }
 
 
