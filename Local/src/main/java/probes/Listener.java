@@ -6,6 +6,7 @@ import protos.AddrOuterClass;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -39,6 +40,7 @@ public class Listener extends Thread {
         //DatagramSocket socket = null;
         String ip;
         int port;
+        Peer tmp;
 
         try { // passar o try para dentro do while
 
@@ -60,10 +62,17 @@ public class Listener extends Thread {
                     ip = addr.getAddr();
                     port = addr.getPortNumber();
 
-                    if(! peers.containsKey(ip)){
+                    tmp = peers.get(ip);
 
-                        peers.put(ip,new Peer(ip,port));
-                        System.out.println("new dude : " + ip);
+                    if(tmp == null){
+
+                        peers.put(ip,new Peer(ip,port, new Timestamp(System.currentTimeMillis())));
+                        System.out.println( "\u001B[32m" + "new dude : " + "\u001B[0m" + ip);
+
+                    }
+                    else{
+
+                        tmp.setLast(new Timestamp(System.currentTimeMillis()));
                     }
 
 

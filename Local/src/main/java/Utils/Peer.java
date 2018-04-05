@@ -14,6 +14,16 @@ public class Peer {
         this.port = port;
     }
 
+    public Peer(String ip, int port, Timestamp last){
+        this.ip = ip;
+        this.port = port;
+        this.last = last;
+    }
+
+    public void setLast(Timestamp last) {
+        this.last = last;
+    }
+
     public String getIp() {
         return ip;
     }
