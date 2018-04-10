@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -26,8 +27,8 @@ public class Listener extends Thread {
         peers = new ConcurrentHashMap<>();
 
         for(String addr : ips){
-            //Peer p = new Peer(addr, 5555); // put null ??
-            peers.put(addr,null); // TODO tirar os nulls nos values
+            Peer p = new Peer(addr, 5555); // put null ??
+            peers.put(addr,p); // TODO tirar os nulls nos values
         }
 
         //Peer p = new Peer(ip,5555);
@@ -144,6 +145,19 @@ public class Listener extends Thread {
                 try {  // Always wrap your Runnable with a try-catch as any uncaught Exception causes the ScheduledExecutorService to silently terminate.
                     System.out.println ( "Now: " + Instant.now () );  // Our task at hand in this example: Capturing the current moment in UTC.
 
+                    for (Map.Entry<String, Peer> entry : peers.entrySet()) {
+
+                        System.out.println("current time: " + System.currentTimeMillis());
+                        System.out.println("timestamp: " + entry.getValue().getLast().getTime());
+
+
+                        if( (System.currentTimeMillis() - entry.getValue().getLast().getTime() ) > 5000 ){
+
+                            System.out.println("remover");
+                            peers.remove(entry.getKey());
+                        }
+
+                    }
 
 
                 } catch ( Exception e ) {
@@ -153,10 +167,13 @@ public class Listener extends Thread {
         };
 
         executor.scheduleAtFixedRate ( r , 4000 , 4000 , TimeUnit.MILLISECONDS ); // ( runnable , initialDelay , period , TimeUnit )
-        // Let things run a minute to witness the background thread working.
-
-        // ------------
 
     }
+
+//    public long getDateDiff(long timeUpdate, long timeNow, TimeUnit timeUnit)
+//    {
+//        long diffInMillies = Math.abs(timeNow- timeUpdate);
+//        return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS);
+//    }
 
 }
