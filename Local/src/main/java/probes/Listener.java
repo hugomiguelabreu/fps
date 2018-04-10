@@ -143,12 +143,12 @@ public class Listener extends Thread {
             @Override
             public void run () {
                 try {  // Always wrap your Runnable with a try-catch as any uncaught Exception causes the ScheduledExecutorService to silently terminate.
-                    System.out.println ( "Now: " + Instant.now () );  // Our task at hand in this example: Capturing the current moment in UTC.
+                    //System.out.println ( "Now: " + Instant.now () );  // Our task at hand in this example: Capturing the current moment in UTC.
 
                     for (Map.Entry<String, Peer> entry : peers.entrySet()) {
 
-                        System.out.println("current time: " + System.currentTimeMillis());
-                        System.out.println("timestamp: " + entry.getValue().getLast().getTime());
+//                        System.out.println("current time: " + System.currentTimeMillis());
+//                        System.out.println("timestamp: " + entry.getValue().getLast().getTime());
 
 
                         if( (System.currentTimeMillis() - entry.getValue().getLast().getTime() ) > 5000 ){
