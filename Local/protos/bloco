@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package protos;
+
+//os bit maps podem ir aqui
+
+message Bloco {
+
+    int32 size = 1;
+    int32 nbloco = 2;
+    bytes bloco = 3;
+}
