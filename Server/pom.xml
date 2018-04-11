@@ -7,6 +7,43 @@
     <groupId>Server</groupId>
     <artifactId>Server</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.turn</groupId>
+            <artifactId>ttorrent-core</artifactId>
+            <version>1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.5.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.23.Final</version>
+        </dependency>
+
+    </dependencies>
 
 </project>
