@@ -1,4 +1,7 @@
+package Handlers;
+
 import Network.TorrentWrapperOuterClass;
+import com.turn.ttorrent.common.Torrent;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -6,27 +9,25 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
-import io.netty.handler.ssl.SslContext;
+import java.util.List;
 
 
 public class TorrentServerInitializer extends ChannelInitializer<SocketChannel>{
-    private final SslContext sslCtx;
 
-    public TorrentServerInitializer(SslContext sslCtx) {
-        this.sslCtx = sslCtx;
+    private List<Torrent> trackedTorrents;
+
+    public TorrentServerInitializer(List<Torrent> trackedTorrentsParam){
+        this.trackedTorrents = trackedTorrentsParam;
     }
 
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline p = ch.pipeline();
-        if (sslCtx != null) {
-            p.addLast(sslCtx.newHandler(ch.alloc()));
-        }
 
         p.addLast(new ProtobufVarint32FrameDecoder());
         p.addLast(new ProtobufDecoder(TorrentWrapperOuterClass.TorrentWrapper.getDefaultInstance()));
         p.addLast(new ProtobufVarint32LengthFieldPrepender());
         p.addLast(new ProtobufEncoder());
-        p.addLast(new TorrentServerHandler());
+        p.addLast(new TorrentServerHandler(trackedTorrents));
     }
 }
