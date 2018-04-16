@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package Network;
+
+message AddrBroadcast {
+
+    string addr = 1;
+    string username = 2;
+}

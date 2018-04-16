@@ -2,7 +2,7 @@ package Misc;
 import Network.TorrentWrapperOuterClass;
 import com.google.protobuf.ByteString;
 import com.turn.ttorrent.common.Torrent;
-import javafx.util.converter.ByteStringConverter;
+//import javafx.util.converter.ByteStringConverter;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
