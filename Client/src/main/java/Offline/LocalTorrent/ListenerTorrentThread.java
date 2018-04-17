@@ -33,7 +33,7 @@ public class ListenerTorrentThread extends Thread{
 
             TorrentWrapperOuterClass.TorrentWrapper torrent = TorrentWrapperOuterClass.TorrentWrapper.parseDelimitedFrom(stream);
 
-            File dest = new File("/tmp/kek/");
+            File dest = new File("/tmp/");
 
             final SharedTorrent st = new SharedTorrent(torrent.getContent().toByteArray(), dest);
 
@@ -52,6 +52,7 @@ public class ListenerTorrentThread extends Thread{
                     System.out.println(arg);
                 }
             });
+
             c.share(-1);
 
             if (com.turn.ttorrent.client.Client.ClientState.ERROR.equals(c.getState())) {

@@ -80,9 +80,18 @@ public class Client {
                 }
 
                 System.out.println("What is the file?");
+                String file = sc.nextLine();
+
                 ArrayList<String> trc = new ArrayList<String>();
                 trc.add(ownAdrresses.get(0));
-                Torrent t = TorrentUtil.createTorrent(sc.nextLine(), username, trc);
+                Torrent t = TorrentUtil.createTorrent(file, username, trc);
+
+                final SharedTorrent st = new SharedTorrent(t, new File(file));
+
+                com.turn.ttorrent.client.Client c = new com.turn.ttorrent.client.Client(
+                        InetAddress.getByName(ownAdrresses.get(0)),
+                        st);
+
 
                 tck.announce(new TrackedTorrent(t));
 
@@ -108,6 +117,8 @@ public class Client {
                 }
 
                 System.out.println("Upload intention initiated");
+
+
 
             }
 
