@@ -1,5 +1,8 @@
 package Offline;
 
+import Offline.probes.Broadcast;
+import Offline.probes.Listener;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.*;
@@ -13,13 +16,15 @@ public class Client {
 
         Scanner sc = new Scanner(System.in);
         String username;
+        ArrayList<String> ownAdrresses = new ArrayList<>();
 
         System.out.println("username: ");
         username = sc.nextLine();
 
-        findLocalAddresses();
+        ownAdrresses =  findLocalAddresses();
 
-
+        new Listener(username, ownAdrresses).start();
+        new Broadcast(username, ownAdrresses).start();
 
     }
 

@@ -25,4 +25,8 @@ public class Peer {
     public Timestamp getLast() {
         return last;
     }
+
+    public void setLast(Timestamp last) {
+        this.last = last;
+    }
 }
