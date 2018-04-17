@@ -36,7 +36,7 @@ public class ListenerTorrentThread extends Thread{
             Torrent t = new Torrent(torrent.getContent().toByteArray(), false);
             t.getName(); // TODO receber o nome no protobuff ????
 
-            File dest = new File("/tmp/" + t.getName());
+            File dest = new File("/tmp/kek/" + t.getName());
 
             final SharedTorrent st = new SharedTorrent(torrent.getContent().toByteArray(), dest);
 

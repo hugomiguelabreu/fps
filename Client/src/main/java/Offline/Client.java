@@ -110,7 +110,7 @@ public class Client {
 
                     }
                 }
-                
+
                 System.out.println("Upload intention initiated");
 
             }
