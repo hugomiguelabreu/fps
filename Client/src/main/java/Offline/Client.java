@@ -68,7 +68,9 @@ public class Client {
 
                     System.out.println(ownAdrresses.get(0).getIpv4());
 
-                    tck = new Tracker(new InetSocketAddress(ownAdrresses.get(0).getIpv4(),6969));
+                    String httpAdress = "http://" +  ownAdrresses.get(0).getIpv4();
+
+                    tck = new Tracker(new InetSocketAddress(httpAdress,6969));
 
 
 
