@@ -80,13 +80,14 @@ public class Client {
                 }
 
                 System.out.println("What is the file?");
-                String file = sc.nextLine();
+                String fileStr = sc.nextLine();
 
                 ArrayList<String> trc = new ArrayList<String>();
                 trc.add(ownAdrresses.get(0));
-                Torrent t = TorrentUtil.createTorrent(file, username, trc);
+                Torrent t = TorrentUtil.createTorrent(fileStr, username, trc);
 
-                final SharedTorrent st = new SharedTorrent(t, new File(file));
+                File file = new File(fileStr);
+                final SharedTorrent st = new SharedTorrent(t, new File(file.getParent()));
 
                 com.turn.ttorrent.client.Client c = new com.turn.ttorrent.client.Client(
                         InetAddress.getByName(ownAdrresses.get(0)),
