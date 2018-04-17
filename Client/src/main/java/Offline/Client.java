@@ -92,6 +92,8 @@ public class Client {
                         InetAddress.getByName(ownAdrresses.get(0)),
                         st);
 
+                c.share(-1);
+
 
                 tck.announce(new TrackedTorrent(t));
 
