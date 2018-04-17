@@ -63,7 +63,7 @@ public class Listener extends Thread {
 
                     AddrBroadcastOuterClass.AddrBroadcast addr = AddrBroadcastOuterClass.AddrBroadcast.parseDelimitedFrom(ret);
 
-                    System.out.println("recieved : " + addr.getAddr());
+                    // System.out.println("recieved : " + addr.getAddr());
 
                     ip = addr.getAddr();
 
