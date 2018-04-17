@@ -52,7 +52,7 @@ public class Client {
 
         for (LocalAddresses addr : ownAdrresses){
 
-            new ListenerTorrents(username, addr.getIpv4()).start();
+            new ListenerTorrents(username, addr.getIpv6()).start();
         }
 
 
@@ -66,7 +66,7 @@ public class Client {
 
                 try {
 
-                    System.out.println(ownAdrresses.get(0));
+                    System.out.println(ownAdrresses.get(0).getIpv4());
 
                     tck = new Tracker(new InetSocketAddress(ownAdrresses.get(0).getIpv4(),6969));
 
