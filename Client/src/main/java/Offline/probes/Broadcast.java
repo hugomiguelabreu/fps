@@ -3,6 +3,7 @@ package Offline.probes;
 //import protos.AddrOuterClass;
 
 import Network.AddrBroadcastOuterClass;
+import Offline.Utils.LocalAddresses;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,13 +17,13 @@ public class Broadcast extends Thread {
 
     private String username;
     private String ip = null;
-    private ArrayList<String> ips;
+    private ArrayList<LocalAddresses> ips;
     //private ArrayList<DatagramSocket> sockets;
     private HashMap<DatagramSocket, byte[]> sockets;
     private final int sendPort = 5556; // porta de onde saem os multicasts
     private final int receivePort = 5557; // porta de destino dos multicasts
 
-    public Broadcast(String username, ArrayList<String> ips){
+    public Broadcast(String username, ArrayList<LocalAddresses> ips){
 
         this.username = username;
         this.ips = ips;
@@ -30,13 +31,14 @@ public class Broadcast extends Thread {
 
         try{
 
-            for(String ip : ips){
+            for(LocalAddresses ip : ips){
 
-                DatagramSocket ds = new DatagramSocket(new InetSocketAddress(ip, sendPort));
+                DatagramSocket ds = new DatagramSocket(new InetSocketAddress(ip.getIpv6(), sendPort));
                 ds.setBroadcast(true);
 
                 AddrBroadcastOuterClass.AddrBroadcast data = AddrBroadcastOuterClass.AddrBroadcast.newBuilder()
-                        .setAddr(ip)
+                        .setIpv6(ip.getIpv6())
+                        .setIpv4(ip.getIpv4())
                         .setUsername(username).build();
 
                 ByteArrayOutputStream buff = new ByteArrayOutputStream(1024);
@@ -112,7 +114,7 @@ public class Broadcast extends Thread {
 
     }
 
-    public ArrayList<String> getIps() {
+    public ArrayList<LocalAddresses> getIps() {
         return ips;
     }
 

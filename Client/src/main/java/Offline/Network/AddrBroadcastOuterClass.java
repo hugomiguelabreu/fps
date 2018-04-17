@@ -19,21 +19,31 @@ public final class AddrBroadcastOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string addr = 1;</code>
+     * <code>string ipv6 = 1;</code>
      */
-    java.lang.String getAddr();
+    java.lang.String getIpv6();
     /**
-     * <code>string addr = 1;</code>
+     * <code>string ipv6 = 1;</code>
      */
     com.google.protobuf.ByteString
-        getAddrBytes();
+        getIpv6Bytes();
 
     /**
-     * <code>string username = 2;</code>
+     * <code>string ipv4 = 2;</code>
+     */
+    java.lang.String getIpv4();
+    /**
+     * <code>string ipv4 = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getIpv4Bytes();
+
+    /**
+     * <code>string username = 3;</code>
      */
     java.lang.String getUsername();
     /**
-     * <code>string username = 2;</code>
+     * <code>string username = 3;</code>
      */
     com.google.protobuf.ByteString
         getUsernameBytes();
@@ -51,7 +61,8 @@ public final class AddrBroadcastOuterClass {
       super(builder);
     }
     private AddrBroadcast() {
-      addr_ = "";
+      ipv6_ = "";
+      ipv4_ = "";
       username_ = "";
     }
 
@@ -89,10 +100,16 @@ public final class AddrBroadcastOuterClass {
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              addr_ = s;
+              ipv6_ = s;
               break;
             }
             case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              ipv4_ = s;
+              break;
+            }
+            case 26: {
               java.lang.String s = input.readStringRequireUtf8();
 
               username_ = s;
@@ -122,44 +139,78 @@ public final class AddrBroadcastOuterClass {
               Network.AddrBroadcastOuterClass.AddrBroadcast.class, Network.AddrBroadcastOuterClass.AddrBroadcast.Builder.class);
     }
 
-    public static final int ADDR_FIELD_NUMBER = 1;
-    private volatile java.lang.Object addr_;
+    public static final int IPV6_FIELD_NUMBER = 1;
+    private volatile java.lang.Object ipv6_;
     /**
-     * <code>string addr = 1;</code>
+     * <code>string ipv6 = 1;</code>
      */
-    public java.lang.String getAddr() {
-      java.lang.Object ref = addr_;
+    public java.lang.String getIpv6() {
+      java.lang.Object ref = ipv6_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        addr_ = s;
+        ipv6_ = s;
         return s;
       }
     }
     /**
-     * <code>string addr = 1;</code>
+     * <code>string ipv6 = 1;</code>
      */
     public com.google.protobuf.ByteString
-        getAddrBytes() {
-      java.lang.Object ref = addr_;
+        getIpv6Bytes() {
+      java.lang.Object ref = ipv6_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        addr_ = b;
+        ipv6_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
 
-    public static final int USERNAME_FIELD_NUMBER = 2;
+    public static final int IPV4_FIELD_NUMBER = 2;
+    private volatile java.lang.Object ipv4_;
+    /**
+     * <code>string ipv4 = 2;</code>
+     */
+    public java.lang.String getIpv4() {
+      java.lang.Object ref = ipv4_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        ipv4_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string ipv4 = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getIpv4Bytes() {
+      java.lang.Object ref = ipv4_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        ipv4_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int USERNAME_FIELD_NUMBER = 3;
     private volatile java.lang.Object username_;
     /**
-     * <code>string username = 2;</code>
+     * <code>string username = 3;</code>
      */
     public java.lang.String getUsername() {
       java.lang.Object ref = username_;
@@ -174,7 +225,7 @@ public final class AddrBroadcastOuterClass {
       }
     }
     /**
-     * <code>string username = 2;</code>
+     * <code>string username = 3;</code>
      */
     public com.google.protobuf.ByteString
         getUsernameBytes() {
@@ -202,11 +253,14 @@ public final class AddrBroadcastOuterClass {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!getAddrBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, addr_);
+      if (!getIpv6Bytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, ipv6_);
+      }
+      if (!getIpv4Bytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, ipv4_);
       }
       if (!getUsernameBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, username_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, username_);
       }
       unknownFields.writeTo(output);
     }
@@ -216,11 +270,14 @@ public final class AddrBroadcastOuterClass {
       if (size != -1) return size;
 
       size = 0;
-      if (!getAddrBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, addr_);
+      if (!getIpv6Bytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, ipv6_);
+      }
+      if (!getIpv4Bytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, ipv4_);
       }
       if (!getUsernameBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, username_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, username_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -238,8 +295,10 @@ public final class AddrBroadcastOuterClass {
       Network.AddrBroadcastOuterClass.AddrBroadcast other = (Network.AddrBroadcastOuterClass.AddrBroadcast) obj;
 
       boolean result = true;
-      result = result && getAddr()
-          .equals(other.getAddr());
+      result = result && getIpv6()
+          .equals(other.getIpv6());
+      result = result && getIpv4()
+          .equals(other.getIpv4());
       result = result && getUsername()
           .equals(other.getUsername());
       result = result && unknownFields.equals(other.unknownFields);
@@ -253,8 +312,10 @@ public final class AddrBroadcastOuterClass {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + ADDR_FIELD_NUMBER;
-      hash = (53 * hash) + getAddr().hashCode();
+      hash = (37 * hash) + IPV6_FIELD_NUMBER;
+      hash = (53 * hash) + getIpv6().hashCode();
+      hash = (37 * hash) + IPV4_FIELD_NUMBER;
+      hash = (53 * hash) + getIpv4().hashCode();
       hash = (37 * hash) + USERNAME_FIELD_NUMBER;
       hash = (53 * hash) + getUsername().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -386,7 +447,9 @@ public final class AddrBroadcastOuterClass {
       }
       public Builder clear() {
         super.clear();
-        addr_ = "";
+        ipv6_ = "";
+
+        ipv4_ = "";
 
         username_ = "";
 
@@ -412,7 +475,8 @@ public final class AddrBroadcastOuterClass {
 
       public Network.AddrBroadcastOuterClass.AddrBroadcast buildPartial() {
         Network.AddrBroadcastOuterClass.AddrBroadcast result = new Network.AddrBroadcastOuterClass.AddrBroadcast(this);
-        result.addr_ = addr_;
+        result.ipv6_ = ipv6_;
+        result.ipv4_ = ipv4_;
         result.username_ = username_;
         onBuilt();
         return result;
@@ -455,8 +519,12 @@ public final class AddrBroadcastOuterClass {
 
       public Builder mergeFrom(Network.AddrBroadcastOuterClass.AddrBroadcast other) {
         if (other == Network.AddrBroadcastOuterClass.AddrBroadcast.getDefaultInstance()) return this;
-        if (!other.getAddr().isEmpty()) {
-          addr_ = other.addr_;
+        if (!other.getIpv6().isEmpty()) {
+          ipv6_ = other.ipv6_;
+          onChanged();
+        }
+        if (!other.getIpv4().isEmpty()) {
+          ipv4_ = other.ipv4_;
           onChanged();
         }
         if (!other.getUsername().isEmpty()) {
@@ -490,78 +558,147 @@ public final class AddrBroadcastOuterClass {
         return this;
       }
 
-      private java.lang.Object addr_ = "";
+      private java.lang.Object ipv6_ = "";
       /**
-       * <code>string addr = 1;</code>
+       * <code>string ipv6 = 1;</code>
        */
-      public java.lang.String getAddr() {
-        java.lang.Object ref = addr_;
+      public java.lang.String getIpv6() {
+        java.lang.Object ref = ipv6_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          addr_ = s;
+          ipv6_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
-       * <code>string addr = 1;</code>
+       * <code>string ipv6 = 1;</code>
        */
       public com.google.protobuf.ByteString
-          getAddrBytes() {
-        java.lang.Object ref = addr_;
+          getIpv6Bytes() {
+        java.lang.Object ref = ipv6_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          addr_ = b;
+          ipv6_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
-       * <code>string addr = 1;</code>
+       * <code>string ipv6 = 1;</code>
        */
-      public Builder setAddr(
+      public Builder setIpv6(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        addr_ = value;
+        ipv6_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>string addr = 1;</code>
+       * <code>string ipv6 = 1;</code>
        */
-      public Builder clearAddr() {
+      public Builder clearIpv6() {
         
-        addr_ = getDefaultInstance().getAddr();
+        ipv6_ = getDefaultInstance().getIpv6();
         onChanged();
         return this;
       }
       /**
-       * <code>string addr = 1;</code>
+       * <code>string ipv6 = 1;</code>
        */
-      public Builder setAddrBytes(
+      public Builder setIpv6Bytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        addr_ = value;
+        ipv6_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object ipv4_ = "";
+      /**
+       * <code>string ipv4 = 2;</code>
+       */
+      public java.lang.String getIpv4() {
+        java.lang.Object ref = ipv4_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          ipv4_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string ipv4 = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getIpv4Bytes() {
+        java.lang.Object ref = ipv4_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          ipv4_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string ipv4 = 2;</code>
+       */
+      public Builder setIpv4(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        ipv4_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string ipv4 = 2;</code>
+       */
+      public Builder clearIpv4() {
+        
+        ipv4_ = getDefaultInstance().getIpv4();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string ipv4 = 2;</code>
+       */
+      public Builder setIpv4Bytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        ipv4_ = value;
         onChanged();
         return this;
       }
 
       private java.lang.Object username_ = "";
       /**
-       * <code>string username = 2;</code>
+       * <code>string username = 3;</code>
        */
       public java.lang.String getUsername() {
         java.lang.Object ref = username_;
@@ -576,7 +713,7 @@ public final class AddrBroadcastOuterClass {
         }
       }
       /**
-       * <code>string username = 2;</code>
+       * <code>string username = 3;</code>
        */
       public com.google.protobuf.ByteString
           getUsernameBytes() {
@@ -592,7 +729,7 @@ public final class AddrBroadcastOuterClass {
         }
       }
       /**
-       * <code>string username = 2;</code>
+       * <code>string username = 3;</code>
        */
       public Builder setUsername(
           java.lang.String value) {
@@ -605,7 +742,7 @@ public final class AddrBroadcastOuterClass {
         return this;
       }
       /**
-       * <code>string username = 2;</code>
+       * <code>string username = 3;</code>
        */
       public Builder clearUsername() {
         
@@ -614,7 +751,7 @@ public final class AddrBroadcastOuterClass {
         return this;
       }
       /**
-       * <code>string username = 2;</code>
+       * <code>string username = 3;</code>
        */
       public Builder setUsernameBytes(
           com.google.protobuf.ByteString value) {
@@ -690,9 +827,9 @@ public final class AddrBroadcastOuterClass {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\023AddrBroadcast.proto\022\007Network\"/\n\rAddrBr" +
-      "oadcast\022\014\n\004addr\030\001 \001(\t\022\020\n\010username\030\002 \001(\tb" +
-      "\006proto3"
+      "\n\023AddrBroadcast.proto\022\007Network\"=\n\rAddrBr" +
+      "oadcast\022\014\n\004ipv6\030\001 \001(\t\022\014\n\004ipv4\030\002 \001(\t\022\020\n\010u" +
+      "sername\030\003 \001(\tb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -711,7 +848,7 @@ public final class AddrBroadcastOuterClass {
     internal_static_Network_AddrBroadcast_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Network_AddrBroadcast_descriptor,
-        new java.lang.String[] { "Addr", "Username", });
+        new java.lang.String[] { "Ipv6", "Ipv4", "Username", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

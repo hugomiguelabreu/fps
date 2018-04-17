@@ -4,6 +4,7 @@ package Network;
 
 message AddrBroadcast {
 
-    string addr = 1;
-    string username = 2;
+    string ipv6 = 1;
+    string ipv4 = 2;
+    string username = 3;
 }

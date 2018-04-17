@@ -4,6 +4,7 @@ import Handlers.TorrentClientInitializer;
 import Misc.TorrentUtil;
 import Network.TorrentWrapperOuterClass;
 import Offline.LocalTorrent.ListenerTorrents;
+import Offline.Utils.LocalAddresses;
 import Offline.probes.Broadcast;
 import Offline.probes.Listener;
 import Offline.probes.Peer;
@@ -37,7 +38,7 @@ public class Client {
 
         Scanner sc = new Scanner(System.in);
         String username, input;
-        ArrayList<String> ownAdrresses;
+        ArrayList<LocalAddresses> ownAdrresses;
 
         System.out.println("username: ");
         username = sc.nextLine();
@@ -46,11 +47,12 @@ public class Client {
 
         Listener l = new Listener(username, ownAdrresses);
         l.start();
+
         new Broadcast(username, ownAdrresses).start();
 
-        for (String addr : ownAdrresses){
+        for (LocalAddresses addr : ownAdrresses){
 
-            new ListenerTorrents(username, addr).start();
+            new ListenerTorrents(username, addr.getIpv4()).start();
         }
 
 
@@ -66,7 +68,7 @@ public class Client {
 
                     System.out.println(ownAdrresses.get(0));
 
-                    tck = new Tracker(new InetSocketAddress(ownAdrresses.get(0),6969));
+                    tck = new Tracker(new InetSocketAddress(ownAdrresses.get(0).getIpv4(),6969));
 
 
 
@@ -83,14 +85,14 @@ public class Client {
                 String fileStr = sc.nextLine();
 
                 ArrayList<String> trc = new ArrayList<String>();
-                trc.add(ownAdrresses.get(0));
+                trc.add(ownAdrresses.get(0).getIpv4());
                 Torrent t = TorrentUtil.createTorrent(fileStr, username, trc);
 
                 File file = new File(fileStr);
                 final SharedTorrent st = new SharedTorrent(t, new File(file.getParent()));
 
                 com.turn.ttorrent.client.Client c = new com.turn.ttorrent.client.Client(
-                        InetAddress.getByName(ownAdrresses.get(0)),
+                        InetAddress.getByName(ownAdrresses.get(0).getIpv4()),
                         st);
 
                 c.share(-1);
@@ -166,9 +168,9 @@ public class Client {
 
     }
 
-    private static ArrayList<String> findLocalAddresses() {
+    private static ArrayList<LocalAddresses> findLocalAddresses() {
 
-        ArrayList<String> ret = new ArrayList<String>();
+        ArrayList<LocalAddresses> ret = new ArrayList<>();
 
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -179,21 +181,35 @@ public class Client {
                     continue;
 
                 Enumeration<InetAddress> addresses = iface.getInetAddresses();
+                String ipv6 = null;
+                String ipv4 = null;
 
                 while(addresses.hasMoreElements()) {
                     InetAddress addr = addresses.nextElement();
                     if(Inet6Address.class == addr.getClass() && addr.isLinkLocalAddress()){
-                        ret.add(addr.getHostAddress().replaceAll("%.*", "")); // e preciso tirar o %interface
-                        System.out.println("local address: " + addr.getHostAddress());
+                        ipv6 = addr.getHostAddress().replaceAll("%.*", ""); // e preciso tirar o %interface
+                        System.out.println("local ipv6 address: " + ipv6);
+                    }
+
+                }
+
+                ArrayList<InterfaceAddress> bcast = new ArrayList<>(iface.getInterfaceAddresses());
+
+                for(InterfaceAddress addr : bcast){
+
+                    if( addr.getBroadcast() != null){
+                        ipv4 = addr.getBroadcast().getHostName();
+                        System.out.println("local ipv4 address: " + ipv4);
                     }
                 }
+
+                ret.add(new LocalAddresses(ipv6, ipv4));
             }
         } catch (SocketException e) {
             throw new RuntimeException(e);
         }
 
         return ret;
-
     }
 
 

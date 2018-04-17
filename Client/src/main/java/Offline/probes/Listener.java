@@ -1,6 +1,7 @@
 package Offline.probes;
 
 import Network.AddrBroadcastOuterClass;
+import Offline.Utils.LocalAddresses;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -19,13 +20,13 @@ public class Listener extends Thread {
     private final int sendPort = 5556; // porta de onde saem os multicasts
     private final int receivePort = 5557; // porta de destino dos multicasts
 
-    public Listener(String username, ArrayList<String> ips){
+    public Listener(String username, ArrayList<LocalAddresses> ips){
 
         peers = new ConcurrentHashMap<>();
 
-        for(String addr : ips){
-            Peer p = new Peer(username, addr, new Timestamp(System.currentTimeMillis())); // put null ??
-            peers.put(addr,p);
+        for(LocalAddresses addr : ips){
+            Peer p = new Peer(username, addr.getIpv6(), addr.getIpv4(), new Timestamp(System.currentTimeMillis())); // put null ??
+            peers.put(addr.getIpv6(),p);
         }
 
         //Peer p = new Peer(ip,5555);
@@ -43,7 +44,7 @@ public class Listener extends Thread {
         checkPeers();
 
         //DatagramSocket socket = null;
-        String ip;
+        String ipv6, ipv4;
         int port;
 
         try { // passar o try para dentro do while
@@ -65,21 +66,24 @@ public class Listener extends Thread {
 
                     // System.out.println("recieved : " + addr.getAddr());
 
-                    ip = addr.getAddr();
+                    ipv6 = addr.getIpv6();
+                    ipv4 = addr.getIpv4();
 
 
                     //AddrOuterClass.Addr addr = AddrOuterClass.Addr.parseDelimitedFrom(ret);
 
 
-                    if(! peers.containsKey(ip)){
+                    if(! peers.containsKey(ipv6)){
 
-                        peers.put(ip,new Peer(addr.getUsername(), ip, new Timestamp(System.currentTimeMillis())));
-                        System.out.println( "\u001B[32m" + "new dude : " + "\u001B[0m" + ip);
+                        peers.put(ipv6,new Peer(addr.getUsername(), ipv6, ipv4, new Timestamp(System.currentTimeMillis())));
+                        System.out.println( "\u001B[32m" + "new dude : " + "\u001B[0m" + addr.getUsername());
+                        System.out.println( "\u001B[32m" + "ipv6 : " + "\u001B[0m" + ipv6);
+                        System.out.println( "\u001B[32m" + "ipv4 : " + "\u001B[0m" + ipv4);
                     }
 
                     else{
 
-                        Peer tmp = peers.get(ip);
+                        Peer tmp = peers.get(ipv6);
 
                         if(tmp != null){
 
