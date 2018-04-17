@@ -194,18 +194,21 @@ public class Client {
                         ipv6 = addr.getHostAddress().replaceAll("%.*", ""); // e preciso tirar o %interface
                         System.out.println("local ipv6 address: " + ipv6);
                     }
+                    if(Inet4Address.class == addr.getClass())
+                        ipv4 = addr.getHostName();
+                        //System.out.println(addr.getHostAddress());
 
                 }
 
-                ArrayList<InterfaceAddress> bcast = new ArrayList<>(iface.getInterfaceAddresses());
-
-                for(InterfaceAddress addr : bcast){
-
-                    if( addr.getBroadcast() != null){
-                        ipv4 = addr.getBroadcast().getHostName();
-                        System.out.println("local ipv4 address: " + ipv4);
-                    }
-                }
+//                ArrayList<InterfaceAddress> bcast = new ArrayList<>(iface.getInterfaceAddresses());
+//
+//                for(InterfaceAddress addr : bcast){
+//
+//                    if( addr.getBroadcast() != null){
+//                        ipv4 = addr.getBroadcast().getHostName();
+//                        System.out.println("local ipv4 address: " + ipv4);
+//                    }
+//                }
 
                 ret.add(new LocalAddresses(ipv6, ipv4));
             }
