@@ -60,21 +60,15 @@ public class Client {
 
             if(input.equals("upload")){ //
 
-                FilenameFilter filter = new FilenameFilter() {
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        return name.endsWith(".torrent");
-                    }
-                };
+                com.turn.ttorrent.tracker.Tracker tck = null;
 
                 try {
-                    com.turn.ttorrent.tracker.Tracker tck = new Tracker(new InetSocketAddress(ownAdrresses.get(0),6969));
 
-                    File parent = new File("./");
-                    for (File f : parent.listFiles(filter)) {
-                        logger.info("Loading torrent from " + f.getName());
-                        tck.announce(TrackedTorrent.load(f));
-                    }
+                    System.out.println(ownAdrresses.get(0));
+
+                    tck = new Tracker(new InetSocketAddress(ownAdrresses.get(0),6969));
+
+
 
                     logger.info("Starting tracker with {} announced torrents...",
                             tck.getTrackedTorrents().size());
@@ -89,6 +83,8 @@ public class Client {
                 ArrayList<String> trc = new ArrayList<String>();
                 trc.add(ownAdrresses.get(0));
                 Torrent t = TorrentUtil.createTorrent(sc.nextLine(), username, trc);
+
+                tck.announce(new TrackedTorrent(t));
 
                 TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
 
