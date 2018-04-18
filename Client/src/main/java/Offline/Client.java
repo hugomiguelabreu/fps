@@ -64,15 +64,17 @@ public class Client {
 
                 com.turn.ttorrent.tracker.Tracker tck = null;
 
+                String udpAddress;
+
                 try {
 
                     System.out.println(ownAdrresses.get(0).getIpv4());
 
-                    String httpAdress = "upd://" +  ownAdrresses.get(0).getIpv4();
+//                    udpAddress = "upd://" +  ownAdrresses.get(0).getIpv4();
+//
+//                    System.out.println(udpAddress);
 
-                    System.out.println(httpAdress);
-
-                    tck = new Tracker(new InetSocketAddress(httpAdress,6969));
+                    tck = new Tracker(new InetSocketAddress(ownAdrresses.get(0).getIpv4(),6969));
 
 
 
@@ -88,7 +90,7 @@ public class Client {
                 System.out.println("What is the file?");
                 String fileStr = sc.nextLine();
 
-                ArrayList<String> trc = new ArrayList<String>();
+                ArrayList<String> trc = new ArrayList<>();
                 trc.add(ownAdrresses.get(0).getIpv4());
                 Torrent t = TorrentUtil.createTorrent(fileStr, username, trc);
 
