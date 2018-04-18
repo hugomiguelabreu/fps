@@ -65,7 +65,7 @@ public class Client {
                 com.turn.ttorrent.tracker.Tracker tck = null;
 
                 //String announceAddress = "http://" + ownAdrresses.get(0).getIpv4();
-                String trackerAddress = "http://" + ownAdrresses.get(0).getIpv4()  + ":6969";
+                String trackerAddress = "http://" + ownAdrresses.get(0).getIpv4()  + ":6969/announce";
 
                 try {
 
@@ -80,13 +80,13 @@ public class Client {
                     String httpAddress = ownAdrresses.get(0).getIpv4();
 
                     tck = new Tracker(new InetSocketAddress(InetAddress.getByName(httpAddress), 6969));
-
+                    tck.start();
 
 
                     logger.info("Starting tracker with {} announced torrents...",
                             tck.getTrackedTorrents().size());
-                    tck.start();
-                    System.out.println(tck.getTrackedTorrents());
+                    //tck.start();
+                    //System.out.println(tck.getTrackedTorrents());
                 } catch (Exception e) {
                     logger.error("{}", e.getMessage(), e);
                     System.exit(2);
@@ -108,7 +108,6 @@ public class Client {
 
                 c.share(-1);
 
-
                 tck.announce(new TrackedTorrent(t));
 
                 TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
@@ -125,7 +124,7 @@ public class Client {
 
                         System.out.println("a enviar para " + entry.getKey());
 
-                        Socket s = new Socket(entry.getKey(), 5558);
+                        Socket s = new Socket(entry.getValue().getIpv4(), 5558);
                         tw.writeDelimitedTo(s.getOutputStream());
 
                     }
