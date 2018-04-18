@@ -52,7 +52,7 @@ public class Client {
 
         for (LocalAddresses addr : ownAdrresses){
 
-            new ListenerTorrents(username, addr.getIpv6()).start();
+            new ListenerTorrents(username, addr.getIpv4()).start();
         }
 
 
@@ -126,7 +126,6 @@ public class Client {
                         System.out.println("a enviar para " + entry.getKey());
 
                         Socket s = new Socket(entry.getKey(), 5558);
-
                         tw.writeDelimitedTo(s.getOutputStream());
 
                     }
