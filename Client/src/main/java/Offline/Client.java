@@ -64,17 +64,22 @@ public class Client {
 
                 com.turn.ttorrent.tracker.Tracker tck = null;
 
-                String udpAddress;
+                //String announceAddress = "http://" + ownAdrresses.get(0).getIpv4();
+                String trackerAddress = "http://" + ownAdrresses.get(0).getIpv4()  + ":6969";
 
                 try {
 
-                    System.out.println(ownAdrresses.get(0).getIpv4());
+                    //System.out.println(new InetSocketAddress(6963));
+
+                    //System.out.println(ownAdrresses.get(0).getIpv4());
 
 //                    udpAddress = "upd://" +  ownAdrresses.get(0).getIpv4();
 //
 //                    System.out.println(udpAddress);
 
-                    tck = new Tracker(new InetSocketAddress(ownAdrresses.get(0).getIpv4(),6969));
+                    String httpAddress = ownAdrresses.get(0).getIpv4();
+
+                    tck = new Tracker(new InetSocketAddress(InetAddress.getByName(httpAddress), 6969));
 
 
 
@@ -91,7 +96,7 @@ public class Client {
                 String fileStr = sc.nextLine();
 
                 ArrayList<String> trc = new ArrayList<>();
-                trc.add(ownAdrresses.get(0).getIpv4());
+                trc.add(trackerAddress);
                 Torrent t = TorrentUtil.createTorrent(fileStr, username, trc);
 
                 File file = new File(fileStr);
@@ -196,8 +201,11 @@ public class Client {
                         ipv6 = addr.getHostAddress().replaceAll("%.*", ""); // e preciso tirar o %interface
                         System.out.println("local ipv6 address: " + ipv6);
                     }
-                    if(Inet4Address.class == addr.getClass())
+                    if(Inet4Address.class == addr.getClass()){
                         ipv4 = addr.getHostName();
+                        System.out.println("local ipv4 address: " + ipv4);
+                    }
+
                         //System.out.println(addr.getHostAddress());
 
                 }
