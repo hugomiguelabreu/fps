@@ -26,7 +26,7 @@ public class ListenerTorrents extends Thread{
 
                 Socket s = socket.accept();
                 System.out.println("vai receber um torrent");
-                new ListenerTorrentThread(s, ownAddress).start();
+                new TorrentDownloader(s, ownAddress).start();
             }
         } catch (IOException e) {
             e.printStackTrace();

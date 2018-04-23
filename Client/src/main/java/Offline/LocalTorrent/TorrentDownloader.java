@@ -13,12 +13,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Observable;
 import java.util.Observer;
 
-public class ListenerTorrentThread extends Thread{
+public class TorrentDownloader extends Thread{
 
     private Socket socket;
     private String ownAddress;
 
-    public ListenerTorrentThread(Socket socket,String ownaddress ){
+    public TorrentDownloader(Socket socket, String ownaddress ){
 
         this.socket = socket;
         this.ownAddress = ownaddress;
