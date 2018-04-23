@@ -32,7 +32,6 @@ public class MainServer extends Thread{
                     .childHandler(new TorrentServerInitializer(tck));
 
             cf = b.bind(port).sync();
-            System.out.println("Server initiated.");
             //Wait for channel to close
             cf.channel().closeFuture().sync();
             System.out.println("Server shutting down.");
