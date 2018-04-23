@@ -1,4 +1,4 @@
-package Offline.probes;
+package Offline.Utils;
 
 import java.sql.Timestamp;
 

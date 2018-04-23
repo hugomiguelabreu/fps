@@ -7,7 +7,7 @@ import Offline.LocalTorrent.ListenerTorrents;
 import Offline.Utils.LocalAddresses;
 import Offline.probes.Broadcast;
 import Offline.probes.Listener;
-import Offline.probes.Peer;
+import Offline.Utils.Peer;
 import com.google.protobuf.ByteString;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
@@ -21,9 +21,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.*;
 import java.security.NoSuchAlgorithmException;
@@ -52,7 +50,9 @@ public class Client {
 
         for (LocalAddresses addr : ownAdrresses){
 
-            new ListenerTorrents(username, addr.getIpv4()).start();
+
+            // new ListenerTorrents(username, addr.getIpv4()).start();
+            startClient(addr.getIpv4());
         }
 
 
@@ -131,9 +131,6 @@ public class Client {
                 }
 
                 System.out.println("Upload intention initiated");
-
-
-
             }
 
 //            if(input.equals("download")){
@@ -203,9 +200,6 @@ public class Client {
                         ipv4 = addr.getHostName();
                         System.out.println("local ipv4 address: " + ipv4);
                     }
-
-                        //System.out.println(addr.getHostAddress());
-
                 }
 
 //                ArrayList<InterfaceAddress> bcast = new ArrayList<>(iface.getInterfaceAddresses());
@@ -225,6 +219,30 @@ public class Client {
         }
 
         return ret;
+    }
+
+    private static Channel startClient(String address){
+        EventLoopGroup group = new NioEventLoopGroup();
+        Channel ch = null;
+        try {
+            Bootstrap b = new Bootstrap();
+            b.group(group)
+                    .channel(NioSocketChannel.class)
+                    .handler(new TorrentClientInitializer());
+            // Make a new connection.
+            ch = b.connect(address, 5558).sync().channel();
+            // Get the handler instance to initiate the request.
+            //TorrentClientHandler handler = ch.pipeline().get(TorrentClientHandler.class);
+            // Request and get the response.
+            //List<String> response = handler.getLocalTimes(CITIES);
+            // Close the connection.
+            //sch.close();
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return ch;
     }
 
 
