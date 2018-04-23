@@ -1,21 +1,11 @@
-import Handlers.TorrentServerInitializer;
+import Core.MainServer;
 import Util.FileUtils;
-import com.turn.ttorrent.client.SharedTorrent;
-import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class ServerExec {
@@ -23,10 +13,11 @@ public class ServerExec {
     public static void main(String[] args) throws IOException, InterruptedException, NoSuchAlgorithmException {
         //Starts tracker;
         Tracker tck = new Tracker(new InetSocketAddress(6969));
-        System.out.println("Tracker initiated");
         MainServer ms = new MainServer(5000, tck);
         //Starts server;
+        tck.start();
         ms.start();
+        System.out.println("Tracker initiated");
         System.out.println("Server initiated");
 
         if(FileUtils.loadTorrents(tck))

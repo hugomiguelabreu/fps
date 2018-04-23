@@ -1,6 +1,8 @@
 package Handlers;
 
+import Core.ServerClient;
 import Network.TorrentWrapperOuterClass;
+import Util.FileUtils;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.TrackedTorrent;
@@ -36,6 +38,8 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<TorrentWra
         TrackedTorrent tt = new TrackedTorrent(t);
         //No need to check if torrent is already announced
         tck.announce(tt);
+        ServerClient sc = new ServerClient(t);
+        sc.start();
     }
 
     @Override
