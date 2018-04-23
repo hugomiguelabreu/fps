@@ -24,11 +24,11 @@
         <dependency>
             <groupId>com.turn</groupId>
             <artifactId>ttorrent-core</artifactId>
-            <version>1.6-SNAPSHOT</version>
+            <version>1.5</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-nop</artifactId>
+            <artifactId>slf4j-simple</artifactId>
             <version>1.7.25</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
