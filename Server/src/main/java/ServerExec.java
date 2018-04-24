@@ -1,19 +1,23 @@
 import Core.MainServer;
+import Core.ServerClient;
 import Util.FileUtils;
+import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class ServerExec {
 
     public static void main(String[] args) throws IOException, InterruptedException, NoSuchAlgorithmException {
+        HashMap<String, ServerClient> clients = new HashMap<>();
         //Starts tracker;
         Tracker tck = new Tracker(new InetSocketAddress(6969));
-        MainServer ms = new MainServer(5000, tck);
+        MainServer ms = new MainServer(3389, tck, clients);
         //Starts server;
         tck.start();
         ms.start();
