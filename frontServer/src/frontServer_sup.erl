@@ -27,8 +27,17 @@ start_link() ->
 %%====================================================================
 
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
+% init([]) ->
+%     {ok, { {one_for_all, 0, 1}, []} }.
+
 init([]) ->
-    {ok, { {one_for_all, 0, 1}, []} }.
+%~     Server = {char_case_server, {char_case_server, start_link, []},
+%~               permanent, 2000, worker, [char_case_server]},
+    Server = {frontServer_app, {frontServer_app, start},
+              permanent, 2000, worker, [frontServer_app]},
+    Children = [Server],
+    RestartStrategy = {one_for_one, 0, 1},
+    {ok, {RestartStrategy, Children}}.
 
 %%====================================================================
 %% Internal functions
