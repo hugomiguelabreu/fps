@@ -130,7 +130,7 @@ public class Client {
 
                         System.out.println("a enviar para " + entry.getKey());
 
-                        Socket s = new Socket(entry.getValue().getIpv6(), 5558);
+                        Socket s = new Socket(entry.getValue().getIpv4(), 5558);
                         tw.writeDelimitedTo(s.getOutputStream());
 
                     }

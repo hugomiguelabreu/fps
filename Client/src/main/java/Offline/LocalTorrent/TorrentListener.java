@@ -32,7 +32,7 @@ public class TorrentListener extends Thread{
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new TorrentListenerInitializer(ipv4));
-            cf = b.bind(ipv6,port).sync();
+            cf = b.bind(ipv4,port).sync();
             System.out.println("Torrent Listner inited");
             //Wait for channel to close
             cf.channel().closeFuture().sync();
