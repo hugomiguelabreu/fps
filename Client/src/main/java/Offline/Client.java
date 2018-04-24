@@ -56,7 +56,7 @@ public class Client {
 
             // System.out.println(addr.getIpv4());
             // new ListenerTorrents(username, addr.getIpv4()).start();
-            new TorrentListener(addr.getIpv6()).start();
+            new TorrentListener(addr.getIpv6(), addr.getIpv4()).start();
         }
 
 

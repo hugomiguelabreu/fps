@@ -14,13 +14,16 @@ public class TorrentListener extends Thread{
     private ChannelFuture cf;
     private EventLoopGroup workerGroup;
     private EventLoopGroup bossGroup;
-    private String ownaddress;
+    //private String ownaddress;
+    private String ipv6;
+    private String ipv4;
 
-    public TorrentListener(String ownaddress){
+    public TorrentListener(String ipv6, String ipv4){
 
         this.workerGroup = new NioEventLoopGroup();
         this.bossGroup = new NioEventLoopGroup();
-        this.ownaddress = ownaddress;
+        this.ipv6 = ipv6;
+        this.ipv4 = ipv4;
     }
 
     public void run(){
@@ -28,8 +31,8 @@ public class TorrentListener extends Thread{
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new TorrentListenerInitializer());
-            cf = b.bind(ownaddress,port).sync();
+                    .childHandler(new TorrentListenerInitializer(ipv4));
+            cf = b.bind(ipv6,port).sync();
             System.out.println("Torrent Listner inited");
             //Wait for channel to close
             cf.channel().closeFuture().sync();

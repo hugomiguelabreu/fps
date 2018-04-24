@@ -49,8 +49,8 @@ public class Main {
             if(input.equals("upload")){
                 System.out.println("What is the file?");
                 ArrayList<String> trc = new ArrayList<String>();
-                trc.add("http://83.223.249.50:6969/annouce");
-                trc.add("http://localhost:8989/annouce");
+                trc.add("http://192.168.43.243:6969/announce");
+                //trc.add("http://localhost:8989/annouce");
                 t = TorrentUtil.createTorrent(sc.nextLine(), username, trc);
 
                 TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
@@ -143,7 +143,7 @@ public class Main {
                 .channel(NioSocketChannel.class)
                 .handler(new TorrentClientInitializer());
                 // Make a new connection.
-                ch = b.connect("83.223.249.50", 5000).sync().channel();
+                ch = b.connect("192.168.43.243", 5000).sync().channel();
                 // Get the handler instance to initiate the request.
                 //TorrentClientHandler handler = ch.pipeline().get(TorrentClientHandler.class);
                 // Request and get the response.
