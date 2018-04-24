@@ -56,7 +56,7 @@ public class Client {
 
             System.out.println(addr.getIpv4());
             // new ListenerTorrents(username, addr.getIpv4()).start();
-            new TorrentListener(addr.getIpv4()).run();
+            new TorrentListener(addr.getIpv4()).start();
         }
 
 
@@ -65,6 +65,8 @@ public class Client {
         while (!(input = sc.nextLine()).equals("quit")) {
 
             if(input.equals("upload")){ //
+
+                System.out.println("gonna upload");
 
                 com.turn.ttorrent.tracker.Tracker tck = null;
 

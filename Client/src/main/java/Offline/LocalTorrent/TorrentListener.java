@@ -30,7 +30,7 @@ public class TorrentListener extends Thread{
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new TorrentListenerInitializer());
             cf = b.bind(ownaddress,port).sync();
-            System.out.println("Server initiated.");
+            System.out.println("Torrent Listner inited");
             //Wait for channel to close
             cf.channel().closeFuture().sync();
             System.out.println("Server shutting down.");
