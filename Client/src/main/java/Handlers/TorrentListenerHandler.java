@@ -32,6 +32,8 @@ public class TorrentListenerHandler extends SimpleChannelInboundHandler<TorrentW
 
         try {
 
+            System.out.println(torrentWrapper.getSerializedSize());
+
             File dest = new File("/tmp/");
 
             final SharedTorrent st = new SharedTorrent(torrentWrapper.getContent().toByteArray(), dest);
