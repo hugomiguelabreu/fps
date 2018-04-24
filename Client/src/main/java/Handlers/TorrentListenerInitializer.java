@@ -22,7 +22,7 @@ public class TorrentListenerInitializer extends ChannelInitializer<SocketChannel
 
         p.addLast(new ProtobufVarint32LengthFieldPrepender());
         p.addLast(new ProtobufEncoder());
-        p.addLast(new TorrentClientHandler());
+        p.addLast(new TorrentListenerHandler(socketChannel.localAddress().toString()));
 
     }
 }
