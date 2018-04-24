@@ -2,8 +2,7 @@ package Handlers;
 
 import Core.ServerClient;
 import Network.TorrentWrapperOuterClass;
-import Util.FileUtils;
-import com.turn.ttorrent.client.SharedTorrent;
+import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
@@ -11,18 +10,17 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.apache.commons.io.IOUtils;
 
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.util.UUID;
-
+import java.util.Map;
 
 public class TorrentServerHandler extends SimpleChannelInboundHandler<TorrentWrapperOuterClass.TorrentWrapper>{
 
     private Tracker tck;
+    private Map<String, ServerClient> openClients;
 
-    public TorrentServerHandler(Tracker trackedTorrentsParam) {
+    public TorrentServerHandler(Tracker trackedTorrentsParam, Map<String, ServerClient> openClientsParam) {
+        this.openClients = openClientsParam;
         this.tck = trackedTorrentsParam;
     }
 
@@ -36,10 +34,11 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<TorrentWra
         IOUtils.closeQuietly(fos);
 
         TrackedTorrent tt = new TrackedTorrent(t);
+        ServerClient sc = new ServerClient(t);
         //No need to check if torrent is already announced
         tck.announce(tt);
-        ServerClient sc = new ServerClient(t);
         sc.start();
+        openClients.put(tt.getHexInfoHash(), sc);
     }
 
     @Override
