@@ -13,11 +13,9 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 public class TorrentListenerInitializer extends ChannelInitializer<SocketChannel> {
 
     private String ipv4;
-    //private String ipv6;
 
     public TorrentListenerInitializer(String ipv4){
 
-        //this.ipv6 = ipv6;
         this.ipv4 = ipv4;
     }
 
