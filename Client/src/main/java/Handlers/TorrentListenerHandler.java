@@ -28,11 +28,7 @@ public class TorrentListenerHandler extends SimpleChannelInboundHandler<TorrentW
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, TorrentWrapperOuterClass.TorrentWrapper torrentWrapper) throws Exception {
 
-        System.out.println("kappa");
-
         try {
-
-            System.out.println(torrentWrapper.getSerializedSize());
 
             File dest = new File("/tmp/");
 
