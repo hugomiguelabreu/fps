@@ -54,9 +54,9 @@ public class Client {
         for (LocalAddresses addr : ownAdrresses){
 
 
-            System.out.println(addr.getIpv4());
+            // System.out.println(addr.getIpv4());
             // new ListenerTorrents(username, addr.getIpv4()).start();
-            new TorrentListener(addr.getIpv4()).start();
+            new TorrentListener(addr.getIpv6()).start();
         }
 
 
@@ -130,7 +130,7 @@ public class Client {
 
                         System.out.println("a enviar para " + entry.getKey());
 
-                        Socket s = new Socket(entry.getValue().getIpv4(), 5558);
+                        Socket s = new Socket(entry.getValue().getIpv6(), 5558);
                         tw.writeDelimitedTo(s.getOutputStream());
 
                     }
