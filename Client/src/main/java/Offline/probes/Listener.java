@@ -2,6 +2,7 @@ package Offline.probes;
 
 import Network.AddrBroadcastOuterClass;
 import Offline.Utils.LocalAddresses;
+import Offline.Utils.Peer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

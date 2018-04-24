@@ -4,26 +4,27 @@ import Handlers.TorrentClientInitializer;
 import Misc.TorrentUtil;
 import Network.TorrentWrapperOuterClass;
 import Offline.LocalTorrent.ListenerTorrents;
+import Offline.LocalTorrent.TorrentListener;
 import Offline.Utils.LocalAddresses;
 import Offline.probes.Broadcast;
 import Offline.probes.Listener;
-import Offline.probes.Peer;
+import Offline.Utils.Peer;
 import com.google.protobuf.ByteString;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.*;
 import java.security.NoSuchAlgorithmException;
@@ -52,7 +53,10 @@ public class Client {
 
         for (LocalAddresses addr : ownAdrresses){
 
-            new ListenerTorrents(username, addr.getIpv4()).start();
+
+            // System.out.println(addr.getIpv4());
+            // new ListenerTorrents(username, addr.getIpv4()).start();
+            new TorrentListener(addr.getIpv6()).start();
         }
 
 
@@ -61,6 +65,8 @@ public class Client {
         while (!(input = sc.nextLine()).equals("quit")) {
 
             if(input.equals("upload")){ //
+
+                System.out.println("gonna upload");
 
                 com.turn.ttorrent.tracker.Tracker tck = null;
 
@@ -124,16 +130,13 @@ public class Client {
 
                         System.out.println("a enviar para " + entry.getKey());
 
-                        Socket s = new Socket(entry.getValue().getIpv4(), 5558);
+                        Socket s = new Socket(entry.getValue().getIpv6(), 5558);
                         tw.writeDelimitedTo(s.getOutputStream());
 
                     }
                 }
 
                 System.out.println("Upload intention initiated");
-
-
-
             }
 
 //            if(input.equals("download")){
@@ -203,9 +206,6 @@ public class Client {
                         ipv4 = addr.getHostName();
                         System.out.println("local ipv4 address: " + ipv4);
                     }
-
-                        //System.out.println(addr.getHostAddress());
-
                 }
 
 //                ArrayList<InterfaceAddress> bcast = new ArrayList<>(iface.getInterfaceAddresses());
@@ -226,6 +226,32 @@ public class Client {
 
         return ret;
     }
+
+    //The first one, often called 'boss', accepts an incoming connection.
+    // The second one, often called 'worker', handles the traffic of the accepted connection once the boss accepts
+    // the connection and registers the accepted connection to the worker.
+
+//    private static Channel startClient(String address){
+//        EventLoopGroup group = new NioEventLoopGroup();
+//        Channel ch = null;
+//        try {
+//            ServerBootstrap b = new ServerBootstrap();
+//            b.group(bossGroup, workerGroup)
+//                    .channel(NioServerSocketChannel.class)
+//                    .childHandler(new TorrentServerInitializer(tck));
+//
+//            cf = b.bind(port).sync();
+//            System.out.println("Server initiated.");
+//            //Wait for channel to close
+//            cf.channel().closeFuture().sync();
+//            System.out.println("Server shutting down.");
+//
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return ch;
+//    }
 
 
 }

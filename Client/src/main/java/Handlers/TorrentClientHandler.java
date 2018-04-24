@@ -21,6 +21,7 @@ public class TorrentClientHandler extends SimpleChannelInboundHandler<TorrentWra
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) {
+
         channel = ctx.channel();
     }
 

@@ -1,27 +1,26 @@
-import Handlers.TorrentServerInitializer;
-import com.turn.ttorrent.common.Torrent;
-import com.turn.ttorrent.tracker.Tracker;
+package Offline.LocalTorrent;
+
+import Handlers.TorrentClientHandler;
+import Handlers.TorrentListenerInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import java.util.List;
 
-public class MainServer extends Thread{
-    private int port;
+public class TorrentListener extends Thread{
+
+    private final int port = 5558;
     private ChannelFuture cf;
     private EventLoopGroup workerGroup;
     private EventLoopGroup bossGroup;
-    private Tracker tck;
+    private String ownaddress;
 
-    public MainServer(int portParam, Tracker tckParam){
-        this.port = portParam;
-        this.tck = tckParam;
-        //Acceptor
-        this.bossGroup = new NioEventLoopGroup(1);
-        //Workers
+    public TorrentListener(String ownaddress){
+
         this.workerGroup = new NioEventLoopGroup();
+        this.bossGroup = new NioEventLoopGroup();
+        this.ownaddress = ownaddress;
     }
 
     public void run(){
@@ -29,9 +28,9 @@ public class MainServer extends Thread{
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new TorrentServerInitializer(tck));
-
-            cf = b.bind(port).sync();
+                    .childHandler(new TorrentListenerInitializer());
+            cf = b.bind(ownaddress,port).sync();
+            System.out.println("Torrent Listner inited");
             //Wait for channel to close
             cf.channel().closeFuture().sync();
             System.out.println("Server shutting down.");
@@ -44,8 +43,4 @@ public class MainServer extends Thread{
         }
     }
 
-    public void shutdown(){
-        //Close server channel;
-        cf.channel().close();
-    }
 }
