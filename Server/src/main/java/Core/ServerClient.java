@@ -53,9 +53,7 @@ public class ServerClient extends Thread{
 
         try {
             st = new SharedTorrent(t, dest);
-
-        c = new Client(Inet4Address.getByName("0.0.0.0"), st);
-
+            c = new Client(Inet4Address.getByName("0.0.0.0"), st);
         } catch (IOException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
