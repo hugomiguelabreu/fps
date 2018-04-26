@@ -1,5 +1,5 @@
 -module(zk).
--export([init/2,register/3, login/2]).
+-export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/1, setOffline/1, getGroupUsers/1]).
 
 
 init(Host, Port) ->
@@ -17,6 +17,26 @@ loop(Pid) ->
     		loop(Pid);
     	{{login, U, P}, From} ->
 			V = login(Pid, U, P),
+			From ! {?MODULE, V},
+    		loop(Pid);
+    	{{create_group, N, U}, From} ->
+			V = createGroup(Pid, N, U),
+			From ! {?MODULE, V},
+    		loop(Pid);
+		{{join_group, N, U}, From} ->
+			V = joinGroup(N, U, Pid),
+			From ! {?MODULE, V},
+    		loop(Pid);
+		{{set_online, U}, From} ->
+			V = setOnline(U, Pid),
+			From ! {?MODULE, V},
+    		loop(Pid);
+    	{{set_offline, U}, From} ->
+			V = setOffline(U, Pid),
+			From ! {?MODULE, V},
+    		loop(Pid);
+    	{{group_users, N}, From} ->
+			V = getGroupUsers(N, Pid),
 			From ! {?MODULE, V},
     		loop(Pid)
 	end.
@@ -41,7 +61,7 @@ register(Pid, Username, Password, Name) ->
 			ok
 	end.
 
-login(U,P) -> rpc({register,U,P}).
+login(U,P) -> rpc({login,U,P}).
 login(PID,Username,Password) ->
 	UserPath = "/users/" ++ Username,
 	case erlzk:exists(PID,UserPath) of
@@ -56,6 +76,68 @@ login(PID,Username,Password) ->
 				 {ok,{RP,_}} ->
 				 	string:equal(RP,Password)
 			end
+	end.
+
+createGroup(N,U) -> rpc({create_group,N,U}).
+createGroup(PID,Name,User) -> 
+	GroupPath = "/groups/" ++ Name,
+	case erlzk:exists(PID,GroupPath) of
+		{error, no_node} ->
+			erlzk:create(PID,GroupPath, list_to_binary("")),
+			erlzk:create(PID,GroupPath ++ "/log", list_to_binary("")),
+			erlzk:create(PID,GroupPath ++ "/meta", list_to_binary("")),
+			erlzk:create(PID,GroupPath ++ "/users", list_to_binary("")),
+			erlzk:create(PID,GroupPath ++ "/users/" ++ User, list_to_binary("admin")),
+			ok;
+		{ok, _} ->
+			group_exists;
+		_ ->
+			error
+	end.
+
+joinGroup(N,U) -> rpc({join_group,N,U}).
+joinGroup(Name, Username, PID) ->
+	GroupPath = "/groups/" ++ Name,
+	case erlzk:exists(PID,GroupPath) of
+		{error, no_node} ->
+			no_group;
+		{ok, _} ->
+			erlzk:create(PID,GroupPath ++ "/users/" ++ Username, list_to_binary("user")),
+			ok;
+		_ ->
+			error
+	end.
+
+setOnline(U) -> rpc({set_online, U}).
+setOnline(Username,PID) ->
+	UserPath = "/users/" ++ Username ++ "/online",
+	case erlzk:set_data(PID,UserPath,list_to_binary("true")) of
+		{error, _} ->
+			error;
+		_ ->
+			ok
+	end.
+
+setOffline(U) -> rpc({set_offline, U}).
+setOffline(Username,PID) ->
+	UserPath = "/users/" ++ Username ++ "/online",
+	case erlzk:set_data(PID,UserPath,list_to_binary("false")) of
+		{error, _} ->
+			error;
+		_ ->
+			ok
+	end.
+
+getGroupUsers(N)-> rpc({group_users, N}).
+getGroupUsers(Name, PID) ->
+	GroupPath = "/groups/" ++ Name ++ "/users",
+	case erlzk:get_children(PID,GroupPath) of
+		{error, no_node} ->
+			no_group;
+		{ok, L} ->
+			L;
+		_ ->
+			error
 	end.
 
 
