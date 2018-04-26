@@ -17,18 +17,16 @@ import java.util.Observer;
 
 public class TorrentListenerHandler extends SimpleChannelInboundHandler<TorrentWrapperOuterClass.TorrentWrapper> {
 
-    private String ownAddress;
+    private String ipv4;
 
-    public TorrentListenerHandler(String ownAddress) {
+    public TorrentListenerHandler(String ipv4) {
 
         super(false);
-        this.ownAddress = ownAddress;
+        this.ipv4 = ipv4;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, TorrentWrapperOuterClass.TorrentWrapper torrentWrapper) throws Exception {
-
-        System.out.println("kappa");
 
         try {
 
@@ -37,7 +35,7 @@ public class TorrentListenerHandler extends SimpleChannelInboundHandler<TorrentW
             final SharedTorrent st = new SharedTorrent(torrentWrapper.getContent().toByteArray(), dest);
 
             com.turn.ttorrent.client.Client c = new com.turn.ttorrent.client.Client(
-                    InetAddress.getByName(ownAddress),
+                    InetAddress.getByName(ipv4),
                     st);
 
             c.setMaxDownloadRate(0.0);

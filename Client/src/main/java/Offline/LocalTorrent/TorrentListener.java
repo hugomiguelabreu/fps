@@ -10,17 +10,27 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class TorrentListener extends Thread{
 
-    private final int port = 5558;
+    private int port;
     private ChannelFuture cf;
     private EventLoopGroup workerGroup;
     private EventLoopGroup bossGroup;
-    private String ownaddress;
+    //private String ownaddress;
+    private String ipv4;
 
-    public TorrentListener(String ownaddress){
+    public TorrentListener(String ipv4){
 
         this.workerGroup = new NioEventLoopGroup();
         this.bossGroup = new NioEventLoopGroup();
-        this.ownaddress = ownaddress;
+        this.ipv4 = ipv4;
+        this.port = 0;
+    }
+
+    public TorrentListener(String ipv4, int port){
+
+        this.workerGroup = new NioEventLoopGroup();
+        this.bossGroup = new NioEventLoopGroup();
+        this.ipv4 = ipv4;
+        this.port = port;
     }
 
     public void run(){
@@ -28,8 +38,8 @@ public class TorrentListener extends Thread{
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new TorrentListenerInitializer());
-            cf = b.bind(ownaddress,port).sync();
+                    .childHandler(new TorrentListenerInitializer(ipv4));
+            cf = b.bind(ipv4,port).sync();
             System.out.println("Torrent Listner inited");
             //Wait for channel to close
             cf.channel().closeFuture().sync();
