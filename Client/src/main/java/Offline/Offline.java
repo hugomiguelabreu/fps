@@ -5,8 +5,8 @@ import Network.TorrentWrapperOuterClass;
 import Offline.LocalTorrent.TorrentListener;
 import Offline.Utils.LocalAddresses;
 import Offline.Utils.Peer;
-import Offline.probes.Broadcast;
-import Offline.probes.Listener;
+import Offline.Probes.Broadcast;
+import Offline.Probes.Listener;
 import com.google.protobuf.ByteString;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
@@ -34,7 +34,7 @@ public class Offline {
 
 
     /**
-     * inicia os probes e o Torrentlistner
+     * inicia os Probes e o Torrentlistner
      * @param username nome do dude loged
      */
 
@@ -43,7 +43,7 @@ public class Offline {
         Scanner sc = new Scanner(System.in);
         this.username = username;
 
-        // start probes
+        // start Probes
 
         ownAdrresses =  findLocalAddresses();
 

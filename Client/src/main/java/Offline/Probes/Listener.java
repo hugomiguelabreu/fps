@@ -1,4 +1,4 @@
-package Offline.probes;
+package Offline.Probes;
 
 import Network.AddrBroadcastOuterClass;
 import Offline.Utils.LocalAddresses;
