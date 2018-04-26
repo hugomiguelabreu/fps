@@ -15,7 +15,6 @@ public class TorrentListenerInitializer extends ChannelInitializer<SocketChannel
     private String ipv4;
 
     public TorrentListenerInitializer(String ipv4){
-
         this.ipv4 = ipv4;
     }
 

@@ -1,6 +1,5 @@
 package Offline.LocalTorrent;
 
-import Handlers.TorrentClientHandler;
 import Handlers.TorrentListenerInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;

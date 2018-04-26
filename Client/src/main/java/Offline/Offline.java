@@ -34,7 +34,7 @@ public class Offline {
 
 
     /**
-     * inicia os Probes e o Torrentlistner
+     * Inicia os Probes e o Torrentlistner
      * @param username nome do dude loged
      */
 
