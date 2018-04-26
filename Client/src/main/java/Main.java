@@ -1,14 +1,11 @@
-import Handlers.TorrentClientHandler;
-import Handlers.TorrentClientInitializer;
+import Handlers.TorrentListenerHandler;
+import Handlers.TorrentListenerInitializer;
 import Misc.TorrentUtil;
 import Network.TorrentWrapperOuterClass;
+import Offline.Offline;
 import com.google.protobuf.ByteString;
-import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.client.SharedTorrent;
-import com.turn.ttorrent.client.peer.SharingPeer;
 import com.turn.ttorrent.common.Torrent;
-import com.turn.ttorrent.tracker.TrackedTorrent;
-import com.turn.ttorrent.tracker.Tracker;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -16,17 +13,15 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
-
+import java.awt.*;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.net.*;
 import java.nio.channels.UnsupportedAddressTypeException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.concurrent.TimeoutException;
 
 public class Main {
 
@@ -38,110 +33,86 @@ public class Main {
         String input;
         String username = "default";
         Torrent t = null;
+        ArrayList<Torrent> available = new ArrayList<>();
+        Channel ch = null;
 
-        Channel ch = startClient();
         System.out.println("Started client");
+        System.out.println("Tell me your username: ");
+        username = sc.nextLine();
+        System.out.println("Online or Offline?");
+        String type = sc.nextLine();
 
-        while (!(input = sc.nextLine()).equals("quit")){
-            if(input.equals("login")){
-                username = sc.nextLine();
-            }
-            if(input.equals("upload")){
-                System.out.println("What is the file?");
-                ArrayList<String> trc = new ArrayList<String>();
-                trc.add("http://192.168.43.243:6969/announce");
-                //trc.add("http://localhost:8989/annouce");
-                t = TorrentUtil.createTorrent(sc.nextLine(), username, trc);
-
-                TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
-                try {
-                    //Escreve e espera pela escrita no socket
-                    ch.writeAndFlush(tw).sync();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                System.out.println("Upload intention initiated");
-            }
-
-            if(input.equals("download")){
-                System.out.println("What is the file?");
-                String file = sc.nextLine();
-                try {
-                    final SharedTorrent st = SharedTorrent.fromFile(
-                            new File(file),
-                            new File("/tmp/" + sc.nextLine()));
-
-                    Client c = new Client(
-                            getIPv4Address(null),
-                            st);
-
-                    c.setMaxDownloadRate(0.0);
-                    c.setMaxUploadRate(0.0);
-
-                    //Download and seed
-                    c.addObserver(new Observer() {
-                        @Override
-                        public void update(Observable o, Object arg) {
-                            System.out.println(st.getCompletion());
-                            System.out.println(arg);
-                        }
-                    });
-                    c.share(-1);
-
-                    if (Client.ClientState.ERROR.equals(c.getState())) {
-                        System.exit(1);
-                    }
-                } catch (Exception e) {
-                    logger.error("Fatal error: {}", e.getMessage(), e);
-                    System.exit(2);
-                }
-            }
-
-            if(input.equals("track")) {
-                FilenameFilter filter = new FilenameFilter() {
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        return name.endsWith(".torrent");
-                    }
-                };
-
-                try {
-                    Tracker tck = new Tracker(new InetSocketAddress(6969));
-
-                    File parent = new File("./");
-                    for (File f : parent.listFiles(filter)) {
-                        logger.info("Loading torrent from " + f.getName());
-                        tck.announce(TrackedTorrent.load(f));
-                    }
-
-                    logger.info("Starting tracker with {} announced torrents...",
-                            tck.getTrackedTorrents().size());
-                    tck.start();
-                    System.out.println(tck.getTrackedTorrents());
-                } catch (Exception e) {
-                    logger.error("{}", e.getMessage(), e);
-                    System.exit(2);
-                }
-            }
-
-            if(input.equals("info")){
-                System.out.println(t.getName());
-                System.out.println(t.getSize());
-                System.out.println(t.getAnnounceList());
-                System.out.println(t.getCreatedBy());
+        if(type.equals("Offline")) {
+            Offline.startProbes(username, available);
+        }else {
+            ch = startClient(available);
+            if (ch == null) {
+                System.out.println("\u001B[31mError opening socket\u001B[0m");
+                System.exit(2);
             }
         }
 
+        while (!(input = sc.nextLine()).equals("quit")) {
+            if (type.equals("Online")) {
+                System.out.println("Working online");
+                if (input.equals("upload")) {
+                    System.out.println("What is the file?");
+                    ArrayList<String> trc = new ArrayList<String>();
+                    //TODO: This IP must be dynamic
+                    trc.add("http://192.168.43.243:6969/announce");
+                    t = TorrentUtil.createTorrent(sc.nextLine(), username, trc);
+
+                    TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
+                    try {
+                        //Escreve e espera pela escrita no socket
+                        ch.writeAndFlush(tw).sync();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("Upload intention initiated");
+                }
+            } else {
+                System.out.println("Working offline");
+                if (input.equals("upload")) {
+                    System.out.println("What is the file?");
+                    String path = sc.nextLine();
+                    ArrayList<String> trc = new ArrayList<String>();
+                    trc.add("http://" + Offline.findLocalAddresses().get(0).getIpv4()  + ":6969/announce");
+                    t = TorrentUtil.createTorrent(path, username, trc);
+                    TorrentUtil.upload(t, path);
+                    //TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
+                    System.out.println("Upload intention initiated");
+                }
+            }
+
+            if (input.equals("download")) {
+                File dest = new File("/tmp/");
+                SharedTorrent st = new SharedTorrent(available.get(0), dest);
+                //TODO: Keep track of shared torrent to know when they end;
+                TorrentUtil.download(getIPv4Address(null).getHostAddress(), st);
+            }
+
+            if (input.equals("info")) {
+                for(Torrent tA : available) {
+                    System.out.println("Torrent info:");
+                    System.out.println(tA.getName());
+                    System.out.println(tA.getSize());
+                    System.out.println(tA.getAnnounceList());
+                    System.out.println(tA.getCreatedBy());
+                    System.out.println("-----------------------------------");
+                }
+            }
+        }
     }
 
-    private static Channel startClient(){
+    private static Channel startClient(ArrayList<Torrent> available) throws SocketException, UnknownHostException {
         EventLoopGroup group = new NioEventLoopGroup();
         Channel ch = null;
         try {
             Bootstrap b = new Bootstrap();
             b.group(group)
                 .channel(NioSocketChannel.class)
-                .handler(new TorrentClientInitializer());
+                .handler(new TorrentListenerInitializer(available));
                 // Make a new connection.
                 ch = b.connect("192.168.43.243", 5000).sync().channel();
                 // Get the handler instance to initiate the request.
@@ -150,13 +121,12 @@ public class Main {
                 //List<String> response = handler.getLocalTimes(CITIES);
                 // Close the connection.
                 //sch.close();
-
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            return ch;
         } finally {
-                //group.shutdownGracefully();
+            group.shutdownGracefully();
         }
-
         return ch;
     }
 

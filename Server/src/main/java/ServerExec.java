@@ -17,14 +17,14 @@ public class ServerExec {
         HashMap<String, ServerClient> clients = new HashMap<>();
         //Starts tracker;
         Tracker tck = new Tracker(new InetSocketAddress(6969));
-        MainServer ms = new MainServer(3389, tck, clients);
+        MainServer ms = new MainServer(5000, tck, clients);
         //Starts server;
         tck.start();
         ms.start();
         System.out.println("Tracker initiated");
         System.out.println("Server initiated");
 
-        if(FileUtils.loadTorrents(tck))
+        if(FileUtils.loadTorrents(tck, clients))
             System.out.println("Could not load torrents persisted / No files");
 
         Scanner reader = new Scanner(System.in);
