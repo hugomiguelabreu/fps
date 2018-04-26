@@ -1,6 +1,7 @@
 package Handlers;
 
 import Network.TorrentWrapperOuterClass;
+import com.turn.ttorrent.common.Torrent;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -9,13 +10,15 @@ import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 
+import java.util.ArrayList;
+
 
 public class TorrentListenerInitializer extends ChannelInitializer<SocketChannel> {
 
-    private String ipv4;
+    private ArrayList<Torrent> available;
 
-    public TorrentListenerInitializer(String ipv4){
-        this.ipv4 = ipv4;
+    public TorrentListenerInitializer(ArrayList<Torrent> availableParam){
+        this.available = availableParam;
     }
 
 
@@ -28,7 +31,7 @@ public class TorrentListenerInitializer extends ChannelInitializer<SocketChannel
 
         p.addLast(new ProtobufVarint32LengthFieldPrepender());
         p.addLast(new ProtobufEncoder());
-        p.addLast(new TorrentListenerHandler(ipv4));
+        p.addLast(new TorrentListenerHandler(this.available));
 
     }
 }
