@@ -10,7 +10,7 @@
 -ifndef('RESPONSE_PB_H').
 -define('RESPONSE_PB_H', true).
 -record('Response',
-        {rep                    :: boolean() | 0 | 1 % = 1
+        {rep = false            :: boolean() | 0 | 1 | undefined % = 1
         }).
 -endif.
 

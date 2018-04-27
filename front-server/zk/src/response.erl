@@ -56,9 +56,14 @@ e_msg_Response(Msg, TrUserData) ->
 
 e_msg_Response(#'Response'{rep = F1}, Bin,
 	       TrUserData) ->
-    begin
-      TrF1 = id(F1, TrUserData),
-      e_type_bool(TrF1, <<Bin/binary, 8>>)
+    if F1 == undefined -> Bin;
+       true ->
+	   begin
+	     TrF1 = id(F1, TrUserData),
+	     if TrF1 =:= false -> Bin;
+		true -> e_type_bool(TrF1, <<Bin/binary, 8>>)
+	     end
+	   end
     end.
 
 e_type_bool(true, Bin) -> <<Bin/binary, 1>>;
@@ -87,7 +92,7 @@ decode_msg(Bin, MsgName, Opts) when is_binary(Bin) ->
 
 d_msg_Response(Bin, TrUserData) ->
     dfp_read_field_def_Response(Bin, 0, 0,
-				id(undefined, TrUserData), TrUserData).
+				id(false, TrUserData), TrUserData).
 
 dfp_read_field_def_Response(<<8, Rest/binary>>, Z1, Z2,
 			    F@_1, TrUserData) ->
@@ -241,9 +246,12 @@ merge_msgs(Prev, New, Opts)
 	  merge_msg_Response(Prev, New, TrUserData)
     end.
 
-merge_msg_Response(#'Response'{},
+merge_msg_Response(#'Response'{rep = PFrep},
 		   #'Response'{rep = NFrep}, _) ->
-    #'Response'{rep = NFrep}.
+    #'Response'{rep =
+		    if NFrep =:= undefined -> PFrep;
+		       true -> NFrep
+		    end}.
 
 
 verify_msg(Msg) -> verify_msg(Msg, []).
@@ -259,7 +267,10 @@ verify_msg(Msg, Opts) ->
 
 -dialyzer({nowarn_function,v_msg_Response/3}).
 v_msg_Response(#'Response'{rep = F1}, Path, _) ->
-    v_type_bool(F1, [rep | Path]), ok.
+    if F1 == undefined -> ok;
+       true -> v_type_bool(F1, [rep | Path])
+    end,
+    ok.
 
 -dialyzer({nowarn_function,v_type_bool/2}).
 v_type_bool(false, _Path) -> ok;
@@ -290,7 +301,7 @@ id(X, _TrUserData) -> X.
 get_msg_defs() ->
     [{{msg, 'Response'},
       [#field{name = rep, fnum = 1, rnum = 2, type = bool,
-	      occurrence = required, opts = []}]}].
+	      occurrence = optional, opts = []}]}].
 
 
 get_msg_names() -> ['Response'].
@@ -319,7 +330,7 @@ fetch_enum_def(EnumName) ->
 
 find_msg_def('Response') ->
     [#field{name = rep, fnum = 1, rnum = 2, type = bool,
-	    occurrence = required, opts = []}];
+	    occurrence = optional, opts = []}];
 find_msg_def(_) -> error.
 
 
@@ -355,7 +366,7 @@ fetch_rpc_def(ServiceName, RpcName) ->
     erlang:error({no_such_rpc, ServiceName, RpcName}).
 
 
-get_package_name() -> response.
+get_package_name() -> network.
 
 
 

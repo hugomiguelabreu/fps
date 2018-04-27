@@ -135,7 +135,7 @@ getGroupUsers(Name, PID) ->
 		{error, no_node} ->
 			no_group;
 		{ok, L} ->
-			L;
+			{ok,L};
 		_ ->
 			error
 	end.

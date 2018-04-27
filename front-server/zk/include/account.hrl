@@ -10,10 +10,10 @@
 -ifndef('ACCOUNT_PB_H').
 -define('ACCOUNT_PB_H', true).
 -record('Account',
-        {type                   :: boolean() | 0 | 1, % = 1
-         username               :: iodata(),        % = 2
-         password               :: iodata(),        % = 3
-         name                   :: iodata()         % = 3
+        {type = false           :: boolean() | 0 | 1 | undefined, % = 1
+         username = <<>>        :: iodata() | undefined, % = 2
+         password = <<>>        :: iodata() | undefined, % = 3
+         name = <<>>            :: iodata() | undefined % = 4
         }).
 -endif.
 

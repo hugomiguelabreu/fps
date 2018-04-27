@@ -1,9 +1,6 @@
-syntax = "proto2";
-
-package response;
-
-option java_package = "protobuff.response";
+syntax = "proto3";
+package network;
 
 message Response {
-  required bool rep = 1;
+  bool rep = 1;
 }

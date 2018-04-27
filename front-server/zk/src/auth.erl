@@ -3,6 +3,7 @@
 
 -include("account.hrl").
 -include("response.hrl").
+-include("torrentWrapper.hrl").
 
 -export([init/0]).
 
@@ -33,25 +34,23 @@ acceptor(LSock) ->
 	auth(Socket).
 
 auth(Socket) ->
-	io:format("recebi merdas"),
-	case gen_tcp:recv(Socket, 0) of
-		{ok, Data} ->
-			io:format("oix"),
+	receive 
+		{tcp, Socket, Data} ->
 			ProtAcc =  account:decode_msg(Data, 'Account'),
-			Username = ProtAcc#'Account'.username,
-			Password = ProtAcc#'Account'.password,
+			Username = binary_to_list(ProtAcc#'Account'.username),
+			Password = binary_to_list(ProtAcc#'Account'.password),
 			Type = ProtAcc#'Account'.type,
 
 			case Type of 
 				true ->
-					Name = ProtAcc#'Account'.name,
+					Name = binary_to_list(ProtAcc#'Account'.name),
 					register(Username, Password, Name, Socket);
 				false -> 
 					login(Username, Password, Socket)
 			end;
 
-		%{tcp_closed, _} ->
-		%	io:format("closed\n");
+		{tcp_closed, _} ->
+			io:format("closed\n");
 		_ ->
 		 	io:format("error\n")
 
@@ -78,22 +77,54 @@ login(Username, Password, Socket) ->
 			gen_tcp:send(Socket, Msg);
 		error ->
 			login(Username,Password,Socket);
-		ok ->
+		true ->
 			Msg = response:encode_msg(#'Response'{rep=true}),
 			zk:setOnline(Username),
 			gen_tcp:send(Socket, Msg),
-			spawn(fun() -> loggedLoop(Socket, Username) end)
+			io:format("> Client " ++ Username ++ " logged in.\n"),
+			loggedLoop(Socket, Username);
+		false ->
+			Msg = response:encode_msg(#'Response'{rep=false}),
+			gen_tcp:send(Socket, Msg)
 	end.
 
 loggedLoop(Socket, Username) ->
 	receive
 		{tcp, Socket, Data} ->
-			io:format(Data),
+			ProtoTorrent =  torrentWrapper:decode_msg(Data,'TorrentWrapper'),
+			redirect(ProtoTorrent),
 			loggedLoop(Socket, Username);
-		_ ->
-		 zk:setOffline(Username),
-		 exit("client " ++ Username ++ " timed out.")
+		
+		{tcp_closed, Socket} ->
+		 	zk:setOffline(Username),
+		 	io:format("> client " ++ Username ++ " closed connection\n");
+
+		{tcp_error, Socket, Reason} ->
+		 	zk:setOffline(Username),
+		 	io:format("> client " ++ Username ++ " timed out: " ++ Reason ++ "\n");
+
+		{Username, torrent, Data} ->
+			io:format("received and redirected\n"),
+			torrentWrapper:encode_msg(Data),
+			gen_tcp:send(Socket,Data) 
 	end.
+
+redirect(ProtoTorrent) ->
+	io:format("> starting to redirect to group " ++ binary_to_list(ProtoTorrent#'TorrentWrapper'.group) ++ "\n"),
+	case zk:getGroupUsers(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
+		{ok, L} ->
+			lists:foreach(fun(USR) ->
+							?MODULE ! {USR, torrent, ProtoTorrent}
+						 end, L);
+		no_group ->
+			io:format("error: group doesn't exist\n");
+
+		_ ->
+			io:format("error NA LISTA\n")
+	end.
+
+
+
 
 
 

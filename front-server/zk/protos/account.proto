@@ -1,12 +1,9 @@
-syntax = "proto2";
-
-package account;
-
-option java_package = "protobuff.account";
+syntax = "proto3";
+package network;
 
 message Account {
-  required bool type = 1;
-  required string username = 2;
-  required string password = 3;
-  required string name = 3;
+  bool type = 1;
+  string username = 2;
+  string password = 3;
+  string name = 4;
 }

@@ -57,21 +57,44 @@ e_msg_Account(Msg, TrUserData) ->
 e_msg_Account(#'Account'{type = F1, username = F2,
 			 password = F3, name = F4},
 	      Bin, TrUserData) ->
-    B1 = begin
-	   TrF1 = id(F1, TrUserData),
-	   e_type_bool(TrF1, <<Bin/binary, 8>>)
+    B1 = if F1 == undefined -> Bin;
+	    true ->
+		begin
+		  TrF1 = id(F1, TrUserData),
+		  if TrF1 =:= false -> Bin;
+		     true -> e_type_bool(TrF1, <<Bin/binary, 8>>)
+		  end
+		end
 	 end,
-    B2 = begin
-	   TrF2 = id(F2, TrUserData),
-	   e_type_string(TrF2, <<B1/binary, 18>>)
+    B2 = if F2 == undefined -> B1;
+	    true ->
+		begin
+		  TrF2 = id(F2, TrUserData),
+		  case is_empty_string(TrF2) of
+		    true -> B1;
+		    false -> e_type_string(TrF2, <<B1/binary, 18>>)
+		  end
+		end
 	 end,
-    B3 = begin
-	   TrF3 = id(F3, TrUserData),
-	   e_type_string(TrF3, <<B2/binary, 26>>)
+    B3 = if F3 == undefined -> B2;
+	    true ->
+		begin
+		  TrF3 = id(F3, TrUserData),
+		  case is_empty_string(TrF3) of
+		    true -> B2;
+		    false -> e_type_string(TrF3, <<B2/binary, 26>>)
+		  end
+		end
 	 end,
-    begin
-      TrF4 = id(F4, TrUserData),
-      e_type_string(TrF4, <<B3/binary, 26>>)
+    if F4 == undefined -> B3;
+       true ->
+	   begin
+	     TrF4 = id(F4, TrUserData),
+	     case is_empty_string(TrF4) of
+	       true -> B3;
+	       false -> e_type_string(TrF4, <<B3/binary, 34>>)
+	     end
+	   end
     end.
 
 e_type_bool(true, Bin) -> <<Bin/binary, 1>>;
@@ -88,6 +111,25 @@ e_varint(N, Bin) when N =< 127 -> <<Bin/binary, N>>;
 e_varint(N, Bin) ->
     Bin2 = <<Bin/binary, (N band 127 bor 128)>>,
     e_varint(N bsr 7, Bin2).
+
+is_empty_string("") -> true;
+is_empty_string(<<>>) -> true;
+is_empty_string(L) when is_list(L) ->
+    not string_has_chars(L);
+is_empty_string(B) when is_binary(B) -> false.
+
+string_has_chars([C | _]) when is_integer(C) -> true;
+string_has_chars([H | T]) ->
+    case string_has_chars(H) of
+      true -> true;
+      false -> string_has_chars(T)
+    end;
+string_has_chars(B)
+    when is_binary(B), byte_size(B) =/= 0 ->
+    true;
+string_has_chars(C) when is_integer(C) -> true;
+string_has_chars(<<>>) -> false;
+string_has_chars([]) -> false.
 
 
 decode_msg(Bin, MsgName) when is_binary(Bin) ->
@@ -110,10 +152,9 @@ decode_msg(Bin, MsgName, Opts) when is_binary(Bin) ->
 
 d_msg_Account(Bin, TrUserData) ->
     dfp_read_field_def_Account(Bin, 0, 0,
-			       id(undefined, TrUserData),
-			       id(undefined, TrUserData),
-			       id(undefined, TrUserData),
-			       id(undefined, TrUserData), TrUserData).
+			       id(false, TrUserData), id(<<>>, TrUserData),
+			       id(<<>>, TrUserData), id(<<>>, TrUserData),
+			       TrUserData).
 
 dfp_read_field_def_Account(<<8, Rest/binary>>, Z1, Z2,
 			   F@_1, F@_2, F@_3, F@_4, TrUserData) ->
@@ -127,7 +168,7 @@ dfp_read_field_def_Account(<<26, Rest/binary>>, Z1, Z2,
 			   F@_1, F@_2, F@_3, F@_4, TrUserData) ->
     d_field_Account_password(Rest, Z1, Z2, F@_1, F@_2, F@_3,
 			     F@_4, TrUserData);
-dfp_read_field_def_Account(<<26, Rest/binary>>, Z1, Z2,
+dfp_read_field_def_Account(<<34, Rest/binary>>, Z1, Z2,
 			   F@_1, F@_2, F@_3, F@_4, TrUserData) ->
     d_field_Account_name(Rest, Z1, Z2, F@_1, F@_2, F@_3,
 			 F@_4, TrUserData);
@@ -158,7 +199,7 @@ dg_read_field_def_Account(<<0:1, X:7, Rest/binary>>, N,
       26 ->
 	  d_field_Account_password(Rest, 0, 0, F@_1, F@_2, F@_3,
 				   F@_4, TrUserData);
-      26 ->
+      34 ->
 	  d_field_Account_name(Rest, 0, 0, F@_1, F@_2, F@_3, F@_4,
 			       TrUserData);
       _ ->
@@ -346,12 +387,28 @@ merge_msgs(Prev, New, Opts)
       #'Account'{} -> merge_msg_Account(Prev, New, TrUserData)
     end.
 
-merge_msg_Account(#'Account'{},
+merge_msg_Account(#'Account'{type = PFtype,
+			     username = PFusername, password = PFpassword,
+			     name = PFname},
 		  #'Account'{type = NFtype, username = NFusername,
 			     password = NFpassword, name = NFname},
 		  _) ->
-    #'Account'{type = NFtype, username = NFusername,
-	       password = NFpassword, name = NFname}.
+    #'Account'{type =
+		   if NFtype =:= undefined -> PFtype;
+		      true -> NFtype
+		   end,
+	       username =
+		   if NFusername =:= undefined -> PFusername;
+		      true -> NFusername
+		   end,
+	       password =
+		   if NFpassword =:= undefined -> PFpassword;
+		      true -> NFpassword
+		   end,
+	       name =
+		   if NFname =:= undefined -> PFname;
+		      true -> NFname
+		   end}.
 
 
 verify_msg(Msg) -> verify_msg(Msg, []).
@@ -369,10 +426,18 @@ verify_msg(Msg, Opts) ->
 v_msg_Account(#'Account'{type = F1, username = F2,
 			 password = F3, name = F4},
 	      Path, _) ->
-    v_type_bool(F1, [type | Path]),
-    v_type_string(F2, [username | Path]),
-    v_type_string(F3, [password | Path]),
-    v_type_string(F4, [name | Path]),
+    if F1 == undefined -> ok;
+       true -> v_type_bool(F1, [type | Path])
+    end,
+    if F2 == undefined -> ok;
+       true -> v_type_string(F2, [username | Path])
+    end,
+    if F3 == undefined -> ok;
+       true -> v_type_string(F3, [password | Path])
+    end,
+    if F4 == undefined -> ok;
+       true -> v_type_string(F4, [name | Path])
+    end,
     ok.
 
 -dialyzer({nowarn_function,v_type_bool/2}).
@@ -417,13 +482,13 @@ id(X, _TrUserData) -> X.
 get_msg_defs() ->
     [{{msg, 'Account'},
       [#field{name = type, fnum = 1, rnum = 2, type = bool,
-	      occurrence = required, opts = []},
+	      occurrence = optional, opts = []},
        #field{name = username, fnum = 2, rnum = 3,
-	      type = string, occurrence = required, opts = []},
+	      type = string, occurrence = optional, opts = []},
        #field{name = password, fnum = 3, rnum = 4,
-	      type = string, occurrence = required, opts = []},
-       #field{name = name, fnum = 3, rnum = 5, type = string,
-	      occurrence = required, opts = []}]}].
+	      type = string, occurrence = optional, opts = []},
+       #field{name = name, fnum = 4, rnum = 5, type = string,
+	      occurrence = optional, opts = []}]}].
 
 
 get_msg_names() -> ['Account'].
@@ -452,13 +517,13 @@ fetch_enum_def(EnumName) ->
 
 find_msg_def('Account') ->
     [#field{name = type, fnum = 1, rnum = 2, type = bool,
-	    occurrence = required, opts = []},
+	    occurrence = optional, opts = []},
      #field{name = username, fnum = 2, rnum = 3,
-	    type = string, occurrence = required, opts = []},
+	    type = string, occurrence = optional, opts = []},
      #field{name = password, fnum = 3, rnum = 4,
-	    type = string, occurrence = required, opts = []},
-     #field{name = name, fnum = 3, rnum = 5, type = string,
-	    occurrence = required, opts = []}];
+	    type = string, occurrence = optional, opts = []},
+     #field{name = name, fnum = 4, rnum = 5, type = string,
+	    occurrence = optional, opts = []}];
 find_msg_def(_) -> error.
 
 
@@ -494,7 +559,7 @@ fetch_rpc_def(ServiceName, RpcName) ->
     erlang:error({no_such_rpc, ServiceName, RpcName}).
 
 
-get_package_name() -> account.
+get_package_name() -> network.
 
 
 
