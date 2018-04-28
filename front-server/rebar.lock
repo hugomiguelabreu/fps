@@ -1,4 +1,0 @@
-[{<<"erlzk">>,
-  {git,"git://github.com/huaban/erlzk.git",
-       {ref,"aa7190ee2343ac1341cea3edc9b9eea36c591708"}},
-  0}].

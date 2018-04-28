@@ -17,12 +17,9 @@
 init() ->
 	io:format("> autentication staterd\n"),
 	zk:init("localhost",2184),
+	data:init(),
 	{ok, LSock} = gen_tcp:listen(2000, [binary, {reuseaddr, true}, {packet, 1}]),
-	acceptor(LSock),
-	receive
-		kek ->
-			io:format("Kek\n")
-	end.
+	acceptor(LSock).
 
 %%====================================================================
 %% Internal functions
@@ -80,6 +77,7 @@ login(Username, Password, Socket) ->
 		true ->
 			Msg = response:encode_msg(#'Response'{rep=true}),
 			zk:setOnline(Username),
+			data:register_pid(Username,self()),
 			gen_tcp:send(Socket, Msg),
 			io:format("> Client " ++ Username ++ " logged in.\n"),
 			loggedLoop(Socket, Username);
@@ -97,16 +95,19 @@ loggedLoop(Socket, Username) ->
 		
 		{tcp_closed, Socket} ->
 		 	zk:setOffline(Username),
+		 	data:delete_pid(Username),
 		 	io:format("> client " ++ Username ++ " closed connection\n");
 
 		{tcp_error, Socket, Reason} ->
 		 	zk:setOffline(Username),
+		 	data:delete_pid(Username),
 		 	io:format("> client " ++ Username ++ " timed out: " ++ Reason ++ "\n");
 
 		{Username, torrent, Data} ->
 			io:format("received and redirected\n"),
-			torrentWrapper:encode_msg(Data),
-			gen_tcp:send(Socket,Data) 
+			T = torrentWrapper:encode_msg(Data),
+			gen_tcp:send(Socket, T),
+			loggedLoop(Socket, Username)
 	end.
 
 redirect(ProtoTorrent) ->
@@ -114,13 +115,18 @@ redirect(ProtoTorrent) ->
 	case zk:getGroupUsers(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
 		{ok, L} ->
 			lists:foreach(fun(USR) ->
-							?MODULE ! {USR, torrent, ProtoTorrent}
-						 end, L);
+							case data:get_pid(USR) of
+								{ok, Pid} ->
+									Pid ! {USR, torrent, ProtoTorrent};
+								{error, Reason} ->
+									Reason
+								end
+						  end, L);
 		no_group ->
 			io:format("error: group doesn't exist\n");
 
 		_ ->
-			io:format("error NA LISTA\n")
+			io:format("list error\n")
 	end.
 
 
