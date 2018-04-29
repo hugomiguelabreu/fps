@@ -89,7 +89,6 @@ public class Main {
 
                     t = TorrentUtil.createTorrent(path, username, trc);
                     TorrentUtil.upload(t, path, offlineTck);
-                    //TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
                     System.out.println("Upload intention initiated");
                 }
             }
