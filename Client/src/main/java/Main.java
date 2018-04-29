@@ -86,15 +86,18 @@ public class Main {
             }
 
             if (input.equals("download")) {
+                System.out.println("What's the file number?");
                 File dest = new File("/tmp/");
-                SharedTorrent st = new SharedTorrent(available.get(0), dest);
+                SharedTorrent st = new SharedTorrent(available.get(Integer.parseInt(sc.nextLine())), dest);
+                System.out.println("Downloading to /tmp/");
                 //TODO: Keep track of shared torrent to know when they end;
                 TorrentUtil.download(getIPv4Address(null).getHostAddress(), st);
             }
 
             if (input.equals("info")) {
+                int n = 0;
                 for(Torrent tA : available) {
-                    System.out.println("Torrent info:");
+                    System.out.println("Torrent info " + n++ + ":");
                     System.out.println(tA.getName());
                     System.out.println(tA.getSize());
                     System.out.println(tA.getAnnounceList());
