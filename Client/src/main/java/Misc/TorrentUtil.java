@@ -10,6 +10,7 @@ import com.turn.ttorrent.common.Torrent;
 //import javafx.util.converter.ByteStringConverter;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
+import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,36 +92,22 @@ public class TorrentUtil {
      * @throws NoSuchAlgorithmException
      */
 
-    public static void upload(Torrent t, String path) throws IOException, NoSuchAlgorithmException {
-        Tracker tck = null;
-        ArrayList<LocalAddresses> ownAdrresses = Offline.findLocalAddresses();
-        String trackerAddress = "http://" + ownAdrresses.get(0).getIpv4()  + ":6969/announce";
-        try {
-            String httpAddress = ownAdrresses.get(0).getIpv4();
-            tck = new Tracker(new InetSocketAddress(InetAddress.getByName(httpAddress), 6969));
-            tck.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(2);
-        }
-
-        ArrayList<String> trc = new ArrayList<>();
-        trc.add(trackerAddress);
-
+    public static void upload(Torrent t, String path, Tracker tck) throws IOException, NoSuchAlgorithmException
+    {
+        ArrayList<LocalAddresses> ownAddresses = Offline.findLocalAddresses();
         File dest = new File(path);
+        //Seeding starts.
         SharedTorrent st = new SharedTorrent(t, dest.getParentFile());
         Client c = new Client(
-                InetAddress.getByName(ownAdrresses.get(0).getIpv4()),
+                InetAddress.getByName(ownAddresses.get(0).getIpv4()),
                 st);
         c.share(-1);
         tck.announce(new TrackedTorrent(t));
 
+        //Creates a protobuf to send file info
         TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
-
-        // mandar este tw para a rede local
-        //TODO teste
+        //Offline sends to all users
         ConcurrentHashMap<String, User> foundUsers = Offline.listener.getUsers();
-
         for (Map.Entry<String, User> entry : foundUsers.entrySet()) {
             if(!entry.getValue().getUsername().equals(t.getCreatedBy())){
                 System.out.println("Sending to: " + entry.getKey());
@@ -128,6 +115,21 @@ public class TorrentUtil {
                 tw.writeDelimitedTo(s.getOutputStream());
             }
         }
+    }
+
+    public static void upload(Torrent t, String path, Channel ch) throws IOException, NoSuchAlgorithmException, InterruptedException {
+        ArrayList<LocalAddresses> ownAddresses = Offline.findLocalAddresses();
+        File dest = new File(path);
+        //Seeding starts.
+        SharedTorrent st = new SharedTorrent(t, dest.getParentFile());
+        Client c = new Client(
+                InetAddress.getByName(ownAddresses.get(0).getIpv4()),
+                st);
+        c.share(-1);
+        //Creates a protobuf to send file info
+        TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
+        //Escreve e espera pela escrita no socket
+        ch.writeAndFlush(tw).sync();
     }
 
     public static void download(String ipv4, SharedTorrent st)

@@ -6,6 +6,7 @@ import Offline.Offline;
 import com.google.protobuf.ByteString;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
+import com.turn.ttorrent.tracker.Tracker;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -35,6 +36,7 @@ public class Main {
         Torrent t = null;
         ArrayList<Torrent> available = new ArrayList<>();
         Channel ch = null;
+        Tracker offlineTck = null;
 
         System.out.println("Started client");
         System.out.println("Tell me your username: ");
@@ -57,18 +59,18 @@ public class Main {
                 System.out.println("Working online");
                 if (input.equals("upload")) {
                     System.out.println("What is the file?");
+                    String path = sc.nextLine();
                     ArrayList<String> trc = new ArrayList<String>();
                     //TODO: This IP must be dynamic
                     trc.add("http://192.168.43.243:6969/announce");
-                    t = TorrentUtil.createTorrent(sc.nextLine(), username, trc);
+                    t = TorrentUtil.createTorrent(path, username, trc);
 
-                    TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
                     try {
-                        //Escreve e espera pela escrita no socket
-                        ch.writeAndFlush(tw).sync();
+                        TorrentUtil.upload(t, path, ch);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+
                     System.out.println("Upload intention initiated");
                 }
             } else {
@@ -78,8 +80,15 @@ public class Main {
                     String path = sc.nextLine();
                     ArrayList<String> trc = new ArrayList<String>();
                     trc.add("http://" + Offline.findLocalAddresses().get(0).getIpv4()  + ":6969/announce");
+                    //Already has a tracker running?
+                    if(offlineTck == null) {
+                        String httpAddress = Offline.findLocalAddresses().get(0).getIpv4();
+                        offlineTck = new Tracker(new InetSocketAddress(InetAddress.getByName(httpAddress), 6969));
+                        offlineTck.start();
+                    }
+
                     t = TorrentUtil.createTorrent(path, username, trc);
-                    TorrentUtil.upload(t, path);
+                    TorrentUtil.upload(t, path, offlineTck);
                     //TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
                     System.out.println("Upload intention initiated");
                 }
