@@ -14,14 +14,15 @@ import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.URI;
+import java.io.InputStreamReader;
+import java.net.*;
+import java.nio.channels.UnsupportedAddressTypeException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -117,19 +118,26 @@ public class TorrentUtil {
         }
     }
 
-    public static void upload(Torrent t, String path, Channel ch) throws IOException, NoSuchAlgorithmException, InterruptedException {
-        ArrayList<LocalAddresses> ownAddresses = Offline.findLocalAddresses();
-        File dest = new File(path);
-        //Seeding starts.
-        SharedTorrent st = new SharedTorrent(t, dest.getParentFile());
-        Client c = new Client(
-                InetAddress.getByName(ownAddresses.get(0).getIpv4()),
-                st);
-        c.share(-1);
+    public static void upload(Torrent t, String path, Channel ch) throws IOException, NoSuchAlgorithmException, InterruptedException
+    {
         //Creates a protobuf to send file info
         TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
         //Escreve e espera pela escrita no socket
         ch.writeAndFlush(tw).sync();
+
+        File dest = new File(path);
+        //Seeding starts.
+        //Get my external IP
+        URL whatismyip = new URL("http://checkip.amazonaws.com");
+        BufferedReader in = new BufferedReader(new InputStreamReader(
+                whatismyip.openStream()));
+        String ip = in.readLine(); //you get the IP as a String
+
+        SharedTorrent st = new SharedTorrent(t, dest.getParentFile());
+        Client c = new Client(new InetSocketAddress((Offline.findLocalAddresses().get(0).getIpv4()), 7000),
+                new InetSocketAddress(ip, 7000),
+                st);
+        c.share(-1);
     }
 
     public static void download(String ipv4, SharedTorrent st)

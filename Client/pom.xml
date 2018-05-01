@@ -33,12 +33,18 @@
             </plugin>
         </plugins>
     </build>
+
     <dependencies>
         <!-- https://mvnrepository.com/artifact/com.turn/ttorrent-core -->
         <dependency>
             <groupId>com.turn</groupId>
             <artifactId>ttorrent-core</artifactId>
-            <version>1.5</version>
+            <version>1.6-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bitlet</groupId>
+            <artifactId>weupnp</artifactId>
+            <version>RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

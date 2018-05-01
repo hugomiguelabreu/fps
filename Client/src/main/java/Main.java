@@ -1,9 +1,6 @@
-import Handlers.TorrentListenerHandler;
 import Handlers.TorrentListenerInitializer;
 import Misc.TorrentUtil;
-import Network.TorrentWrapperOuterClass;
 import Offline.Offline;
-import com.google.protobuf.ByteString;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.Tracker;
@@ -12,23 +9,113 @@ import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.bitlet.weupnp.GatewayDevice;
+import org.bitlet.weupnp.GatewayDiscover;
+import org.bitlet.weupnp.PortMappingEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.awt.*;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.*;
 import java.nio.channels.UnsupportedAddressTypeException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.concurrent.TimeoutException;
 
 public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Object.class);
+    private static int SAMPLE_PORT = 7000;
+    private static short WAIT_TIME = 10;
+    private static boolean LIST_ALL_MAPPINGS = false;
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
+
+
+            GatewayDiscover gatewayDiscover = new GatewayDiscover();
+            Map<InetAddress, GatewayDevice> gateways = gatewayDiscover.discover();
+
+            if (gateways.isEmpty()) {
+                System.out.println("No gateways found");
+                System.out.println("Stopping weupnp");
+                return;
+            }
+            System.out.println(gateways.size()+" gateway(s) found\n");
+
+            int counter=0;
+            for (GatewayDevice gw: gateways.values()) {
+                counter++;
+                System.out.println("Listing gateway details of device #" + counter+
+                        "\n\tFriendly name: " + gw.getFriendlyName()+
+                        "\n\tPresentation URL: " + gw.getPresentationURL()+
+                        "\n\tModel name: " + gw.getModelName()+
+                        "\n\tModel number: " + gw.getModelNumber()+
+                        "\n\tLocal interface address: " + gw.getLocalAddress().getHostAddress()+"\n");
+            }
+
+            // choose the first active gateway for the tests
+            GatewayDevice activeGW = gatewayDiscover.getValidGateway();
+
+            if (null != activeGW) {
+                System.out.println("Using gateway: " + activeGW.getFriendlyName());
+            } else {
+                System.out.println("No active gateway device found");
+                System.out.println("Stopping weupnp");
+                return;
+            }
+
+
+            // testing PortMappingNumberOfEntries
+            Integer portMapCount = activeGW.getPortMappingNumberOfEntries();
+            System.out.println("GetPortMappingNumberOfEntries: " + (portMapCount!=null?portMapCount.toString():"(unsupported)"));
+
+            // testing getGenericPortMappingEntry
+            PortMappingEntry portMapping = new PortMappingEntry();
+            if (LIST_ALL_MAPPINGS) {
+                int pmCount = 0;
+                do {
+                    if (activeGW.getGenericPortMappingEntry(pmCount,portMapping))
+                        System.out.println("Portmapping #"+pmCount+" successfully retrieved ("+portMapping.getPortMappingDescription()+":"+portMapping.getExternalPort()+")");
+                    else{
+                        System.out.println("Portmapping #"+pmCount+" retrieval failed");
+                        break;
+                    }
+                    pmCount++;
+                } while (portMapping!=null);
+            } else {
+                if (activeGW.getGenericPortMappingEntry(0,portMapping))
+                    System.out.println("Portmapping #0 successfully retrieved ("+portMapping.getPortMappingDescription()+":"+portMapping.getExternalPort()+")");
+                else
+                    System.out.println("Portmapping #0 retrival failed");
+            }
+
+            InetAddress localAddress = activeGW.getLocalAddress();
+            System.out.println("Using local address: "+ localAddress.getHostAddress());
+            String externalIPAddress = activeGW.getExternalIPAddress();
+            System.out.println("External address: "+ externalIPAddress);
+
+            System.out.println("Querying device to see if a port mapping already exists for port "+ SAMPLE_PORT);
+
+            if (activeGW.getSpecificPortMappingEntry(SAMPLE_PORT,"TCP",portMapping)) {
+                System.out.println("Port "+SAMPLE_PORT+" is already mapped. Aborting test.");
+                return;
+            } else {
+                System.out.println("Mapping free. Sending port mapping request for port "+SAMPLE_PORT);
+
+                // test static lease duration mapping
+                if (activeGW.addPortMapping(SAMPLE_PORT,SAMPLE_PORT,localAddress.getHostAddress(),"TCP","test")) {
+                    System.out.println("Mapping SUCCESSFUL. Waiting "+WAIT_TIME+" seconds before removing mapping...");
+                    Thread.sleep(1000*WAIT_TIME);
+
+                   /* if (activeGW.deletePortMapping(SAMPLE_PORT,"TCP")) {
+                        System.out.println("Port mapping removed, test SUCCESSFUL");
+                    } else {
+                        System.out.println("Port mapping removal FAILED");
+                    }*/
+                }
+            }
 
         Scanner sc = new Scanner(System.in);
         String input;
@@ -62,7 +149,7 @@ public class Main {
                     String path = sc.nextLine();
                     ArrayList<String> trc = new ArrayList<String>();
                     //TODO: This IP must be dynamic
-                    trc.add("http://192.168.43.243:6969/announce");
+                    trc.add("http://178.62.23.209:6969/announce");
                     t = TorrentUtil.createTorrent(path, username, trc);
 
                     try {
@@ -125,7 +212,7 @@ public class Main {
                 .channel(NioSocketChannel.class)
                 .handler(new TorrentListenerInitializer(available));
                 // Make a new connection.
-                ch = b.connect("192.168.43.243", 5000).sync().channel();
+                ch = b.connect("178.62.23.209", 5000).sync().channel();
                 // Get the handler instance to initiate the request.
                 //TorrentClientHandler handler = ch.pipeline().get(TorrentClientHandler.class);
                 // Request and get the response.
@@ -136,7 +223,8 @@ public class Main {
             e.printStackTrace();
             return ch;
         } finally {
-            group.shutdownGracefully();
+            //TODO: fechar grupo quando queremos fechar cliente
+            //group.shutdownGracefully();
         }
         return ch;
     }
