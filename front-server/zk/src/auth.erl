@@ -138,14 +138,14 @@ msgDecriptor(Data, User, Socket, ID) ->
 			{G} = D,
 			joinGroup(User, G, Socket);
 		torrentWrapper ->
-			redirect(D)
+			redirect(D, ID)
 	end.
 
-redirect(ProtoTorrent) ->
+redirect(ProtoTorrent, ID) ->
 	io:format("> starting to redirect to group " ++ binary_to_list(ProtoTorrent#'TorrentWrapper'.group) ++ "\n"),
 	case zk:getGroupUsers(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
 		{ok, L} ->
-			lists:foreach(fun(USR) ->
+			lists:foreach(fun({Loc,User}) ->
 							case data:get_pid(USR) of
 								{ok, Pid} ->
 									Pid ! {USR, torrent, ProtoTorrent};

@@ -153,7 +153,7 @@ getGroupUsers(Name, PID) ->
 	L = erlzk:get_children(PID,GroupPath),
 	case L of
 		{ok, _} ->
-			lists:map(fun(X) -> getLoc(PID, X) end, L);
+			{ok, lists:map(fun(X) -> getLoc(PID, X) end, L)};
 		{error, no_node} ->
 			no_group;
 		_ ->

@@ -3,7 +3,9 @@
 
 % o primeiro atributo do record e a Key
 -record(connections, {user, pid}).
--export ([init/0, register_pid/2, get_pid/1, delete_pid/1]).
+-record(counter, {id, current}).
+
+-export ([init/0, register_pid/2, get_pid/1, delete_pid/1, startCounter/0, getCurrentCounter/0, incrementAndGet/0]).
 
 %%====================================================================
 %% start mnesia
@@ -17,11 +19,12 @@ init() ->
 	mnesia:create_schema([node()]),
 	mnesia:start(),
 	mnesia:create_table(connections, [{attributes, record_info(fields, connections)}]),
+	mnesia:create_table(counter, [{attributes, record_info(fields, counter)}, {disc_copies, [node()]}]),
 	start().
 
 
 %%====================================================================
-%% API
+%% API -- connections
 %%====================================================================
 
 register_pid(Username, Pid) ->
@@ -50,6 +53,42 @@ get_pid(Username) ->
 			_ -> 
 				io:format("> Unexistent user.\n"),
 				{error, undefined}
+		end
+	end,
+	mnesia:activity(transaction, F).
+
+%%====================================================================
+%% API -- counter
+%%====================================================================
+
+startCounter() ->
+ 	F = fun() ->
+		mnesia:write(#counter {id = counter,
+				   			   current = 0}),
+		ok
+	end,
+	mnesia:activity(transaction, F).
+
+
+getCurrentCounter() ->
+	F = fun() ->
+		case mnesia:wread({counter, counter}) of
+			[#counter{current = Counter}] ->
+				{ok, Counter};
+			_ -> 
+				error
+		end
+	end,
+	mnesia:activity(transaction, F).
+
+incrementAndGet() ->
+	F = fun() ->
+		X = mnesia:dirty_update_counter({counter, counter}, 1),
+		case X of
+			{aborted, _} ->
+				error;
+			_ ->
+				{ok,X}
 		end
 	end,
 	mnesia:activity(transaction, F).
