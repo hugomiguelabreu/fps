@@ -1,8 +1,6 @@
 
 -module(auth).
-
 -include("wrapper.hrl").
-
 -export([init/1]).
 
 % registo -> true
@@ -15,7 +13,7 @@
 init(ID) ->
 	{ok, LSock} = gen_tcp:listen(2000, [binary, {reuseaddr, true}, {packet, 1}]),
 	io:format("> autentication started\n"),
-	acceptor(LSock,ID).
+	acceptor(LSock, ID).
 
 %%====================================================================
 %% Initialization
@@ -89,9 +87,15 @@ loggedLoop(Socket, Username, ID) ->
 		 	data:delete_pid(Username),
 		 	io:format("> client " ++ Username ++ " timed out: " ++ Reason ++ "\n");
 
-		{Username, torrent, Data} ->
+		{Username, packed_torrent, Data} ->
 			io:format("received and redirected\n"),
 			T = wrapper:encode_msg(#'ClientMessage'{msg = {torrentWrapper, Data}}),
+			gen_tcp:send(Socket, T),
+			loggedLoop(Socket, Username, ID);
+
+		{Username, unpacked_torrent, Group, Data} ->
+			io:format("received from another server and redirected\n"),
+			T = wrapper:encode_msg(#'ClientMessage'{msg = {torrentWrapper, {group=Group, content=Data}}}),
 			gen_tcp:send(Socket, T),
 			loggedLoop(Socket, Username, ID)
 	end.
@@ -138,20 +142,31 @@ msgDecriptor(Data, User, Socket, ID) ->
 			{G} = D,
 			joinGroup(User, G, Socket);
 		torrentWrapper ->
-			redirect(D, ID)
+			redirect(D, ID, User)
 	end.
 
-redirect(ProtoTorrent, ID) ->
+redirect(ProtoTorrent, ID, CurrentUser) ->
 	io:format("> starting to redirect to group " ++ binary_to_list(ProtoTorrent#'TorrentWrapper'.group) ++ "\n"),
+	TID = ID ++ "_" ++ data:incrementAndGet(),
+	zk:newTorrent(TID, ProtoTorrent#'TorrentWrapper'.group, CurrentUser),
+
 	case zk:getGroupUsers(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
 		{ok, L} ->
 			lists:foreach(fun({Loc,User}) ->
-							case data:get_pid(USR) of
-								{ok, Pid} ->
-									Pid ! {USR, torrent, ProtoTorrent};
-								{error, Reason} ->
-									Reason
-								end
+							case Loc of
+								ID ->
+									UserPid = data:get_pid(User),
+									case UserPid of
+										{ok, Pid} ->
+											Pid ! {User, packed_torrent, ProtoTorrent};
+										error ->
+											zk:setUnreceivedTorrent(TID, User, ProtoTorrent#'TorrentWrapper'.group)
+									end;
+								offline ->
+									zk:setUnreceivedTorrent(TID, User, ProtoTorrent#'TorrentWrapper'.group);
+								_ ->
+									server_comm:send_torrent(Loc, User, ProtoTorrent#'TorrentWrapper'.group, ProtoTorrent#'TorrentWrapper'.content)
+							end
 						  end, L);
 		no_group ->
 			io:format("error: group doesn't exist\n");

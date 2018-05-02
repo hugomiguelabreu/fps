@@ -1,5 +1,5 @@
 -module(zk).
--export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/2, setOffline/1, getGroupUsers/1, getTrackerList/0, getFrontSv/1]).
+-export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/2, setOffline/1, getGroupUsers/1, getTrackerList/0, getFrontSv/1, newTorrent/3, setUnreceivedTorrent/3]).
 
 
 init(Host, Port) ->
@@ -45,6 +45,14 @@ loop(Pid) ->
     		loop(Pid);
     	{{front_sv, ID}, From} ->
 			V = getFrontSv(ID, Pid),
+			From ! {?MODULE, V},
+    		loop(Pid);
+    	{{new_torrent, TID, U, G}, From} ->
+    		V = newTorrent(TID, U, G, Pid),
+			From ! {?MODULE, V},
+    		loop(Pid);
+    	{{unreceived_torrent, TID, U, G}, From} ->
+    		V = setUnreceivedTorrent(TID, U, G, Pid),
 			From ! {?MODULE, V},
     		loop(Pid)
 	end.
@@ -99,6 +107,7 @@ createGroup(PID,Name,User) ->
 			erlzk:create(PID,GroupPath, list_to_binary("")),
 			erlzk:create(PID,GroupPath ++ "/log", list_to_binary("")),
 			erlzk:create(PID,GroupPath ++ "/meta", list_to_binary("")),
+			erlzk:create(PID,GroupPath ++ "/torrents", list_to_binary("")),
 			erlzk:create(PID,GroupPath ++ "/users", list_to_binary("")),
 			erlzk:create(PID,GroupPath ++ "/users/" ++ User, list_to_binary("admin")),
 			ok;
@@ -207,11 +216,20 @@ getFrontSv(ID, PID) ->
 		 	RP
 	 	end.
 
+newTorrent(TID, U, G) -> rpc({new_torrent, TID, U, G}). 
+newTorrent(TID, User, Group, PID) ->
+	GroupPath = "/groups/" ++ Group ++ "/torrents/" ++ TID,
+	erlzk:create(PID, GroupPath, list_to_binary(User)),
+	erlzk:create(PID, GroupPath ++ "/" ++ User, list_to_binary("")),
+	ok.	
 
+setUnreceivedTorrent(TID, U, G) -> rpc({unreceived_torrent, TID, U, G}). 
+setUnreceivedTorrent(TID, User, Group, PID) -> 
+	GroupPath = "/groups/" ++ Group ++ "/torrents/" ++ TID ++ "/" ++ User,
+	erlzk:create(PID, GroupPath ++ User, list_to_binary("")),
+	ok.	
 
-
-
-
+		
 
 
 

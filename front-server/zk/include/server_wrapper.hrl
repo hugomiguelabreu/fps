@@ -11,9 +11,16 @@
 -define('TORRENTWRAPPER_PB_H', true).
 -record('TorrentWrapper',
         {id = <<>>              :: iodata() | undefined, % = 1
-         users = []             :: [iodata()] | undefined, % = 2
+         user = <<>>            :: iodata() | undefined, % = 2
          group = <<>>           :: iodata() | undefined, % = 3
          content = <<>>         :: binary() | undefined % = 4
+        }).
+-endif.
+
+-ifndef('SERVERMESSAGE_PB_H').
+-define('SERVERMESSAGE_PB_H', true).
+-record('ServerMessage',
+        {msg                    :: {torrentWrapper, #'TorrentWrapper'{}} | undefined % oneof
         }).
 -endif.
 

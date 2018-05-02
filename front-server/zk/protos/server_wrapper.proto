@@ -8,7 +8,7 @@ message TorrentWrapper{
     bytes content = 4;
 }
 
-message ClientMessage {
+message ServerMessage {
     oneof msg {
         TorrentWrapper torrentWrapper = 1;
     }   

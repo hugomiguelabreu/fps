@@ -31,13 +31,14 @@
 
 %% message types
 -type 'TorrentWrapper'() :: #'TorrentWrapper'{}.
--export_type(['TorrentWrapper'/0]).
+-type 'ServerMessage'() :: #'ServerMessage'{}.
+-export_type(['TorrentWrapper'/0, 'ServerMessage'/0]).
 
--spec encode_msg(#'TorrentWrapper'{}) -> binary().
+-spec encode_msg(#'TorrentWrapper'{} | #'ServerMessage'{}) -> binary().
 encode_msg(Msg) -> encode_msg(Msg, []).
 
 
--spec encode_msg(#'TorrentWrapper'{}, list()) -> binary().
+-spec encode_msg(#'TorrentWrapper'{} | #'ServerMessage'{}, list()) -> binary().
 encode_msg(Msg, Opts) ->
     case proplists:get_bool(verify, Opts) of
       true -> verify_msg(Msg, Opts);
@@ -46,7 +47,9 @@ encode_msg(Msg, Opts) ->
     TrUserData = proplists:get_value(user_data, Opts),
     case Msg of
       #'TorrentWrapper'{} ->
-	  e_msg_TorrentWrapper(Msg, TrUserData)
+	  e_msg_TorrentWrapper(Msg, TrUserData);
+      #'ServerMessage'{} ->
+	  e_msg_ServerMessage(Msg, TrUserData)
     end.
 
 
@@ -56,7 +59,7 @@ e_msg_TorrentWrapper(Msg, TrUserData) ->
 
 
 e_msg_TorrentWrapper(#'TorrentWrapper'{id = F1,
-				       users = F2, group = F3, content = F4},
+				       user = F2, group = F3, content = F4},
 		     Bin, TrUserData) ->
     B1 = if F1 == undefined -> Bin;
 	    true ->
@@ -68,12 +71,15 @@ e_msg_TorrentWrapper(#'TorrentWrapper'{id = F1,
 		  end
 		end
 	 end,
-    B2 = begin
-	   TrF2 = id(F2, TrUserData),
-	   if TrF2 == [] -> B1;
-	      true ->
-		  e_field_TorrentWrapper_users(TrF2, B1, TrUserData)
-	   end
+    B2 = if F2 == undefined -> B1;
+	    true ->
+		begin
+		  TrF2 = id(F2, TrUserData),
+		  case is_empty_string(TrF2) of
+		    true -> B1;
+		    false -> e_type_string(TrF2, <<B1/binary, 18>>)
+		  end
+		end
 	 end,
     B3 = if F3 == undefined -> B2;
 	    true ->
@@ -96,13 +102,28 @@ e_msg_TorrentWrapper(#'TorrentWrapper'{id = F1,
 	   end
     end.
 
-e_field_TorrentWrapper_users([Elem | Rest], Bin,
-			     TrUserData) ->
-    Bin2 = <<Bin/binary, 18>>,
-    Bin3 = e_type_string(id(Elem, TrUserData), Bin2),
-    e_field_TorrentWrapper_users(Rest, Bin3, TrUserData);
-e_field_TorrentWrapper_users([], Bin, _TrUserData) ->
-    Bin.
+e_msg_ServerMessage(Msg, TrUserData) ->
+    e_msg_ServerMessage(Msg, <<>>, TrUserData).
+
+
+e_msg_ServerMessage(#'ServerMessage'{msg = F1}, Bin,
+		    TrUserData) ->
+    case F1 of
+      undefined -> Bin;
+      {torrentWrapper, OF1} ->
+	  begin
+	    TrOF1 = id(OF1, TrUserData),
+	    e_mfield_ServerMessage_torrentWrapper(TrOF1,
+						  <<Bin/binary, 10>>,
+						  TrUserData)
+	  end
+    end.
+
+e_mfield_ServerMessage_torrentWrapper(Msg, Bin,
+				      TrUserData) ->
+    SubBin = e_msg_TorrentWrapper(Msg, <<>>, TrUserData),
+    Bin2 = e_varint(byte_size(SubBin), Bin),
+    <<Bin2/binary, SubBin/binary>>.
 
 e_type_string(S, Bin) ->
     Utf8 = unicode:characters_to_binary(S),
@@ -155,6 +176,14 @@ decode_msg(Bin, MsgName, Opts) when is_binary(Bin) ->
 		error({gpb_error,
 		       {decoding_failure,
 			{Bin, 'TorrentWrapper', {Class, Reason, StackTrace}}}})
+	  end;
+      'ServerMessage' ->
+	  try d_msg_ServerMessage(Bin, TrUserData) catch
+	    Class:Reason ->
+		StackTrace = erlang:get_stacktrace(),
+		error({gpb_error,
+		       {decoding_failure,
+			{Bin, 'ServerMessage', {Class, Reason, StackTrace}}}})
 	  end
     end.
 
@@ -162,7 +191,8 @@ decode_msg(Bin, MsgName, Opts) when is_binary(Bin) ->
 
 d_msg_TorrentWrapper(Bin, TrUserData) ->
     dfp_read_field_def_TorrentWrapper(Bin, 0, 0,
-				      id(<<>>, TrUserData), id([], TrUserData),
+				      id(<<>>, TrUserData),
+				      id(<<>>, TrUserData),
 				      id(<<>>, TrUserData),
 				      id(<<>>, TrUserData), TrUserData).
 
@@ -172,8 +202,8 @@ dfp_read_field_def_TorrentWrapper(<<10, Rest/binary>>,
 			      F@_3, F@_4, TrUserData);
 dfp_read_field_def_TorrentWrapper(<<18, Rest/binary>>,
 				  Z1, Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
-    d_field_TorrentWrapper_users(Rest, Z1, Z2, F@_1, F@_2,
-				 F@_3, F@_4, TrUserData);
+    d_field_TorrentWrapper_user(Rest, Z1, Z2, F@_1, F@_2,
+				F@_3, F@_4, TrUserData);
 dfp_read_field_def_TorrentWrapper(<<26, Rest/binary>>,
 				  Z1, Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
     d_field_TorrentWrapper_group(Rest, Z1, Z2, F@_1, F@_2,
@@ -182,10 +212,9 @@ dfp_read_field_def_TorrentWrapper(<<34, Rest/binary>>,
 				  Z1, Z2, F@_1, F@_2, F@_3, F@_4, TrUserData) ->
     d_field_TorrentWrapper_content(Rest, Z1, Z2, F@_1, F@_2,
 				   F@_3, F@_4, TrUserData);
-dfp_read_field_def_TorrentWrapper(<<>>, 0, 0, F@_1, R1,
-				  F@_3, F@_4, TrUserData) ->
-    #'TorrentWrapper'{id = F@_1,
-		      users = lists_reverse(R1, TrUserData), group = F@_3,
+dfp_read_field_def_TorrentWrapper(<<>>, 0, 0, F@_1,
+				  F@_2, F@_3, F@_4, _) ->
+    #'TorrentWrapper'{id = F@_1, user = F@_2, group = F@_3,
 		      content = F@_4};
 dfp_read_field_def_TorrentWrapper(Other, Z1, Z2, F@_1,
 				  F@_2, F@_3, F@_4, TrUserData) ->
@@ -208,8 +237,8 @@ dg_read_field_def_TorrentWrapper(<<0:1, X:7,
 	  d_field_TorrentWrapper_id(Rest, 0, 0, F@_1, F@_2, F@_3,
 				    F@_4, TrUserData);
       18 ->
-	  d_field_TorrentWrapper_users(Rest, 0, 0, F@_1, F@_2,
-				       F@_3, F@_4, TrUserData);
+	  d_field_TorrentWrapper_user(Rest, 0, 0, F@_1, F@_2,
+				      F@_3, F@_4, TrUserData);
       26 ->
 	  d_field_TorrentWrapper_group(Rest, 0, 0, F@_1, F@_2,
 				       F@_3, F@_4, TrUserData);
@@ -236,10 +265,9 @@ dg_read_field_def_TorrentWrapper(<<0:1, X:7,
 				       F@_4, TrUserData)
 	  end
     end;
-dg_read_field_def_TorrentWrapper(<<>>, 0, 0, F@_1, R1,
-				 F@_3, F@_4, TrUserData) ->
-    #'TorrentWrapper'{id = F@_1,
-		      users = lists_reverse(R1, TrUserData), group = F@_3,
+dg_read_field_def_TorrentWrapper(<<>>, 0, 0, F@_1, F@_2,
+				 F@_3, F@_4, _) ->
+    #'TorrentWrapper'{id = F@_1, user = F@_2, group = F@_3,
 		      content = F@_4}.
 
 d_field_TorrentWrapper_id(<<1:1, X:7, Rest/binary>>, N,
@@ -257,21 +285,20 @@ d_field_TorrentWrapper_id(<<0:1, X:7, Rest/binary>>, N,
     dfp_read_field_def_TorrentWrapper(RestF, 0, 0,
 				      NewFValue, F@_2, F@_3, F@_4, TrUserData).
 
-d_field_TorrentWrapper_users(<<1:1, X:7, Rest/binary>>,
-			     N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
+d_field_TorrentWrapper_user(<<1:1, X:7, Rest/binary>>,
+			    N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
     when N < 57 ->
-    d_field_TorrentWrapper_users(Rest, N + 7, X bsl N + Acc,
-				 F@_1, F@_2, F@_3, F@_4, TrUserData);
-d_field_TorrentWrapper_users(<<0:1, X:7, Rest/binary>>,
-			     N, Acc, F@_1, Prev, F@_3, F@_4, TrUserData) ->
+    d_field_TorrentWrapper_user(Rest, N + 7, X bsl N + Acc,
+				F@_1, F@_2, F@_3, F@_4, TrUserData);
+d_field_TorrentWrapper_user(<<0:1, X:7, Rest/binary>>,
+			    N, Acc, F@_1, _, F@_3, F@_4, TrUserData) ->
     {NewFValue, RestF} = begin
 			   Len = X bsl N + Acc,
 			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
 			   {binary:copy(Bytes), Rest2}
 			 end,
     dfp_read_field_def_TorrentWrapper(RestF, 0, 0, F@_1,
-				      cons(NewFValue, Prev, TrUserData), F@_3,
-				      F@_4, TrUserData).
+				      NewFValue, F@_3, F@_4, TrUserData).
 
 d_field_TorrentWrapper_group(<<1:1, X:7, Rest/binary>>,
 			     N, Acc, F@_1, F@_2, F@_3, F@_4, TrUserData)
@@ -347,6 +374,120 @@ skip_64_TorrentWrapper(<<_:64, Rest/binary>>, Z1, Z2,
     dfp_read_field_def_TorrentWrapper(Rest, Z1, Z2, F@_1,
 				      F@_2, F@_3, F@_4, TrUserData).
 
+d_msg_ServerMessage(Bin, TrUserData) ->
+    dfp_read_field_def_ServerMessage(Bin, 0, 0,
+				     id(undefined, TrUserData), TrUserData).
+
+dfp_read_field_def_ServerMessage(<<10, Rest/binary>>,
+				 Z1, Z2, F@_1, TrUserData) ->
+    d_field_ServerMessage_torrentWrapper(Rest, Z1, Z2, F@_1,
+					 TrUserData);
+dfp_read_field_def_ServerMessage(<<>>, 0, 0, F@_1, _) ->
+    #'ServerMessage'{msg = F@_1};
+dfp_read_field_def_ServerMessage(Other, Z1, Z2, F@_1,
+				 TrUserData) ->
+    dg_read_field_def_ServerMessage(Other, Z1, Z2, F@_1,
+				    TrUserData).
+
+dg_read_field_def_ServerMessage(<<1:1, X:7,
+				  Rest/binary>>,
+				N, Acc, F@_1, TrUserData)
+    when N < 32 - 7 ->
+    dg_read_field_def_ServerMessage(Rest, N + 7,
+				    X bsl N + Acc, F@_1, TrUserData);
+dg_read_field_def_ServerMessage(<<0:1, X:7,
+				  Rest/binary>>,
+				N, Acc, F@_1, TrUserData) ->
+    Key = X bsl N + Acc,
+    case Key of
+      10 ->
+	  d_field_ServerMessage_torrentWrapper(Rest, 0, 0, F@_1,
+					       TrUserData);
+      _ ->
+	  case Key band 7 of
+	    0 ->
+		skip_varint_ServerMessage(Rest, 0, 0, F@_1, TrUserData);
+	    1 ->
+		skip_64_ServerMessage(Rest, 0, 0, F@_1, TrUserData);
+	    2 ->
+		skip_length_delimited_ServerMessage(Rest, 0, 0, F@_1,
+						    TrUserData);
+	    3 ->
+		skip_group_ServerMessage(Rest, Key bsr 3, 0, F@_1,
+					 TrUserData);
+	    5 -> skip_32_ServerMessage(Rest, 0, 0, F@_1, TrUserData)
+	  end
+    end;
+dg_read_field_def_ServerMessage(<<>>, 0, 0, F@_1, _) ->
+    #'ServerMessage'{msg = F@_1}.
+
+d_field_ServerMessage_torrentWrapper(<<1:1, X:7,
+				       Rest/binary>>,
+				     N, Acc, F@_1, TrUserData)
+    when N < 57 ->
+    d_field_ServerMessage_torrentWrapper(Rest, N + 7,
+					 X bsl N + Acc, F@_1, TrUserData);
+d_field_ServerMessage_torrentWrapper(<<0:1, X:7,
+				       Rest/binary>>,
+				     N, Acc, Prev, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bs:Len/binary, Rest2/binary>> = Rest,
+			   {id(d_msg_TorrentWrapper(Bs, TrUserData),
+			       TrUserData),
+			    Rest2}
+			 end,
+    dfp_read_field_def_ServerMessage(RestF, 0, 0,
+				     case Prev of
+				       undefined -> {torrentWrapper, NewFValue};
+				       {torrentWrapper, MVPrev} ->
+					   {torrentWrapper,
+					    merge_msg_TorrentWrapper(MVPrev,
+								     NewFValue,
+								     TrUserData)};
+				       _ -> {torrentWrapper, NewFValue}
+				     end,
+				     TrUserData).
+
+skip_varint_ServerMessage(<<1:1, _:7, Rest/binary>>, Z1,
+			  Z2, F@_1, TrUserData) ->
+    skip_varint_ServerMessage(Rest, Z1, Z2, F@_1,
+			      TrUserData);
+skip_varint_ServerMessage(<<0:1, _:7, Rest/binary>>, Z1,
+			  Z2, F@_1, TrUserData) ->
+    dfp_read_field_def_ServerMessage(Rest, Z1, Z2, F@_1,
+				     TrUserData).
+
+skip_length_delimited_ServerMessage(<<1:1, X:7,
+				      Rest/binary>>,
+				    N, Acc, F@_1, TrUserData)
+    when N < 57 ->
+    skip_length_delimited_ServerMessage(Rest, N + 7,
+					X bsl N + Acc, F@_1, TrUserData);
+skip_length_delimited_ServerMessage(<<0:1, X:7,
+				      Rest/binary>>,
+				    N, Acc, F@_1, TrUserData) ->
+    Length = X bsl N + Acc,
+    <<_:Length/binary, Rest2/binary>> = Rest,
+    dfp_read_field_def_ServerMessage(Rest2, 0, 0, F@_1,
+				     TrUserData).
+
+skip_group_ServerMessage(Bin, FNum, Z2, F@_1,
+			 TrUserData) ->
+    {_, Rest} = read_group(Bin, FNum),
+    dfp_read_field_def_ServerMessage(Rest, 0, Z2, F@_1,
+				     TrUserData).
+
+skip_32_ServerMessage(<<_:32, Rest/binary>>, Z1, Z2,
+		      F@_1, TrUserData) ->
+    dfp_read_field_def_ServerMessage(Rest, Z1, Z2, F@_1,
+				     TrUserData).
+
+skip_64_ServerMessage(<<_:64, Rest/binary>>, Z1, Z2,
+		      F@_1, TrUserData) ->
+    dfp_read_field_def_ServerMessage(Rest, Z1, Z2, F@_1,
+				     TrUserData).
+
 read_group(Bin, FieldNum) ->
     {NumBytes, EndTagLen} = read_gr_b(Bin, 0, 0, 0, 0, FieldNum),
     <<Group:NumBytes/binary, _:EndTagLen/binary, Rest/binary>> = Bin,
@@ -412,25 +553,25 @@ merge_msgs(Prev, New, Opts)
     TrUserData = proplists:get_value(user_data, Opts),
     case Prev of
       #'TorrentWrapper'{} ->
-	  merge_msg_TorrentWrapper(Prev, New, TrUserData)
+	  merge_msg_TorrentWrapper(Prev, New, TrUserData);
+      #'ServerMessage'{} ->
+	  merge_msg_ServerMessage(Prev, New, TrUserData)
     end.
 
 merge_msg_TorrentWrapper(#'TorrentWrapper'{id = PFid,
-					   users = PFusers, group = PFgroup,
+					   user = PFuser, group = PFgroup,
 					   content = PFcontent},
-			 #'TorrentWrapper'{id = NFid, users = NFusers,
+			 #'TorrentWrapper'{id = NFid, user = NFuser,
 					   group = NFgroup,
 					   content = NFcontent},
-			 TrUserData) ->
+			 _) ->
     #'TorrentWrapper'{id =
 			  if NFid =:= undefined -> PFid;
 			     true -> NFid
 			  end,
-		      users =
-			  if PFusers /= undefined, NFusers /= undefined ->
-				 'erlang_++'(PFusers, NFusers, TrUserData);
-			     PFusers == undefined -> NFusers;
-			     NFusers == undefined -> PFusers
+		      user =
+			  if NFuser =:= undefined -> PFuser;
+			     true -> NFuser
 			  end,
 		      group =
 			  if NFgroup =:= undefined -> PFgroup;
@@ -441,6 +582,19 @@ merge_msg_TorrentWrapper(#'TorrentWrapper'{id = PFid,
 			     true -> NFcontent
 			  end}.
 
+merge_msg_ServerMessage(#'ServerMessage'{msg = PFmsg},
+			#'ServerMessage'{msg = NFmsg}, TrUserData) ->
+    #'ServerMessage'{msg =
+			 case {PFmsg, NFmsg} of
+			   {{torrentWrapper, OPFmsg},
+			    {torrentWrapper, ONFmsg}} ->
+			       {torrentWrapper,
+				merge_msg_TorrentWrapper(OPFmsg, ONFmsg,
+							 TrUserData)};
+			   {_, undefined} -> PFmsg;
+			   _ -> NFmsg
+			 end}.
+
 
 verify_msg(Msg) -> verify_msg(Msg, []).
 
@@ -450,29 +604,42 @@ verify_msg(Msg, Opts) ->
       #'TorrentWrapper'{} ->
 	  v_msg_TorrentWrapper(Msg, ['TorrentWrapper'],
 			       TrUserData);
+      #'ServerMessage'{} ->
+	  v_msg_ServerMessage(Msg, ['ServerMessage'], TrUserData);
       _ -> mk_type_error(not_a_known_message, Msg, [])
     end.
 
 
 -dialyzer({nowarn_function,v_msg_TorrentWrapper/3}).
 v_msg_TorrentWrapper(#'TorrentWrapper'{id = F1,
-				       users = F2, group = F3, content = F4},
+				       user = F2, group = F3, content = F4},
 		     Path, _) ->
     if F1 == undefined -> ok;
        true -> v_type_string(F1, [id | Path])
     end,
-    if is_list(F2) ->
-	   _ = [v_type_string(Elem, [users | Path]) || Elem <- F2],
-	   ok;
-       true ->
-	   mk_type_error({invalid_list_of, string}, F2,
-			 [users | Path])
+    if F2 == undefined -> ok;
+       true -> v_type_string(F2, [user | Path])
     end,
     if F3 == undefined -> ok;
        true -> v_type_string(F3, [group | Path])
     end,
     if F4 == undefined -> ok;
        true -> v_type_bytes(F4, [content | Path])
+    end,
+    ok;
+v_msg_TorrentWrapper(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'TorrentWrapper'}, X,
+		  Path).
+
+-dialyzer({nowarn_function,v_msg_ServerMessage/3}).
+v_msg_ServerMessage(#'ServerMessage'{msg = F1}, Path,
+		    TrUserData) ->
+    case F1 of
+      undefined -> ok;
+      {torrentWrapper, OF1} ->
+	  v_msg_TorrentWrapper(OF1, [torrentWrapper, msg | Path],
+			       TrUserData);
+      _ -> mk_type_error(invalid_oneof, F1, [msg | Path])
     end,
     ok.
 
@@ -512,33 +679,33 @@ prettify_path(PathR) ->
 -compile({inline,id/2}).
 id(X, _TrUserData) -> X.
 
--compile({inline,cons/3}).
-cons(Elem, Acc, _TrUserData) -> [Elem | Acc].
-
--compile({inline,lists_reverse/2}).
-'lists_reverse'(L, _TrUserData) -> lists:reverse(L).
--compile({inline,'erlang_++'/3}).
-'erlang_++'(A, B, _TrUserData) -> A ++ B.
 
 get_msg_defs() ->
     [{{msg, 'TorrentWrapper'},
       [#field{name = id, fnum = 1, rnum = 2, type = string,
 	      occurrence = optional, opts = []},
-       #field{name = users, fnum = 2, rnum = 3, type = string,
-	      occurrence = repeated, opts = []},
+       #field{name = user, fnum = 2, rnum = 3, type = string,
+	      occurrence = optional, opts = []},
        #field{name = group, fnum = 3, rnum = 4, type = string,
 	      occurrence = optional, opts = []},
        #field{name = content, fnum = 4, rnum = 5, type = bytes,
-	      occurrence = optional, opts = []}]}].
+	      occurrence = optional, opts = []}]},
+     {{msg, 'ServerMessage'},
+      [#gpb_oneof{name = msg, rnum = 2,
+		  fields =
+		      [#field{name = torrentWrapper, fnum = 1, rnum = 2,
+			      type = {msg, 'TorrentWrapper'},
+			      occurrence = optional, opts = []}]}]}].
 
 
-get_msg_names() -> ['TorrentWrapper'].
+get_msg_names() -> ['TorrentWrapper', 'ServerMessage'].
 
 
 get_group_names() -> [].
 
 
-get_msg_or_group_names() -> ['TorrentWrapper'].
+get_msg_or_group_names() ->
+    ['TorrentWrapper', 'ServerMessage'].
 
 
 get_enum_names() -> [].
@@ -559,12 +726,18 @@ fetch_enum_def(EnumName) ->
 find_msg_def('TorrentWrapper') ->
     [#field{name = id, fnum = 1, rnum = 2, type = string,
 	    occurrence = optional, opts = []},
-     #field{name = users, fnum = 2, rnum = 3, type = string,
-	    occurrence = repeated, opts = []},
+     #field{name = user, fnum = 2, rnum = 3, type = string,
+	    occurrence = optional, opts = []},
      #field{name = group, fnum = 3, rnum = 4, type = string,
 	    occurrence = optional, opts = []},
      #field{name = content, fnum = 4, rnum = 5, type = bytes,
 	    occurrence = optional, opts = []}];
+find_msg_def('ServerMessage') ->
+    [#gpb_oneof{name = msg, rnum = 2,
+		fields =
+		    [#field{name = torrentWrapper, fnum = 1, rnum = 2,
+			    type = {msg, 'TorrentWrapper'},
+			    occurrence = optional, opts = []}]}];
 find_msg_def(_) -> error.
 
 
