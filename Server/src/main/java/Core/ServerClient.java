@@ -3,7 +3,9 @@ package Core;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.client.Client;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.net.*;
@@ -54,7 +56,7 @@ public class ServerClient extends Thread{
         try {
             st = new SharedTorrent(t, dest);
             c = new Client(Inet4Address.getByName("0.0.0.0"), st);
-        } catch (IOException | NoSuchAlgorithmException e) {
+        } catch (IOException | NoSuchAlgorithmException | ParserConfigurationException | InterruptedException | SAXException e) {
             e.printStackTrace();
         }
         c.setMaxDownloadRate(0.0);
