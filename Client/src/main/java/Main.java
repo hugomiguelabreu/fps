@@ -183,7 +183,8 @@ public class Main {
             e.printStackTrace();
             return ch;
         } finally {
-            group.shutdownGracefully();
+            //TODO: ter cuidado a fechar isto
+            //group.shutdownGracefully();
         }
         return ch;
     }
