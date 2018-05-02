@@ -14,6 +14,9 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +31,7 @@ public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Object.class);
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
 
         Scanner sc = new Scanner(System.in);
         String input;
@@ -62,12 +65,13 @@ public class Main {
                     String path = sc.nextLine();
                     ArrayList<String> trc = new ArrayList<String>();
                     //TODO: This IP must be dynamic
-                    trc.add("http://192.168.43.243:6969/announce");
+                    trc.add("http://138.68.151.167:6969/announce");
                     t = TorrentUtil.createTorrent(path, username, trc);
 
                     try {
                         TorrentUtil.upload(t, path, ch);
-                    } catch (InterruptedException e) {
+                    } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
+                        System.out.println("Couldn't bind, fallback to local");
                         e.printStackTrace();
                     }
 
@@ -88,12 +92,18 @@ public class Main {
                     }
 
                     t = TorrentUtil.createTorrent(path, username, trc);
-                    TorrentUtil.upload(t, path, offlineTck);
+                    try {
+                        TorrentUtil.upload(t, path, offlineTck);
+                    } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
+                        System.out.println("Couldn't bind, ERROR.");
+                        e.printStackTrace();
+                    }
                     System.out.println("Upload intention initiated");
                 }
             }
 
-            if (input.equals("download")) {
+            if (input.equals("download"))
+            {
                 System.out.println("What's the file number?");
                 File dest = new File("/tmp/");
                 SharedTorrent st = new SharedTorrent(available.get(Integer.parseInt(sc.nextLine())), dest);
@@ -125,7 +135,7 @@ public class Main {
                 .channel(NioSocketChannel.class)
                 .handler(new TorrentListenerInitializer(available));
                 // Make a new connection.
-                ch = b.connect("192.168.43.243", 5000).sync().channel();
+                ch = b.connect("138.68.151.167", 5000).sync().channel();
                 // Get the handler instance to initiate the request.
                 //TorrentClientHandler handler = ch.pipeline().get(TorrentClientHandler.class);
                 // Request and get the response.
