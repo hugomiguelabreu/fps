@@ -104,9 +104,9 @@ public class TorrentUtil {
         Client c = new Client(
                 InetAddress.getByName(ownAddresses.get(0).getIpv4()),
                 st);
-        c.getPeerSpec().setPeerId(ByteBuffer.wrap(username.getBytes()));
         c.share(-1);
         tck.announce(new TrackedTorrent(t));
+        System.out.println(c.getPeerSpec().getHexPeerId());
 
         //Creates a protobuf to send file info
         TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
@@ -135,7 +135,6 @@ public class TorrentUtil {
         Client c = new Client(
                 InetAddress.getByName(ip),
                 st);
-        c.getPeerSpec().setPeerId(ByteBuffer.wrap(username.getBytes()));
         c.share(-1);
 
         //Creates a protobuf to send file info
@@ -161,9 +160,9 @@ public class TorrentUtil {
             Client c = new Client(
                     InetAddress.getByName(ip),
                     st);
-            c.getPeerSpec().setPeerId(ByteBuffer.wrap(username.getBytes()));
             c.setMaxDownloadRate(0.0);
             c.setMaxUploadRate(0.0);
+
             //Download and seed
             c.addObserver((o, arg) -> {
                 System.out.println(st.getCompletion());
