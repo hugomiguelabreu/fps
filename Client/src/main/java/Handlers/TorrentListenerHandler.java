@@ -1,10 +1,12 @@
 package Handlers;
 
 
+import Misc.FileUtils;
 import Network.TorrentWrapperOuterClass;
 import com.turn.ttorrent.common.Torrent;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+
 import java.util.ArrayList;
 
 public class TorrentListenerHandler extends SimpleChannelInboundHandler<TorrentWrapperOuterClass.TorrentWrapper> {
@@ -23,6 +25,7 @@ public class TorrentListenerHandler extends SimpleChannelInboundHandler<TorrentW
                 torrentWrapper.getContent().toByteArray(),
                 true);
         available.add(t);
+        FileUtils.addTorrent(t);
     }
 
     @Override

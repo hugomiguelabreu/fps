@@ -1,9 +1,7 @@
-import Handlers.TorrentListenerHandler;
 import Handlers.TorrentListenerInitializer;
+import Misc.FileUtils;
 import Misc.TorrentUtil;
-import Network.TorrentWrapperOuterClass;
 import Offline.Offline;
-import com.google.protobuf.ByteString;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.Tracker;
@@ -14,15 +12,13 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.awt.*;
+
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.*;
 import java.nio.channels.UnsupportedAddressTypeException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.concurrent.TimeoutException;
 
 public class Main {
 
@@ -33,14 +29,53 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         String input;
         String username = "default";
+        String password, name;
         Torrent t = null;
         ArrayList<Torrent> available = new ArrayList<>();
         Channel ch = null;
         Tracker offlineTck = null;
+        FileUtils.initDir();
 
         System.out.println("Started client");
-        System.out.println("Tell me your username: ");
-        username = sc.nextLine();
+
+        while (true){
+
+            System.out.println("[l]login");
+            System.out.println("[r]register");
+
+            input = sc.nextLine();
+
+            if(input.equals("l")){
+                System.out.println("username:");
+                username = sc.nextLine();
+                System.out.println("password:");
+                password = sc.nextLine();
+                if(login(username, password)){
+                    System.out.println("logged in");
+                    break;
+                }
+            }
+
+            if(input.equals("r")){
+                System.out.println("username:");
+                username = sc.nextLine();
+                System.out.println("password:");
+                password = sc.nextLine();
+                System.out.println("name:");
+                name = sc.nextLine();
+                if(register(username, password, name)){
+                    System.out.println("registed");
+                    break;
+                }
+            }
+
+            System.out.println("---------------------------------");
+
+        }
+
+
+//        System.out.println("Tell me your username: ");
+//        username = sc.nextLine();
         System.out.println("Online or Offline?");
         String type = sc.nextLine();
 
@@ -161,5 +196,54 @@ public class Main {
         }
 
         throw new UnsupportedAddressTypeException();
+    }
+
+    private static boolean login(String username, String password){
+
+        return true;
+
+//        AccountOuterClass.Account request = AccountOuterClass.Account.newBuilder()
+//                .setType(false) // register -> true , login -> false
+//                .setUsername(username)
+//                .setPassword(password)
+//                .setName("").build();
+//
+//        try {
+//            //TODO mudar endereco
+//            Socket socket = new Socket("localhost" , 2184);
+//            request.writeDelimitedTo(socket.getOutputStream());
+//
+//            ResponseOuterClass.Response response = ResponseOuterClass.Response.parseDelimitedFrom(socket.getInputStream());
+//
+//            return response.getRep();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+    }
+
+    private static boolean register(String username, String password, String name){
+
+        return true;
+
+//        AccountOuterClass.Account request = AccountOuterClass.Account.newBuilder()
+//                .setType(true) // register -> true , login -> false
+//                .setUsername(username)
+//                .setPassword(password)
+//                .setName(name).build();
+//
+//        try {
+//            Socket socket = new Socket("localhost" , 2184);
+//            request.writeDelimitedTo(socket.getOutputStream());
+//
+//            ResponseOuterClass.Response response = ResponseOuterClass.Response.parseDelimitedFrom(socket.getInputStream());
+//
+//            return response.getRep();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
     }
 }
