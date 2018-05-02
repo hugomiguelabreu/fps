@@ -22,8 +22,6 @@ public class FileUtils {
             fos = new FileOutputStream(System.getProperty( "user.home" ) + "/.fps/" + t.getHexInfoHash());
             t.save(fos);
             IOUtils.closeQuietly(fos);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

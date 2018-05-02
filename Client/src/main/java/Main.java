@@ -82,9 +82,9 @@ public class Main {
 //        System.out.println("Tell me your username: ");
 //        username = sc.nextLine();
         System.out.println("Online or Offline?");
-        String type = sc.nextLine();
+        boolean type = sc.nextLine().equals("Online");
 
-        if(type.equals("Offline")) {
+        if(!type) {
             Offline.startProbes(username, available);
         }else {
             ch = startClient(available);
@@ -95,7 +95,7 @@ public class Main {
         }
 
         while (!(input = sc.nextLine()).equals("quit")) {
-            if (type.equals("Online")) {
+            if (type) {
                 System.out.println("Working online");
                 if (input.equals("upload")) {
                     System.out.println("What is the file?");
@@ -146,7 +146,7 @@ public class Main {
                 SharedTorrent st = new SharedTorrent(available.get(Integer.parseInt(sc.nextLine())), dest);
                 System.out.println("Downloading to /tmp/");
                 //TODO: Keep track of shared torrent to know when they end;
-                TorrentUtil.download(getIPv4Address(null).getHostAddress(), st);
+                TorrentUtil.download(st, type);
             }
 
             if (input.equals("info")) {
@@ -186,28 +186,6 @@ public class Main {
             group.shutdownGracefully();
         }
         return ch;
-    }
-
-    private static Inet4Address getIPv4Address(String iface)
-            throws SocketException, UnsupportedAddressTypeException,
-            UnknownHostException {
-        if (iface != null) {
-            Enumeration<InetAddress> addresses =
-                    NetworkInterface.getByName(iface).getInetAddresses();
-            while (addresses.hasMoreElements()) {
-                InetAddress addr = addresses.nextElement();
-                if (addr instanceof Inet4Address) {
-                    return (Inet4Address)addr;
-                }
-            }
-        }
-
-        InetAddress localhost = InetAddress.getLocalHost();
-        if (localhost instanceof Inet4Address) {
-            return (Inet4Address)localhost;
-        }
-
-        throw new UnsupportedAddressTypeException();
     }
 
     private static boolean login(String username, String password){

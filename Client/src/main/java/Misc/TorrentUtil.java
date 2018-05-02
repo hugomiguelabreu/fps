@@ -98,6 +98,8 @@ public class TorrentUtil {
         File dest = new File(path);
         //Seeding starts.
         SharedTorrent st = new SharedTorrent(t, dest.getParentFile());
+
+        //TODO: return client
         Client c = new Client(
                 InetAddress.getByName(ownAddresses.get(0).getIpv4()),
                 st);
@@ -118,30 +120,43 @@ public class TorrentUtil {
     }
 
     public static void upload(Torrent t, String path, Channel ch) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
-        ArrayList<LocalAddresses> ownAddresses = Offline.findLocalAddresses();
+
         File dest = new File(path);
         //Seeding starts.
         URL whatismyip = new URL("http://checkip.amazonaws.com");
         BufferedReader in = new BufferedReader(new InputStreamReader(
                 whatismyip.openStream()));
-
         String ip = in.readLine(); //you get the IP as a String
+
         SharedTorrent st = new SharedTorrent(t, dest.getParentFile());
+        //TODO: return client
         Client c = new Client(
                 InetAddress.getByName(ip),
                 st);
         c.share(-1);
+
         //Creates a protobuf to send file info
         TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
         //Escreve e espera pela escrita no socket
         ch.writeAndFlush(tw).sync();
     }
 
-    public static void download(String ipv4, SharedTorrent st)
+    public static void download(SharedTorrent st, boolean online)
     {
+        String ip;
         try {
+            if(online){
+                //Seeding starts.
+                URL whatismyip = new URL("http://checkip.amazonaws.com");
+                BufferedReader in = new BufferedReader(new InputStreamReader(
+                        whatismyip.openStream()));
+                ip = in.readLine(); //you get the IP as a String
+            }else{
+                ip = Offline.findLocalAddresses().get(0).getIpv4();
+            }
+
             Client c = new Client(
-                    InetAddress.getByName(ipv4),
+                    InetAddress.getByName(ip),
                     st);
 
             c.setMaxDownloadRate(0.0);
