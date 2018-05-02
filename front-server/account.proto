@@ -1,0 +1,9 @@
+syntax = "proto3";
+package network;
+
+message Account {
+  bool type = 1;
+  string username = 2;
+  string password = 3;
+  string name = 4;
+}

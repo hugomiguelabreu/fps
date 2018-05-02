@@ -130,4 +130,38 @@ msgDecriptor(Data, User, Socket, ID) ->
 			login(binary_to_list(U),binary_to_list(P),ID, Socket);
 		register ->
 			{'Register',U,P,N}=D,
-			register(binary_to_list(U),binary_to_list(P),binary_
+			register(binary_to_list(U),binary_to_list(P),binary_to_list(N),Socket);
+		createGroup ->
+			{G} = D,
+			createGroup(User, G, Socket);
+		joinGroup ->
+			{G} = D,
+			joinGroup(User, G, Socket);
+		torrentWrapper ->
+			redirect(D)
+	end.
+
+redirect(ProtoTorrent) ->
+	io:format("> starting to redirect to group " ++ binary_to_list(ProtoTorrent#'TorrentWrapper'.group) ++ "\n"),
+	case zk:getGroupUsers(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
+		{ok, L} ->
+			lists:foreach(fun(USR) ->
+							case data:get_pid(USR) of
+								{ok, Pid} ->
+									Pid ! {USR, torrent, ProtoTorrent};
+								{error, Reason} ->
+									Reason
+								end
+						  end, L);
+		no_group ->
+			io:format("error: group doesn't exist\n");
+
+		_ ->
+			io:format("list error\n")
+	end.
+
+
+
+
+
+

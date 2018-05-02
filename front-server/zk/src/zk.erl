@@ -154,4 +154,78 @@ getGroupUsers(Name, PID) ->
 	case L of
 		{ok, _} ->
 			lists:map(fun(X) -> getLoc(PID, X) end, L);
-		{err
+		{error, no_node} ->
+			no_group;
+		_ ->
+			error
+	end.
+
+
+getLoc(PID, User) ->
+	case erlzk:get_data(PID, "/users/" + User + "/online") of
+		{error, _} ->
+		 	error;
+		{ok,{RP,_}} ->
+		 	case RP of
+		 		true -> 
+		 			case erlzk:get_data(PID, "/users/" + User + "/sv") of 
+		 				{error, _} ->
+		 					error;
+						{ok,{RP,_}} ->
+							{RP,User}
+					end;
+				false ->
+					{'offline', User}
+			end
+
+ 	end.
+
+
+% ---------------------------------------------------
+% server
+% ---------------------------------------------------
+
+getTrackerList() -> rpc({tracker_list}).
+getTrackerList(PID) ->
+	TrackersPath = "/trackers",
+	case erlzk:get_children(PID,TrackersPath) of
+		{error, no_node} ->
+			io:format("> tracker list empty\n");
+		{ok, L} ->
+			{ok,L};
+		_ ->
+			error
+	end.
+
+getFrontSv(ID) -> rpc({front_sv, ID}).
+getFrontSv(ID, PID) ->
+	FEpath = "/front-servers/" + ID, 
+	case erlzk:get_data(PID, FEpath) of
+		{error, _} ->
+		 	error;
+		{ok,{RP,_}} ->
+		 	RP
+	 	end.
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+ 
+
+
+
+
+
+
