@@ -106,7 +106,7 @@ public class Main {
                     t = TorrentUtil.createTorrent(path, username, trc);
 
                     try {
-                        TorrentUtil.upload(t, path, ch);
+                        TorrentUtil.upload(t, path, ch, username);
                     } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
                         System.out.println("Couldn't bind, fallback to local");
                         e.printStackTrace();
@@ -130,7 +130,7 @@ public class Main {
 
                     t = TorrentUtil.createTorrent(path, username, trc);
                     try {
-                        TorrentUtil.upload(t, path, offlineTck);
+                        TorrentUtil.upload(t, path, offlineTck, username);
                     } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
                         System.out.println("Couldn't bind, ERROR.");
                         e.printStackTrace();
@@ -146,7 +146,7 @@ public class Main {
                 SharedTorrent st = new SharedTorrent(available.get(Integer.parseInt(sc.nextLine())), dest);
                 System.out.println("Downloading to /tmp/");
                 //TODO: Keep track of shared torrent to know when they end;
-                TorrentUtil.download(st, type);
+                TorrentUtil.download(st, type, username);
             }
 
             if (input.equals("info")) {

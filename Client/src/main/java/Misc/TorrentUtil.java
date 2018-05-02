@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,7 +94,7 @@ public class TorrentUtil {
      * @throws NoSuchAlgorithmException
      */
 
-    public static void upload(Torrent t, String path, Tracker tck) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
+    public static void upload(Torrent t, String path, Tracker tck, String username) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
         ArrayList<LocalAddresses> ownAddresses = Offline.findLocalAddresses();
         File dest = new File(path);
         //Seeding starts.
@@ -103,6 +104,7 @@ public class TorrentUtil {
         Client c = new Client(
                 InetAddress.getByName(ownAddresses.get(0).getIpv4()),
                 st);
+        c.getPeerSpec().setPeerId(ByteBuffer.wrap(username.getBytes()));
         c.share(-1);
         tck.announce(new TrackedTorrent(t));
 
@@ -119,7 +121,7 @@ public class TorrentUtil {
         }
     }
 
-    public static void upload(Torrent t, String path, Channel ch) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
+    public static void upload(Torrent t, String path, Channel ch, String username) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
 
         File dest = new File(path);
         //Seeding starts.
@@ -133,6 +135,7 @@ public class TorrentUtil {
         Client c = new Client(
                 InetAddress.getByName(ip),
                 st);
+        c.getPeerSpec().setPeerId(ByteBuffer.wrap(username.getBytes()));
         c.share(-1);
 
         //Creates a protobuf to send file info
@@ -141,7 +144,7 @@ public class TorrentUtil {
         ch.writeAndFlush(tw).sync();
     }
 
-    public static void download(SharedTorrent st, boolean online)
+    public static void download(SharedTorrent st, boolean online, String username)
     {
         String ip;
         try {
@@ -158,7 +161,7 @@ public class TorrentUtil {
             Client c = new Client(
                     InetAddress.getByName(ip),
                     st);
-
+            c.getPeerSpec().setPeerId(ByteBuffer.wrap(username.getBytes()));
             c.setMaxDownloadRate(0.0);
             c.setMaxUploadRate(0.0);
             //Download and seed
