@@ -103,7 +103,8 @@ public class TorrentUtil {
         //TODO: return client
         Client c = new Client(
                 InetAddress.getByName(ownAddresses.get(0).getIpv4()),
-                st);
+                st,
+                username);
         c.share(-1);
         tck.announce(new TrackedTorrent(t));
         System.out.println(c.getPeerSpec().getHexPeerId());
@@ -134,7 +135,8 @@ public class TorrentUtil {
         //TODO: return client
         Client c = new Client(
                 InetAddress.getByName(ip),
-                st);
+                st,
+                username);
         c.share(-1);
 
         //Creates a protobuf to send file info
@@ -159,7 +161,8 @@ public class TorrentUtil {
 
             Client c = new Client(
                     InetAddress.getByName(ip),
-                    st);
+                    st,
+                    username);
             c.setMaxDownloadRate(0.0);
             c.setMaxUploadRate(0.0);
 

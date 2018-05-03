@@ -4,6 +4,7 @@ import Misc.TorrentUtil;
 import Offline.Offline;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
+import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
