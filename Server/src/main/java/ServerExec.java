@@ -4,28 +4,35 @@ import Util.FileUtils;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerExec {
 
     public static void main(String[] args) throws IOException, InterruptedException, NoSuchAlgorithmException {
-        HashMap<String, ServerClient> clients = new HashMap<>();
-        //Starts tracker;
+        ConcurrentHashMap<String, Client> clients = new ConcurrentHashMap<>();
         Tracker tck = new Tracker(new InetSocketAddress(6969));
         MainServer ms = new MainServer(5000, tck, clients);
-        //Starts server;
+        //Starts tracker
         tck.start();
-        ms.start();
         System.out.println("Tracker initiated");
+        //Starts server;
+        ms.start();
         System.out.println("Server initiated");
 
-        if(FileUtils.loadTorrents(tck, clients))
-            System.out.println("Could not load torrents persisted / No files");
+        try {
+            if(FileUtils.loadTorrents(tck, clients))
+                System.out.println("Could not load torrents persisted / No files");
+        } catch (SAXException | ParserConfigurationException e) {
+            e.printStackTrace();
+        }
 
         Scanner reader = new Scanner(System.in);
         String line;

@@ -19,9 +19,9 @@ import java.util.Map;
 public class TorrentServerInitializer extends ChannelInitializer<SocketChannel>{
 
     private Tracker trackedTorrents;
-    private Map<String, ServerClient> openClients;
+    private Map<String, Client> openClients;
 
-    public TorrentServerInitializer(Tracker trackedTorrentsParam, Map<String, ServerClient> openClientsParam){
+    public TorrentServerInitializer(Tracker trackedTorrentsParam, Map<String, Client> openClientsParam){
         this.openClients = openClientsParam;
         this.trackedTorrents = trackedTorrentsParam;
     }
