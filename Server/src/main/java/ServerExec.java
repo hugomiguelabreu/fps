@@ -9,7 +9,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,7 +40,6 @@ public class ServerExec {
                 System.out.println(t.getName());
                 System.out.println(t.getCreatedBy());
                 System.out.println("---------------------------");
-
             }
         }
         ms.shutdown();
