@@ -1,27 +1,14 @@
 package Handlers;
 
-import Core.ServerClient;
 import Network.TorrentWrapperOuterClass;
 import Util.FileUtils;
 import Util.TorrentUtil;
 import com.turn.ttorrent.client.Client;
-import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
-import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.commons.io.IOUtils;
-import org.xml.sax.SAXException;
-
-import javax.sound.midi.Track;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.Inet4Address;
-import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 public class TorrentServerHandler extends SimpleChannelInboundHandler<TorrentWrapperOuterClass.TorrentWrapper>{
