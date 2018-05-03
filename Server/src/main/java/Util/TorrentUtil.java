@@ -38,8 +38,8 @@ public class TorrentUtil {
 
         tt.addObserver((o, arg) -> {
             TrackedPeer tp = (TrackedPeer) arg;
-            if(tp.isCompleted()){
-                if(tt.getPeers().values().stream().allMatch(TrackedPeer::isCompleted))
+            if(tp.getLeft() == 0){
+                if(tt.getPeers().values().stream().allMatch(x -> x.getLeft()==0))
                     clients.get(tt.getHexInfoHash()).stop();
             }else{
                 if(!clients.containsKey(t.getHexInfoHash())){
