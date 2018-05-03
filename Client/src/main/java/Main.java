@@ -2,6 +2,7 @@ import Handlers.TorrentListenerInitializer;
 import Misc.FileUtils;
 import Misc.TorrentUtil;
 import Offline.Offline;
+import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.Tracker;
@@ -28,6 +29,7 @@ import java.util.*;
 public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Object.class);
+    private static ArrayList<Client> activeClients;
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
 
@@ -40,6 +42,7 @@ public class Main {
         Channel ch = null;
         Tracker offlineTck = null;
         FileUtils.initDir();
+        activeClients = new ArrayList<>();
 
         System.out.println("Started client");
 
@@ -95,6 +98,7 @@ public class Main {
         }
 
         while (!(input = sc.nextLine()).equals("quit")) {
+
             if (type) {
                 System.out.println("Working online");
                 if (input.equals("upload")) {
@@ -102,11 +106,11 @@ public class Main {
                     String path = sc.nextLine();
                     ArrayList<String> trc = new ArrayList<String>();
                     //TODO: This IP must be dynamic
-                    trc.add("http://138.68.151.167:6969/announce");
+                    trc.add("http://192.168.43.243:6969/announce");
                     t = TorrentUtil.createTorrent(path, username, trc);
 
                     try {
-                        TorrentUtil.upload(t, path, ch, username);
+                        activeClients.add(TorrentUtil.upload(t, path, ch, username));
                     } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
                         System.out.println("Couldn't bind, fallback to local");
                         e.printStackTrace();
@@ -122,7 +126,7 @@ public class Main {
                     ArrayList<String> trc = new ArrayList<String>();
                     trc.add("http://" + Offline.findLocalAddresses().get(0).getIpv4()  + ":6969/announce");
                     //Already has a tracker running?
-                    if(offlineTck == null) {
+                    if(offlineTck == null) { //TODO o tracker pode estar parado e nao ser null pq lambda exps
                         String httpAddress = Offline.findLocalAddresses().get(0).getIpv4();
                         offlineTck = new Tracker(new InetSocketAddress(InetAddress.getByName(httpAddress), 6969));
                         offlineTck.start();
@@ -161,6 +165,20 @@ public class Main {
                 }
             }
         }
+
+        //input == quit
+
+        System.out.println("Shuting down...");
+        for(Client c : activeClients){
+
+            c.stop();
+        }
+
+        if (offlineTck != null) {
+            offlineTck.stop();
+        }
+
+        System.exit(0);
     }
 
     private static Channel startClient(ArrayList<Torrent> available) throws SocketException, UnknownHostException {
@@ -172,7 +190,7 @@ public class Main {
                 .channel(NioSocketChannel.class)
                 .handler(new TorrentListenerInitializer(available));
                 // Make a new connection.
-                ch = b.connect("138.68.151.167", 5000).sync().channel();
+                ch = b.connect("192.168.43.243", 5000).sync().channel();
                 // Get the handler instance to initiate the request.
                 //TorrentClientHandler handler = ch.pipeline().get(TorrentClientHandler.class);
                 // Request and get the response.
@@ -183,7 +201,7 @@ public class Main {
             e.printStackTrace();
             return ch;
         } finally {
-            group.shutdownGracefully();
+            //group.shutdownGracefully();
         }
         return ch;
     }
