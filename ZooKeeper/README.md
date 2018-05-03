@@ -1,5 +1,8 @@
 # Starting manual
 
+Eliminado do git por ser instável e ter bastante Gbs.
+Novo guia a caminho.
+
 ## Iniciar o cluster
 
 1. Aceder pasta Core

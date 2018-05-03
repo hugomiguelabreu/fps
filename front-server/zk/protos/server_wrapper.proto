@@ -1,0 +1,17 @@
+syntax = "proto3";
+package server_network;
+
+message TorrentWrapper{
+	string id = 1;
+	string user = 2;
+	string group = 3;
+    bytes content = 4;
+}
+
+message ServerMessage {
+    oneof msg {
+        TorrentWrapper torrentWrapper = 1;
+    }   
+}
+
+

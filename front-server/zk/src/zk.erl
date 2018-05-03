@@ -1,5 +1,5 @@
 -module(zk).
--export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/1, setOffline/1, getGroupUsers/1]).
+-export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/2, setOffline/1, getGroupUsers/1, getTrackerList/0, getFrontSv/1, newTorrent/3, setUnreceivedTorrent/3]).
 
 
 init(Host, Port) ->
@@ -27,8 +27,8 @@ loop(Pid) ->
 			V = joinGroup(N, U, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
-		{{set_online, U}, From} ->
-			V = setOnline(U, Pid),
+		{{set_online, U, SID}, From} ->
+			V = setOnline(U, SID, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
     	{{set_offline, U}, From} ->
@@ -38,12 +38,33 @@ loop(Pid) ->
     	{{group_users, N}, From} ->
 			V = getGroupUsers(N, Pid),
 			From ! {?MODULE, V},
+    		loop(Pid);
+    	{{tracker_list}, From} ->
+			V = getTrackerList(Pid),
+			From ! {?MODULE, V},
+    		loop(Pid);
+    	{{front_sv, ID}, From} ->
+			V = getFrontSv(ID, Pid),
+			From ! {?MODULE, V},
+    		loop(Pid);
+    	{{new_torrent, TID, U, G}, From} ->
+    		V = newTorrent(TID, U, G, Pid),
+			From ! {?MODULE, V},
+    		loop(Pid);
+    	{{unreceived_torrent, TID, U, G}, From} ->
+    		V = setUnreceivedTorrent(TID, U, G, Pid),
+			From ! {?MODULE, V},
     		loop(Pid)
 	end.
 
 rpc(Request) ->
 	?MODULE ! {Request, self()},
 	receive {?MODULE, Res} -> Res end.
+
+% ---------------------------------------------------
+% client 
+% ---------------------------------------------------
+
 
 register(U,P,N) -> rpc({register,U,P,N}).
 register(Pid, Username, Password, Name) ->
@@ -86,6 +107,7 @@ createGroup(PID,Name,User) ->
 			erlzk:create(PID,GroupPath, list_to_binary("")),
 			erlzk:create(PID,GroupPath ++ "/log", list_to_binary("")),
 			erlzk:create(PID,GroupPath ++ "/meta", list_to_binary("")),
+			erlzk:create(PID,GroupPath ++ "/torrents", list_to_binary("")),
 			erlzk:create(PID,GroupPath ++ "/users", list_to_binary("")),
 			erlzk:create(PID,GroupPath ++ "/users/" ++ User, list_to_binary("admin")),
 			ok;
@@ -108,14 +130,20 @@ joinGroup(Name, Username, PID) ->
 			error
 	end.
 
-setOnline(U) -> rpc({set_online, U}).
-setOnline(Username,PID) ->
+setOnline(U,SID) -> rpc({set_online, U, SID}).
+setOnline(Username,SID,PID) ->
 	UserPath = "/users/" ++ Username ++ "/online",
 	case erlzk:set_data(PID,UserPath,list_to_binary("true")) of
 		{error, _} ->
 			error;
 		_ ->
-			ok
+			SvPath = "/users/" ++ Username ++ "/sv",
+			case erlzk:set_data(PID,SvPath,integer_to_binary(SID)) of
+				{error, _} ->
+					error;
+				_ ->
+					ok
+			end
 	end.
 
 setOffline(U) -> rpc({set_offline, U}).
@@ -131,20 +159,77 @@ setOffline(Username,PID) ->
 getGroupUsers(N)-> rpc({group_users, N}).
 getGroupUsers(Name, PID) ->
 	GroupPath = "/groups/" ++ Name ++ "/users",
-	case erlzk:get_children(PID,GroupPath) of
+	L = erlzk:get_children(PID,GroupPath),
+	case L of
+		{ok, _} ->
+			{ok, lists:map(fun(X) -> getLoc(PID, X) end, L)};
 		{error, no_node} ->
 			no_group;
+		_ ->
+			error
+	end.
+
+
+getLoc(PID, User) ->
+	case erlzk:get_data(PID, "/users/" + User + "/online") of
+		{error, _} ->
+		 	error;
+		{ok,{RP,_}} ->
+		 	case RP of
+		 		true -> 
+		 			case erlzk:get_data(PID, "/users/" + User + "/sv") of 
+		 				{error, _} ->
+		 					error;
+						{ok,{RP,_}} ->
+							{RP,User}
+					end;
+				false ->
+					{'offline', User}
+			end
+
+ 	end.
+
+
+% ---------------------------------------------------
+% server
+% ---------------------------------------------------
+
+getTrackerList() -> rpc({tracker_list}).
+getTrackerList(PID) ->
+	TrackersPath = "/trackers",
+	case erlzk:get_children(PID,TrackersPath) of
+		{error, no_node} ->
+			io:format("> tracker list empty\n");
 		{ok, L} ->
 			{ok,L};
 		_ ->
 			error
 	end.
 
+getFrontSv(ID) -> rpc({front_sv, ID}).
+getFrontSv(ID, PID) ->
+	FEpath = "/front-servers/" + ID, 
+	case erlzk:get_data(PID, FEpath) of
+		{error, _} ->
+		 	error;
+		{ok,{RP,_}} ->
+		 	RP
+	 	end.
 
+newTorrent(TID, U, G) -> rpc({new_torrent, TID, U, G}). 
+newTorrent(TID, User, Group, PID) ->
+	GroupPath = "/groups/" ++ Group ++ "/torrents/" ++ TID,
+	erlzk:create(PID, GroupPath, list_to_binary(User)),
+	erlzk:create(PID, GroupPath ++ "/" ++ User, list_to_binary("")),
+	ok.	
 
+setUnreceivedTorrent(TID, U, G) -> rpc({unreceived_torrent, TID, U, G}). 
+setUnreceivedTorrent(TID, User, Group, PID) -> 
+	GroupPath = "/groups/" ++ Group ++ "/torrents/" ++ TID ++ "/" ++ User,
+	erlzk:create(PID, GroupPath ++ User, list_to_binary("")),
+	ok.	
 
-
-
+		
 
 
 

@@ -10,6 +10,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MainServer extends Thread{
     private int port;
@@ -17,9 +19,9 @@ public class MainServer extends Thread{
     private EventLoopGroup workerGroup;
     private EventLoopGroup bossGroup;
     private Tracker tck;
-    private HashMap<String, ServerClient> clients;
+    private Map<String, Client> clients;
 
-    public MainServer(int portParam, Tracker tckParam, HashMap<String, ServerClient> clientsParam){
+    public MainServer(int portParam, Tracker tckParam, Map<String, Client> clientsParam){
         this.port = portParam;
         this.tck = tckParam;
         this.clients = clientsParam;

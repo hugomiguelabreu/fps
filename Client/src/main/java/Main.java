@@ -5,6 +5,7 @@ import Offline.Offline;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
+import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -30,6 +31,7 @@ public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Object.class);
     private static ArrayList<Client> activeClients;
+    private static EventLoopGroup group = null;
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
 
@@ -106,7 +108,9 @@ public class Main {
                     String path = sc.nextLine();
                     ArrayList<String> trc = new ArrayList<String>();
                     //TODO: This IP must be dynamic
+
                     trc.add("http://192.168.43.243:6969/announce");
+
                     t = TorrentUtil.createTorrent(path, username, trc);
 
                     try {
@@ -178,11 +182,14 @@ public class Main {
             offlineTck.stop();
         }
 
+        group.shutdownGracefully();
         System.exit(0);
+
+        //TODO:Terminar todos os clientes/tarckers abertos
     }
 
     private static Channel startClient(ArrayList<Torrent> available) throws SocketException, UnknownHostException {
-        EventLoopGroup group = new NioEventLoopGroup();
+        group = new NioEventLoopGroup();
         Channel ch = null;
         try {
             Bootstrap b = new Bootstrap();
@@ -190,7 +197,9 @@ public class Main {
                 .channel(NioSocketChannel.class)
                 .handler(new TorrentListenerInitializer(available));
                 // Make a new connection.
+
                 ch = b.connect("192.168.43.243", 5000).sync().channel();
+
                 // Get the handler instance to initiate the request.
                 //TorrentClientHandler handler = ch.pipeline().get(TorrentClientHandler.class);
                 // Request and get the response.
@@ -199,10 +208,12 @@ public class Main {
                 //sch.close();
         } catch (Exception e) {
             e.printStackTrace();
+
             return ch;
         } finally {
             //group.shutdownGracefully();
         }
+
         return ch;
     }
 
