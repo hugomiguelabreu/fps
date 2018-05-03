@@ -29,6 +29,7 @@ import java.util.*;
 public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Object.class);
+    private static EventLoopGroup group = null;
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
 
@@ -103,7 +104,7 @@ public class Main {
                     String path = sc.nextLine();
                     ArrayList<String> trc = new ArrayList<String>();
                     //TODO: This IP must be dynamic
-                    trc.add("http://138.68.151.167:6969/announce");
+                    trc.add("http://192.168.10.1:6969/announce");
                     t = TorrentUtil.createTorrent(path, username, trc);
 
                     try {
@@ -162,10 +163,12 @@ public class Main {
                 }
             }
         }
+        group.shutdownGracefully();
+        //TODO:Terminar todos os clientes/tarckers abertos
     }
 
     private static Channel startClient(ArrayList<Torrent> available) throws SocketException, UnknownHostException {
-        EventLoopGroup group = new NioEventLoopGroup();
+        group = new NioEventLoopGroup();
         Channel ch = null;
         try {
             Bootstrap b = new Bootstrap();
@@ -173,7 +176,7 @@ public class Main {
                 .channel(NioSocketChannel.class)
                 .handler(new TorrentListenerInitializer(available));
                 // Make a new connection.
-                ch = b.connect("138.68.151.167", 5000).sync().channel();
+                ch = b.connect("192.168.10.1", 5000).sync().channel();
                 // Get the handler instance to initiate the request.
                 //TorrentClientHandler handler = ch.pipeline().get(TorrentClientHandler.class);
                 // Request and get the response.
@@ -182,11 +185,9 @@ public class Main {
                 //sch.close();
         } catch (Exception e) {
             e.printStackTrace();
-            return ch;
-        } finally {
-            //TODO: ter cuidado a fechar isto
-            //group.shutdownGracefully();
+            return null;
         }
+
         return ch;
     }
 

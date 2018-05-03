@@ -107,7 +107,6 @@ public class TorrentUtil {
                 username);
         c.share(-1);
         tck.announce(new TrackedTorrent(t));
-        System.out.println(c.getPeerSpec().getHexPeerId());
 
         //Creates a protobuf to send file info
         TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
@@ -161,8 +160,7 @@ public class TorrentUtil {
 
             Client c = new Client(
                     InetAddress.getByName(ip),
-                    st,
-                    username);
+                    st);
             c.setMaxDownloadRate(0.0);
             c.setMaxUploadRate(0.0);
 
