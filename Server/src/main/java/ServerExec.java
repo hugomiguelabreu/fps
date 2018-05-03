@@ -42,6 +42,12 @@ public class ServerExec {
                 System.out.println("---------------------------");
             }
         }
+
+        for (Client c: clients.values()){
+            if(c!=null)
+                c.stop();
+        }
+        tck.stop();
         ms.shutdown();
     }
 

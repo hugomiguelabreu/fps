@@ -33,6 +33,9 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<TorrentWra
         //Start tracked torrent and client
         //No need to check if torrent is already announced
         tck.announce(tt);
+        //Init a client, so server can get the file
+        Client serverCli = TorrentUtil.initClient(t, "/tmp");
+        openClients.put(t.getHexInfoHash(), serverCli);
     }
 
     @Override
