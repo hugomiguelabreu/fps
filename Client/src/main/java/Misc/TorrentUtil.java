@@ -108,13 +108,8 @@ public class TorrentUtil {
 
         Client c = new Client(
                 InetAddress.getByName(ownAddresses.get(0).getIpv4()),
-<<<<<<< HEAD
                 st);
 
-=======
-                st,
-                username);
->>>>>>> 2817ea55cea6f5e5aad17399865419565bab1fd5
         c.share(-1);
 
         TrackedTorrent tr = new TrackedTorrent(t);
@@ -191,10 +186,7 @@ public class TorrentUtil {
                 InetAddress.getByName(ip),
                 st,
                 username);
-<<<<<<< HEAD
-//        c.getPeerSpec().setPeerId(ByteBuffer.wrap(username.getBytes()));
-=======
->>>>>>> 2817ea55cea6f5e5aad17399865419565bab1fd5
+
         c.share(-1);
 
         //Creates a protobuf to send file info
