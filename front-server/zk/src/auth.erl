@@ -127,7 +127,6 @@ joinGroup(User, GroupName, Socket) ->
 
 msgDecriptor(Data, User, Socket, ID) ->
 	{_, {T, D}} =  wrapper:decode_msg(Data, 'ClientMessage'),
-	io:format(T),
 	case T of
 		login ->
 			{'Login',U,P}=D,
@@ -142,13 +141,15 @@ msgDecriptor(Data, User, Socket, ID) ->
 			{G} = D,
 			joinGroup(User, G, Socket);
 		torrentWrapper ->
-			redirect(D, ID, User)
+			redirect(D, integer_to_list(ID), User)
 	end.
 
 redirect(ProtoTorrent, ID, CurrentUser) ->
 	io:format("> starting to redirect to group " ++ binary_to_list(ProtoTorrent#'TorrentWrapper'.group) ++ "\n"),
-	TID = ID ++ "_" ++ data:incrementAndGet(),
-	zk:newTorrent(TID, ProtoTorrent#'TorrentWrapper'.group, CurrentUser),
+	
+	{ok, X} = data:incrementAndGet(),
+	TID = ID ++ "_" ++ integer_to_list(X),
+	zk:newTorrent(TID, CurrentUser, binary_to_list(ProtoTorrent#'TorrentWrapper'.group)),
 
 	case zk:getGroupUsers(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
 		{ok, L} ->
@@ -160,12 +161,12 @@ redirect(ProtoTorrent, ID, CurrentUser) ->
 										{ok, Pid} ->
 											Pid ! {User, packed_torrent, ProtoTorrent};
 										error ->
-											zk:setUnreceivedTorrent(TID, User, ProtoTorrent#'TorrentWrapper'.group)
+											zk:setUnreceivedTorrent(TID, User, binary_to_list(ProtoTorrent#'TorrentWrapper'.group))
 									end;
 								offline ->
-									zk:setUnreceivedTorrent(TID, User, ProtoTorrent#'TorrentWrapper'.group);
+									zk:setUnreceivedTorrent(TID, User, binary_to_list(ProtoTorrent#'TorrentWrapper'.group));
 								_ ->
-									server_comm:send_torrent(Loc, User, ProtoTorrent#'TorrentWrapper'.group, ProtoTorrent#'TorrentWrapper'.content)
+									server_comm:send_torrent(Loc, User, binary_to_list(ProtoTorrent#'TorrentWrapper'.group), ProtoTorrent#'TorrentWrapper'.content)
 							end
 						  end, L);
 		no_group ->

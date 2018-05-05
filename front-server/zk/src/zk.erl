@@ -159,9 +159,9 @@ setOffline(Username,PID) ->
 getGroupUsers(N)-> rpc({group_users, N}).
 getGroupUsers(Name, PID) ->
 	GroupPath = "/groups/" ++ Name ++ "/users",
-	L = erlzk:get_children(PID,GroupPath),
-	case L of
-		{ok, _} ->
+	R = erlzk:get_children(PID,GroupPath),
+	case R of
+		{ok, L} ->
 			{ok, lists:map(fun(X) -> getLoc(PID, X) end, L)};
 		{error, no_node} ->
 			no_group;
@@ -171,19 +171,19 @@ getGroupUsers(Name, PID) ->
 
 
 getLoc(PID, User) ->
-	case erlzk:get_data(PID, "/users/" + User + "/online") of
+	case erlzk:get_data(PID, "/users/" ++ User ++ "/online") of
 		{error, _} ->
 		 	error;
 		{ok,{RP,_}} ->
-		 	case RP of
-		 		true -> 
-		 			case erlzk:get_data(PID, "/users/" + User + "/sv") of 
+		 	case binary_to_list(RP) of
+		 		"true" -> 
+		 			case erlzk:get_data(PID, "/users/" ++ User ++ "/sv") of 
 		 				{error, _} ->
 		 					error;
-						{ok,{RP,_}} ->
-							{RP,User}
+						{ok,{LOC,_}} ->
+							{binary_to_list(LOC),User}
 					end;
-				false ->
+				"false" ->
 					{'offline', User}
 			end
 
@@ -220,7 +220,8 @@ newTorrent(TID, U, G) -> rpc({new_torrent, TID, U, G}).
 newTorrent(TID, User, Group, PID) ->
 	GroupPath = "/groups/" ++ Group ++ "/torrents/" ++ TID,
 	erlzk:create(PID, GroupPath, list_to_binary(User)),
-	erlzk:create(PID, GroupPath ++ "/" ++ User, list_to_binary("")),
+	erlzk:create(PID, GroupPath ++ "/torrent/" ++ User, list_to_binary("")),
+	erlzk:create(PID, GroupPath ++ "/file/" ++ User, list_to_binary("")),
 	ok.	
 
 setUnreceivedTorrent(TID, U, G) -> rpc({unreceived_torrent, TID, U, G}). 
