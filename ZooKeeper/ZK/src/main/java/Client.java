@@ -17,7 +17,10 @@ public class Client implements Runnable{
     public void run() {
         Socket socket = null;
         try {
-            socket = new Socket("localhost"  , 2000);
+            if(username.equals("jib"))
+                socket = new Socket("localhost"  , 2000);
+            else
+                socket = new Socket("localhost"  , 2001);
 
             Wrapper.Login login = Wrapper.Login.newBuilder()
                     .setUsername(username)
@@ -42,7 +45,7 @@ public class Client implements Runnable{
                 socket.getOutputStream().write(wrapper.getSerializedSize());
                 wrapper.writeTo(socket.getOutputStream());
             }
-            System.out.println(Wrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getTorrentWrapper());
+            System.out.println(username + " : " + Wrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getTorrentWrapper());
 
 
         } catch (Exception e) { e.printStackTrace();}

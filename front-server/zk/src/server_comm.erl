@@ -1,9 +1,9 @@
 -module(server_comm).
--export([init/0, send_torrent/5]).
+-export([init/1, send_torrent/5]).
 -include("server_wrapper.hrl").
 
-init() ->
-	{ok, LSock} = gen_tcp:listen(2001, [binary, {reuseaddr, true}, {packet, 1}]),
+init(Port) ->
+	{ok, LSock} = gen_tcp:listen(Port, [binary, {reuseaddr, true}, {packet, 1}]),
 	io:format("> Listening for server communication\n"),
 	acceptor(LSock).
 
@@ -16,7 +16,7 @@ receiveMsg(Socket) ->
 	receive 
 		{tcp, Socket, Data} ->
 			msgDecriptor(Data);
-		{tcp_closed, _} ->
+		{error, _} ->
 			io:format("closed\n");
 		_ ->
 		 	io:format("error\n")
@@ -28,24 +28,27 @@ msgDecriptor(Data) ->
 	case T of
 		torrentWrapper ->
 			{'TorrentWrapper', ID, User, Group, Content} = D,
-			case data:get_pid(User) of
+			case data:get_pid(binary_to_list(User)) of
 				{ok, Pid} ->
-					Pid ! {User, unpacked_torrent, Group, Content};
+					Pid ! {binary_to_list(User), unpacked_torrent, binary_to_list(Group), Content};
 				_ ->
-					zk:setUnreceivedTorrent(ID, User, Group)
+					zk:setUnreceivedTorrent(binary_to_list(ID), binary_to_list(User), binary_to_list(Group))
 			end	
 	end.
 
 send_torrent(Loc, User, Group, TID, Data) ->
-	IP_PORT = zk:getFrontSv(Loc),
+	IP_PORT = binary_to_list(zk:getFrontSv(Loc)),
 	case IP_PORT of
 		error ->
 			error_sending;
 		_ ->
 			[IP,PORT] = string:split(IP_PORT,":"),
-			Msg = server_wrapper:encode_msg(#'ServerMessage'{msg={torrentWrapper, #'TorrentWrapper'{id=TID, user=User, group=Group, content= Data}}}),
-			{ok, Socket} = gen_tcp:connect(IP, PORT, [binary, {packet, 0}]),
-		    ok = gen_tcp:send(Socket, Msg),
-		    ok = gen_tcp:close(Socket)
+			Msg = server_wrapper:encode_msg(#'ServerMessage'{msg={torrentWrapper, #'TorrentWrapper'{id=TID, user=User, group=Group, content=Data}}}),
+			case gen_tcp:connect(IP, list_to_integer(PORT), [binary, {reuseaddr, true}, {packet, 1}]) of
+				{ok, Socket} ->
+		    		gen_tcp:send(Socket, Msg);
+		    	{error, Reason} ->
+		    		Reason
+	    	end
 	end.
 

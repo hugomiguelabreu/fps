@@ -208,7 +208,7 @@ getTrackerList(PID) ->
 
 getFrontSv(ID) -> rpc({front_sv, ID}).
 getFrontSv(ID, PID) ->
-	FEpath = "/front-servers/" + ID, 
+	FEpath = "/front-servers/" ++ ID, 
 	case erlzk:get_data(PID, FEpath) of
 		{error, _} ->
 		 	error;
@@ -220,13 +220,13 @@ newTorrent(TID, U, G) -> rpc({new_torrent, TID, U, G}).
 newTorrent(TID, User, Group, PID) ->
 	GroupPath = "/groups/" ++ Group ++ "/torrents/" ++ TID,
 	erlzk:create(PID, GroupPath, list_to_binary(User)),
-	erlzk:create(PID, GroupPath ++ "/torrent/" ++ User, list_to_binary("")),
-	erlzk:create(PID, GroupPath ++ "/file/" ++ User, list_to_binary("")),
+	erlzk:create(PID, GroupPath ++ "/torrent/", list_to_binary("")),
+	erlzk:create(PID, GroupPath ++ "/file/", list_to_binary("")),
 	ok.	
 
 setUnreceivedTorrent(TID, U, G) -> rpc({unreceived_torrent, TID, U, G}). 
 setUnreceivedTorrent(TID, User, Group, PID) -> 
-	GroupPath = "/groups/" ++ Group ++ "/torrents/" ++ TID ++ "/" ++ User,
+	GroupPath = "/groups/" ++ Group ++ "/torrents/" ++ TID ++ "/torrent/" ++ User,
 	erlzk:create(PID, GroupPath ++ User, list_to_binary("")),
 	ok.	
 

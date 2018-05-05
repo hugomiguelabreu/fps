@@ -1,7 +1,7 @@
 
 -module(auth).
 -include("wrapper.hrl").
--export([init/1]).
+-export([init/2]).
 
 % registo -> true
 % login -> false
@@ -10,8 +10,8 @@
 %% API
 %%====================================================================
 
-init(ID) ->
-	{ok, LSock} = gen_tcp:listen(2000, [binary, {reuseaddr, true}, {packet, 1}]),
+init(ID,Port) ->
+	{ok, LSock} = gen_tcp:listen(Port, [binary, {reuseaddr, true}, {packet, 1}]),
 	io:format("> autentication started\n"),
 	acceptor(LSock, ID).
 
@@ -95,7 +95,7 @@ loggedLoop(Socket, Username, ID) ->
 
 		{Username, unpacked_torrent, Group, Data} ->
 			io:format("received from another server and redirected\n"),
-			T = wrapper:encode_msg(#'ClientMessage'{msg = {torrentWrapper, {group=Group, content=Data}}}),
+			T = wrapper:encode_msg(#'ClientMessage'{msg = {torrentWrapper,#'TorrentWrapper'{group=Group, content=Data}}}),
 			gen_tcp:send(Socket, T),
 			loggedLoop(Socket, Username, ID)
 	end.
@@ -166,7 +166,8 @@ redirect(ProtoTorrent, ID, CurrentUser) ->
 								offline ->
 									zk:setUnreceivedTorrent(TID, User, binary_to_list(ProtoTorrent#'TorrentWrapper'.group));
 								_ ->
-									server_comm:send_torrent(Loc, User, binary_to_list(ProtoTorrent#'TorrentWrapper'.group), ProtoTorrent#'TorrentWrapper'.content)
+									{'TorrentWrapper', _, Content} = ProtoTorrent,
+									server_comm:send_torrent(Loc, User, binary_to_list(ProtoTorrent#'TorrentWrapper'.group), TID, Content)
 							end
 						  end, L);
 		no_group ->
