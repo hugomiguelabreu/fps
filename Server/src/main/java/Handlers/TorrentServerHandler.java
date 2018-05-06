@@ -28,14 +28,14 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<TorrentWra
         //Save torrent for fault sake
         FileUtils.initDir();
         FileUtils.saveTorrent(t);
+        //Init a client, so server can get the file
+        Client serverCli = TorrentUtil.initClient(t, "/tmp");
+        openClients.put(t.getHexInfoHash(), serverCli);
         //Get a tracked torrent with observables;
         TrackedTorrent tt = TorrentUtil.getTrackedTorrentWithObservers(t, openClients);
         //Start tracked torrent and client
         //No need to check if torrent is already announced
         tck.announce(tt);
-        //Init a client, so server can get the file
-        Client serverCli = TorrentUtil.initClient(t, "/tmp");
-        openClients.put(t.getHexInfoHash(), serverCli);
     }
 
     @Override
