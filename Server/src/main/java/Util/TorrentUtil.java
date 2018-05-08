@@ -46,11 +46,6 @@ public class TorrentUtil {
                     if (tp.getLeft() == 0) {
                         System.out.println("\u001B[31m" + tp.getIp() + " is over\u001B[0m");
 
-                        for (TrackedPeer p : tt.getPeers().values()) {
-                            if (p.getLeft() == 0)
-                                System.out.println("\u001B[31m" + p.getIp() + " is over\u001B[0m");
-                        }
-
                         if (clients.containsKey(tt.getHexInfoHash()) &&
                                 tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0)) {
                             System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
