@@ -1,7 +1,5 @@
 package Handlers;
 
-import Network.TorrentWrapperOuterClass;
-import Network.Wrapper;
 import Util.FileUtils;
 import Util.TorrentUtil;
 import com.turn.ttorrent.client.Client;
@@ -9,9 +7,11 @@ import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import server_network.ServerWrapper;
+
 import java.util.Map;
 
-public class TorrentServerHandler extends SimpleChannelInboundHandler<Wrapper.TorrentWrapper>{
+public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrapper.TrackerTorrent> {
 
     private Tracker tck;
     private Map<String, Client> openClients;
@@ -23,7 +23,7 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<Wrapper.To
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, Wrapper.TorrentWrapper torrentWrapper) throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, ServerWrapper.TrackerTorrent torrentWrapper) throws Exception {
         Torrent t = new Torrent(torrentWrapper.getContent().toByteArray(), false);
         //Save torrent for fault sake
         FileUtils.initDir();
