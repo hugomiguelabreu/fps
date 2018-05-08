@@ -7,9 +7,9 @@
 
 -define(server_wrapper_gpb_version, "4.1.1").
 
--ifndef('TORRENTWRAPPER_PB_H').
--define('TORRENTWRAPPER_PB_H', true).
--record('TorrentWrapper',
+-ifndef('FRONTENDTORRENT_PB_H').
+-define('FRONTENDTORRENT_PB_H', true).
+-record('FrontEndTorrent',
         {id = <<>>              :: iodata() | undefined, % = 1
          user = <<>>            :: iodata() | undefined, % = 2
          group = <<>>           :: iodata() | undefined, % = 3
@@ -17,10 +17,17 @@
         }).
 -endif.
 
+-ifndef('TRACKERTORRENT_PB_H').
+-define('TRACKERTORRENT_PB_H', true).
+-record('TrackerTorrent',
+        {content = <<>>         :: binary() | undefined % = 1
+        }).
+-endif.
+
 -ifndef('SERVERMESSAGE_PB_H').
 -define('SERVERMESSAGE_PB_H', true).
 -record('ServerMessage',
-        {msg                    :: {torrentWrapper, #'TorrentWrapper'{}} | undefined % oneof
+        {msg                    :: {frontEndTorrent, #'FrontEndTorrent'{}} | {trackerTorrent, #'TrackerTorrent'{}} | undefined % oneof
         }).
 -endif.
 

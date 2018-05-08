@@ -37,7 +37,7 @@ public class Client implements Runnable{
             if (username.equals("jib")){
                 Wrapper.TorrentWrapper torr = Wrapper.TorrentWrapper.newBuilder()
                         .setGroup("leddit")
-                        .setContent(ByteString.copyFromUtf8("le xis de XD")).build();
+                        .setContent(ByteString.copyFromUtf8("CENAS")).build();
 
                 wrapper = Wrapper.ClientMessage.newBuilder()
                         .setTorrentWrapper(torr).build();
@@ -46,7 +46,7 @@ public class Client implements Runnable{
                 wrapper.writeTo(socket.getOutputStream());
             }
             System.out.println(username + " : " + Wrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getTorrentWrapper());
-
+            socket.close();
 
         } catch (Exception e) { e.printStackTrace();}
     }
