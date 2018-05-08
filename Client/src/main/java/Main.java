@@ -182,7 +182,10 @@ public class Main {
             offlineTck.stop();
         }
 
-        group.shutdownGracefully();
+        if(group != null)
+            group.shutdownGracefully();
+
+
         System.exit(0);
 
         //TODO:Terminar todos os clientes/tarckers abertos

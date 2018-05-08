@@ -98,17 +98,16 @@ public class TorrentUtil {
      * @throws NoSuchAlgorithmException
      */
 
-    public static void upload(Torrent t, String path, Tracker tck, String username) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
+    public static Client upload(Torrent t, String path, Tracker tck, String username) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
         ArrayList<LocalAddresses> ownAddresses = Offline.findLocalAddresses();
         File dest = new File(path);
-        //Seeding starts.
 
         SharedTorrent st = new SharedTorrent(t, dest.getParentFile());
 
 
         Client c = new Client(
                 InetAddress.getByName(ownAddresses.get(0).getIpv4()),
-                st);
+                st, username);
 
         c.share(-1);
 
@@ -117,36 +116,46 @@ public class TorrentUtil {
 
         tr.addObserver((o,arg) -> {
 
-            TrackedPeer p = (TrackedPeer) arg;
-            //System.out.println("tr id:" + tr.getName());
+            try{
 
-            if(p.getLeft() == 0){
+                TrackedPeer p = (TrackedPeer) arg;
+                //System.out.println("tr id:" + tr.getName());
 
-                byte[] b = new byte[p.getPeerId().limit()];
-                p.getPeerId().get(b, 0,p.getPeerId().limit());
-                String id = new String(b);
+                if(p.getLeft() == 0 && p.getState() != TrackedPeer.PeerState.UNKNOWN && p.getState() != TrackedPeer.PeerState.STOPPED){
 
-                //System.out.println("id: " + id);
-                //System.out.println("size = " + torrentPeers.get(tr.getHexInfoHash()).size() );
+                    byte[] b = new byte[p.getPeerId().capacity()];
+                    p.getPeerId().get(b, 0,p.getPeerId().capacity());
+                    String tmp = new String(b);
+                    String id = tmp.replaceAll("-TO0042-", "");
 
-                torrentPeers.get(tr.getHexInfoHash()).remove(id);
-                System.out.println("peer " + id +" completed");
-                //System.out.println("ARRAY = "  + torrentPeers.get(tr.getHexInfoHash()));
 
-                if(torrentPeers.get(tr.getHexInfoHash()).size() == 0){
 
-                    //System.out.println("Tirar torrent do tracker");
-                    tck.remove(t);
-                    c.stop();
+                    //System.out.println("id: " + id);
+                    //System.out.println("size = " + torrentPeers.get(tr.getHexInfoHash()).size() );
 
-                    if(tck.getTrackedTorrents().isEmpty()){
-                        tck.stop();
-                        System.out.println("stop tracker");
+                    torrentPeers.get(tr.getHexInfoHash()).remove(id);
+                    System.out.println("peer " + id +" completed");
+                    //System.out.println("ARRAY = "  + torrentPeers.get(tr.getHexInfoHash()));
+
+                    if(torrentPeers.get(tr.getHexInfoHash()).size() == 0){
+
+                        //System.out.println("Tirar torrent do tracker");
+                        tck.remove(t);
+                        System.out.println("Stop Client");
+                        c.stop();
+
+                        if(tck.getTrackedTorrents().isEmpty()){
+                            tck.stop();
+                            System.out.println("stop tracker");
+                        }
+
+                        //System.out.println("name = " + t.getName());
                     }
-
-                    //System.out.println("name = " + t.getName());
                 }
+            }catch (Exception e){
+                e.printStackTrace();
             }
+
         });
 
         //TODO: return client
@@ -169,6 +178,7 @@ public class TorrentUtil {
             }
         }
 
+        return c;
     }
 
     public static Client upload(Torrent t, String path, Channel ch, String username) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
