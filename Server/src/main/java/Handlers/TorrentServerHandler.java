@@ -5,7 +5,6 @@ import Util.FileUtils;
 import Util.TorrentUtil;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.common.Torrent;
-import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -28,14 +27,11 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<TorrentWra
         //Save torrent for fault sake
         FileUtils.initDir();
         FileUtils.saveTorrent(t);
-        //Get a tracked torrent with observables;
-        TrackedTorrent tt = TorrentUtil.getTrackedTorrentWithObservers(t, openClients);
-        //Start tracked torrent and client
-        //No need to check if torrent is already announced
-        tck.announce(tt);
         //Init a client, so server can get the file
-        Client serverCli = TorrentUtil.initClient(t, "/tmp");
+        Client serverCli = TorrentUtil.initClient(t, FileUtils.fileDir);
         openClients.put(t.getHexInfoHash(), serverCli);
+        //Get a tracked torrent with observables;
+        TorrentUtil.announceTrackedTorrentWithObservers(tck, t, openClients);
     }
 
     @Override
