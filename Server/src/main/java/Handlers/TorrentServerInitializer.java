@@ -1,6 +1,7 @@
 package Handlers;
 
 import Network.TorrentWrapperOuterClass;
+import Network.Wrapper;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.channel.ChannelInitializer;
@@ -28,7 +29,7 @@ public class TorrentServerInitializer extends ChannelInitializer<SocketChannel>{
         ChannelPipeline p = ch.pipeline();
 
         p.addLast(new ProtobufVarint32FrameDecoder());
-        p.addLast(new ProtobufDecoder(TorrentWrapperOuterClass.TorrentWrapper.getDefaultInstance()));
+        p.addLast(new ProtobufDecoder(Wrapper.ClientMessage.getDefaultInstance().getTorrentWrapper()));
         p.addLast(new ProtobufVarint32LengthFieldPrepender());
         p.addLast(new ProtobufEncoder());
         p.addLast(new TorrentServerHandler(trackedTorrents, openClients));

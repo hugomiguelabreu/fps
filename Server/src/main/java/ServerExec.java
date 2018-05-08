@@ -16,8 +16,8 @@ public class ServerExec {
 
     public static void main(String[] args) throws IOException, InterruptedException, NoSuchAlgorithmException {
         ConcurrentHashMap<String, Client> clients = new ConcurrentHashMap<>();
-        Tracker tck = new Tracker(new InetSocketAddress(6969));
-        MainServer ms = new MainServer(5000, tck, clients);
+        Tracker tck = new Tracker(new InetSocketAddress(Integer.parseInt(args[1])));
+        MainServer ms = new MainServer(Integer.parseInt(args[0]), tck, clients);
         //Starts tracker
         tck.start();
         System.out.println("Tracker initiated");

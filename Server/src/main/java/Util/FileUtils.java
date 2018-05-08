@@ -29,9 +29,11 @@ public class FileUtils {
         //supostamente, irá iniciar clientes à medida que for necessário.
         if(parent.exists())
             for (File f : parent.listFiles()) {
-                Torrent t = Torrent.load(f);
-                //Colocar torrent no tracker para o anunciar.
-                TrackedTorrent tt = TorrentUtil.announceTrackedTorrentWithObservers(tck, t, clients);
+                if(!f.isDirectory()) {
+                    Torrent t = Torrent.load(f);
+                    //Colocar torrent no tracker para o anunciar.
+                    TrackedTorrent tt = TorrentUtil.announceTrackedTorrentWithObservers(tck, t, clients);
+                }
             }
         return true;
     }
