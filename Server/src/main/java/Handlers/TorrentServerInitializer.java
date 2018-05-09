@@ -1,6 +1,5 @@
 package Handlers;
 
-import Network.TorrentWrapperOuterClass;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.channel.ChannelInitializer;
@@ -10,6 +9,8 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import server_network.ServerWrapper;
+
 import java.util.Map;
 
 
@@ -28,7 +29,7 @@ public class TorrentServerInitializer extends ChannelInitializer<SocketChannel>{
         ChannelPipeline p = ch.pipeline();
 
         p.addLast(new ProtobufVarint32FrameDecoder());
-        p.addLast(new ProtobufDecoder(TorrentWrapperOuterClass.TorrentWrapper.getDefaultInstance()));
+        p.addLast(new ProtobufDecoder(ServerWrapper.ServerMessage.getDefaultInstance().getTrackerTorrent()));
         p.addLast(new ProtobufVarint32LengthFieldPrepender());
         p.addLast(new ProtobufEncoder());
         p.addLast(new TorrentServerHandler(trackedTorrents, openClients));

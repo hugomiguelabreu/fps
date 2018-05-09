@@ -10,13 +10,17 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 public class FileUtils {
 
+    public static String fileDir = System.getProperty( "user.home" ) + "/.fps/files/";
+
     public static void initDir(){
         new File(System.getProperty( "user.home" ) + "/.fps").mkdirs();
+        new File(System.getProperty( "user.home" ) + "/.fps/files").mkdirs();
     }
 
     public static boolean loadTorrents(Tracker tck, Map<String, Client> clients) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
@@ -25,10 +29,11 @@ public class FileUtils {
         //supostamente, irá iniciar clientes à medida que for necessário.
         if(parent.exists())
             for (File f : parent.listFiles()) {
-                Torrent t = Torrent.load(f);
-                //Colocar torrent no tracker para o anunciar.
-                TrackedTorrent tt = TorrentUtil.getTrackedTorrentWithObservers(t, clients);
-                tck.announce(tt);
+                if(!f.isDirectory()) {
+                    Torrent t = Torrent.load(f);
+                    //Colocar torrent no tracker para o anunciar.
+                    TrackedTorrent tt = TorrentUtil.announceTrackedTorrentWithObservers(tck, t, clients);
+                }
             }
         return true;
     }
@@ -38,6 +43,13 @@ public class FileUtils {
         fos = new FileOutputStream(System.getProperty( "user.home" ) + "/.fps/" + t.getHexInfoHash());
         t.save(fos);
         IOUtils.closeQuietly(fos);
+    }
+
+    public static void deleteFiles(Torrent t) throws IOException {
+        File torrent = new File(System.getProperty( "user.home" ) + "/.fps/" + t.getHexInfoHash());
+        File fileDownloaded = new File(System.getProperty( "user.home" ) + "/.fps/files/" + t.getFilenames().get(0));
+        Files.deleteIfExists(torrent.toPath());
+        Files.deleteIfExists(fileDownloaded.toPath());
     }
 
 }

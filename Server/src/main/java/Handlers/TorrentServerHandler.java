@@ -1,17 +1,17 @@
 package Handlers;
 
-import Network.TorrentWrapperOuterClass;
 import Util.FileUtils;
 import Util.TorrentUtil;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.common.Torrent;
-import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import server_network.ServerWrapper;
+
 import java.util.Map;
 
-public class TorrentServerHandler extends SimpleChannelInboundHandler<TorrentWrapperOuterClass.TorrentWrapper>{
+public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrapper.TrackerTorrent> {
 
     private Tracker tck;
     private Map<String, Client> openClients;
@@ -23,19 +23,16 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<TorrentWra
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, TorrentWrapperOuterClass.TorrentWrapper torrentWrapper) throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, ServerWrapper.TrackerTorrent torrentWrapper) throws Exception {
         Torrent t = new Torrent(torrentWrapper.getContent().toByteArray(), false);
         //Save torrent for fault sake
         FileUtils.initDir();
         FileUtils.saveTorrent(t);
         //Init a client, so server can get the file
-        Client serverCli = TorrentUtil.initClient(t, "/tmp");
+        Client serverCli = TorrentUtil.initClient(t, FileUtils.fileDir);
         openClients.put(t.getHexInfoHash(), serverCli);
         //Get a tracked torrent with observables;
-        TrackedTorrent tt = TorrentUtil.getTrackedTorrentWithObservers(t, openClients);
-        //Start tracked torrent and client
-        //No need to check if torrent is already announced
-        tck.announce(tt);
+        TorrentUtil.announceTrackedTorrentWithObservers(tck, t, openClients);
     }
 
     @Override

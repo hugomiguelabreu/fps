@@ -1,5 +1,5 @@
 -module(zk).
--export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/2, setOffline/1, getGroupUsers/1, getTrackerList/0, getFrontSv/1, newTorrent/3, setUnreceivedTorrent/3]).
+-export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/2, setOffline/1, getGroupUsers/1, getTrackerList/0, getFrontSv/1, newTorrent/3, setUnreceivedTorrent/3, getTracker/1]).
 
 
 init(Host, Port) ->
@@ -47,6 +47,10 @@ loop(Pid) ->
 			V = getFrontSv(ID, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
+    	{{tracker, ID}, From} ->
+			V = getTracker(ID, Pid),
+			From ! {?MODULE, V},
+    		loop(Pid);	
     	{{new_torrent, TID, U, G}, From} ->
     		V = newTorrent(TID, U, G, Pid),
 			From ! {?MODULE, V},
@@ -216,6 +220,16 @@ getFrontSv(ID, PID) ->
 		 	RP
 	 	end.
 
+
+getTracker(ID) -> rpc({tracker, ID}).
+getTracker(ID, PID) ->
+	case erlzk:get_data(PID, "/trackers/" ++ ID) of
+		{error, _} ->
+		 	error;
+		{ok,{RP,_}} ->
+		 	binary_to_list(RP)
+	 	end.
+
 newTorrent(TID, U, G) -> rpc({new_torrent, TID, U, G}). 
 newTorrent(TID, User, Group, PID) ->
 	GroupPath = "/groups/" ++ Group ++ "/torrents/" ++ TID,
@@ -231,7 +245,6 @@ setUnreceivedTorrent(TID, User, Group, PID) ->
 	ok.	
 
 		
-
 
 
 

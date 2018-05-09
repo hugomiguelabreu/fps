@@ -21,7 +21,7 @@ public final class ServerWrapper {
     /**
      * <code>string id = 1;</code>
      */
-    java.lang.String getId();
+    String getId();
     /**
      * <code>string id = 1;</code>
      */
@@ -31,7 +31,7 @@ public final class ServerWrapper {
     /**
      * <code>string user = 2;</code>
      */
-    java.lang.String getUser();
+    String getUser();
     /**
      * <code>string user = 2;</code>
      */
@@ -41,7 +41,7 @@ public final class ServerWrapper {
     /**
      * <code>string group = 3;</code>
      */
-    java.lang.String getGroup();
+    String getGroup();
     /**
      * <code>string group = 3;</code>
      */
@@ -72,7 +72,7 @@ public final class ServerWrapper {
       content_ = com.google.protobuf.ByteString.EMPTY;
     }
 
-    @java.lang.Override
+    @Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
       return this.unknownFields;
@@ -101,19 +101,19 @@ public final class ServerWrapper {
               break;
             }
             case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
+              String s = input.readStringRequireUtf8();
 
               id_ = s;
               break;
             }
             case 18: {
-              java.lang.String s = input.readStringRequireUtf8();
+              String s = input.readStringRequireUtf8();
 
               user_ = s;
               break;
             }
             case 26: {
-              java.lang.String s = input.readStringRequireUtf8();
+              String s = input.readStringRequireUtf8();
 
               group_ = s;
               break;
@@ -137,29 +137,29 @@ public final class ServerWrapper {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return server_network.ServerWrapper.internal_static_server_network_FrontEndTorrent_descriptor;
+      return ServerWrapper.internal_static_server_network_FrontEndTorrent_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+    protected FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return server_network.ServerWrapper.internal_static_server_network_FrontEndTorrent_fieldAccessorTable
+      return ServerWrapper.internal_static_server_network_FrontEndTorrent_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              server_network.ServerWrapper.FrontEndTorrent.class, server_network.ServerWrapper.FrontEndTorrent.Builder.class);
+              FrontEndTorrent.class, Builder.class);
     }
 
     public static final int ID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object id_;
+    private volatile Object id_;
     /**
      * <code>string id = 1;</code>
      */
-    public java.lang.String getId() {
-      java.lang.Object ref = id_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
+    public String getId() {
+      Object ref = id_;
+      if (ref instanceof String) {
+        return (String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
+        String s = bs.toStringUtf8();
         id_ = s;
         return s;
       }
@@ -169,11 +169,11 @@ public final class ServerWrapper {
      */
     public com.google.protobuf.ByteString
         getIdBytes() {
-      java.lang.Object ref = id_;
-      if (ref instanceof java.lang.String) {
+      Object ref = id_;
+      if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
+                (String) ref);
         id_ = b;
         return b;
       } else {
@@ -182,18 +182,18 @@ public final class ServerWrapper {
     }
 
     public static final int USER_FIELD_NUMBER = 2;
-    private volatile java.lang.Object user_;
+    private volatile Object user_;
     /**
      * <code>string user = 2;</code>
      */
-    public java.lang.String getUser() {
-      java.lang.Object ref = user_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
+    public String getUser() {
+      Object ref = user_;
+      if (ref instanceof String) {
+        return (String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
+        String s = bs.toStringUtf8();
         user_ = s;
         return s;
       }
@@ -203,11 +203,11 @@ public final class ServerWrapper {
      */
     public com.google.protobuf.ByteString
         getUserBytes() {
-      java.lang.Object ref = user_;
-      if (ref instanceof java.lang.String) {
+      Object ref = user_;
+      if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
+                (String) ref);
         user_ = b;
         return b;
       } else {
@@ -216,18 +216,18 @@ public final class ServerWrapper {
     }
 
     public static final int GROUP_FIELD_NUMBER = 3;
-    private volatile java.lang.Object group_;
+    private volatile Object group_;
     /**
      * <code>string group = 3;</code>
      */
-    public java.lang.String getGroup() {
-      java.lang.Object ref = group_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
+    public String getGroup() {
+      Object ref = group_;
+      if (ref instanceof String) {
+        return (String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
+        String s = bs.toStringUtf8();
         group_ = s;
         return s;
       }
@@ -237,11 +237,11 @@ public final class ServerWrapper {
      */
     public com.google.protobuf.ByteString
         getGroupBytes() {
-      java.lang.Object ref = group_;
-      if (ref instanceof java.lang.String) {
+      Object ref = group_;
+      if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
+                (String) ref);
         group_ = b;
         return b;
       } else {
@@ -308,15 +308,15 @@ public final class ServerWrapper {
       return size;
     }
 
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
+    @Override
+    public boolean equals(final Object obj) {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof server_network.ServerWrapper.FrontEndTorrent)) {
+      if (!(obj instanceof FrontEndTorrent)) {
         return super.equals(obj);
       }
-      server_network.ServerWrapper.FrontEndTorrent other = (server_network.ServerWrapper.FrontEndTorrent) obj;
+      FrontEndTorrent other = (FrontEndTorrent) obj;
 
       boolean result = true;
       result = result && getId()
@@ -331,7 +331,7 @@ public final class ServerWrapper {
       return result;
     }
 
-    @java.lang.Override
+    @Override
     public int hashCode() {
       if (memoizedHashCode != 0) {
         return memoizedHashCode;
@@ -351,69 +351,69 @@ public final class ServerWrapper {
       return hash;
     }
 
-    public static server_network.ServerWrapper.FrontEndTorrent parseFrom(
+    public static FrontEndTorrent parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static server_network.ServerWrapper.FrontEndTorrent parseFrom(
+    public static FrontEndTorrent parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static server_network.ServerWrapper.FrontEndTorrent parseFrom(
+    public static FrontEndTorrent parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static server_network.ServerWrapper.FrontEndTorrent parseFrom(
+    public static FrontEndTorrent parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static server_network.ServerWrapper.FrontEndTorrent parseFrom(byte[] data)
+    public static FrontEndTorrent parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static server_network.ServerWrapper.FrontEndTorrent parseFrom(
+    public static FrontEndTorrent parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static server_network.ServerWrapper.FrontEndTorrent parseFrom(java.io.InputStream input)
+    public static FrontEndTorrent parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static server_network.ServerWrapper.FrontEndTorrent parseFrom(
+    public static FrontEndTorrent parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static server_network.ServerWrapper.FrontEndTorrent parseDelimitedFrom(java.io.InputStream input)
+    public static FrontEndTorrent parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static server_network.ServerWrapper.FrontEndTorrent parseDelimitedFrom(
+    public static FrontEndTorrent parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static server_network.ServerWrapper.FrontEndTorrent parseFrom(
+    public static FrontEndTorrent parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static server_network.ServerWrapper.FrontEndTorrent parseFrom(
+    public static FrontEndTorrent parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -425,7 +425,7 @@ public final class ServerWrapper {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(server_network.ServerWrapper.FrontEndTorrent prototype) {
+    public static Builder newBuilder(FrontEndTorrent prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() {
@@ -433,9 +433,9 @@ public final class ServerWrapper {
           ? new Builder() : new Builder().mergeFrom(this);
     }
 
-    @java.lang.Override
+    @Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -445,17 +445,17 @@ public final class ServerWrapper {
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:server_network.FrontEndTorrent)
-        server_network.ServerWrapper.FrontEndTorrentOrBuilder {
+        FrontEndTorrentOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return server_network.ServerWrapper.internal_static_server_network_FrontEndTorrent_descriptor;
+        return ServerWrapper.internal_static_server_network_FrontEndTorrent_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      protected FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return server_network.ServerWrapper.internal_static_server_network_FrontEndTorrent_fieldAccessorTable
+        return ServerWrapper.internal_static_server_network_FrontEndTorrent_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                server_network.ServerWrapper.FrontEndTorrent.class, server_network.ServerWrapper.FrontEndTorrent.Builder.class);
+                FrontEndTorrent.class, Builder.class);
       }
 
       // Construct using server_network.ServerWrapper.FrontEndTorrent.newBuilder()
@@ -464,7 +464,7 @@ public final class ServerWrapper {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+          BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -488,23 +488,23 @@ public final class ServerWrapper {
 
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return server_network.ServerWrapper.internal_static_server_network_FrontEndTorrent_descriptor;
+        return ServerWrapper.internal_static_server_network_FrontEndTorrent_descriptor;
       }
 
-      public server_network.ServerWrapper.FrontEndTorrent getDefaultInstanceForType() {
-        return server_network.ServerWrapper.FrontEndTorrent.getDefaultInstance();
+      public FrontEndTorrent getDefaultInstanceForType() {
+        return FrontEndTorrent.getDefaultInstance();
       }
 
-      public server_network.ServerWrapper.FrontEndTorrent build() {
-        server_network.ServerWrapper.FrontEndTorrent result = buildPartial();
+      public FrontEndTorrent build() {
+        FrontEndTorrent result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public server_network.ServerWrapper.FrontEndTorrent buildPartial() {
-        server_network.ServerWrapper.FrontEndTorrent result = new server_network.ServerWrapper.FrontEndTorrent(this);
+      public FrontEndTorrent buildPartial() {
+        FrontEndTorrent result = new FrontEndTorrent(this);
         result.id_ = id_;
         result.user_ = user_;
         result.group_ = group_;
@@ -518,7 +518,7 @@ public final class ServerWrapper {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -531,25 +531,25 @@ public final class ServerWrapper {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
+          int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof server_network.ServerWrapper.FrontEndTorrent) {
-          return mergeFrom((server_network.ServerWrapper.FrontEndTorrent)other);
+        if (other instanceof FrontEndTorrent) {
+          return mergeFrom((FrontEndTorrent)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(server_network.ServerWrapper.FrontEndTorrent other) {
-        if (other == server_network.ServerWrapper.FrontEndTorrent.getDefaultInstance()) return this;
+      public Builder mergeFrom(FrontEndTorrent other) {
+        if (other == FrontEndTorrent.getDefaultInstance()) return this;
         if (!other.getId().isEmpty()) {
           id_ = other.id_;
           onChanged();
@@ -578,11 +578,11 @@ public final class ServerWrapper {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        server_network.ServerWrapper.FrontEndTorrent parsedMessage = null;
+        FrontEndTorrent parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (server_network.ServerWrapper.FrontEndTorrent) e.getUnfinishedMessage();
+          parsedMessage = (FrontEndTorrent) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -592,20 +592,20 @@ public final class ServerWrapper {
         return this;
       }
 
-      private java.lang.Object id_ = "";
+      private Object id_ = "";
       /**
        * <code>string id = 1;</code>
        */
-      public java.lang.String getId() {
-        java.lang.Object ref = id_;
-        if (!(ref instanceof java.lang.String)) {
+      public String getId() {
+        Object ref = id_;
+        if (!(ref instanceof String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
+          String s = bs.toStringUtf8();
           id_ = s;
           return s;
         } else {
-          return (java.lang.String) ref;
+          return (String) ref;
         }
       }
       /**
@@ -613,11 +613,11 @@ public final class ServerWrapper {
        */
       public com.google.protobuf.ByteString
           getIdBytes() {
-        java.lang.Object ref = id_;
+        Object ref = id_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
+                  (String) ref);
           id_ = b;
           return b;
         } else {
@@ -628,7 +628,7 @@ public final class ServerWrapper {
        * <code>string id = 1;</code>
        */
       public Builder setId(
-          java.lang.String value) {
+          String value) {
         if (value == null) {
     throw new NullPointerException();
   }
@@ -661,20 +661,20 @@ public final class ServerWrapper {
         return this;
       }
 
-      private java.lang.Object user_ = "";
+      private Object user_ = "";
       /**
        * <code>string user = 2;</code>
        */
-      public java.lang.String getUser() {
-        java.lang.Object ref = user_;
-        if (!(ref instanceof java.lang.String)) {
+      public String getUser() {
+        Object ref = user_;
+        if (!(ref instanceof String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
+          String s = bs.toStringUtf8();
           user_ = s;
           return s;
         } else {
-          return (java.lang.String) ref;
+          return (String) ref;
         }
       }
       /**
@@ -682,11 +682,11 @@ public final class ServerWrapper {
        */
       public com.google.protobuf.ByteString
           getUserBytes() {
-        java.lang.Object ref = user_;
+        Object ref = user_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
+                  (String) ref);
           user_ = b;
           return b;
         } else {
@@ -697,7 +697,7 @@ public final class ServerWrapper {
        * <code>string user = 2;</code>
        */
       public Builder setUser(
-          java.lang.String value) {
+          String value) {
         if (value == null) {
     throw new NullPointerException();
   }
@@ -730,20 +730,20 @@ public final class ServerWrapper {
         return this;
       }
 
-      private java.lang.Object group_ = "";
+      private Object group_ = "";
       /**
        * <code>string group = 3;</code>
        */
-      public java.lang.String getGroup() {
-        java.lang.Object ref = group_;
-        if (!(ref instanceof java.lang.String)) {
+      public String getGroup() {
+        Object ref = group_;
+        if (!(ref instanceof String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
+          String s = bs.toStringUtf8();
           group_ = s;
           return s;
         } else {
-          return (java.lang.String) ref;
+          return (String) ref;
         }
       }
       /**
@@ -751,11 +751,11 @@ public final class ServerWrapper {
        */
       public com.google.protobuf.ByteString
           getGroupBytes() {
-        java.lang.Object ref = group_;
+        Object ref = group_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
+                  (String) ref);
           group_ = b;
           return b;
         } else {
@@ -766,7 +766,7 @@ public final class ServerWrapper {
        * <code>string group = 3;</code>
        */
       public Builder setGroup(
-          java.lang.String value) {
+          String value) {
         if (value == null) {
     throw new NullPointerException();
   }
@@ -842,12 +842,12 @@ public final class ServerWrapper {
     }
 
     // @@protoc_insertion_point(class_scope:server_network.FrontEndTorrent)
-    private static final server_network.ServerWrapper.FrontEndTorrent DEFAULT_INSTANCE;
+    private static final FrontEndTorrent DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new server_network.ServerWrapper.FrontEndTorrent();
+      DEFAULT_INSTANCE = new FrontEndTorrent();
     }
 
-    public static server_network.ServerWrapper.FrontEndTorrent getDefaultInstance() {
+    public static FrontEndTorrent getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
@@ -865,12 +865,12 @@ public final class ServerWrapper {
       return PARSER;
     }
 
-    @java.lang.Override
+    @Override
     public com.google.protobuf.Parser<FrontEndTorrent> getParserForType() {
       return PARSER;
     }
 
-    public server_network.ServerWrapper.FrontEndTorrent getDefaultInstanceForType() {
+    public FrontEndTorrent getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -901,7 +901,7 @@ public final class ServerWrapper {
       content_ = com.google.protobuf.ByteString.EMPTY;
     }
 
-    @java.lang.Override
+    @Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
       return this.unknownFields;
@@ -948,14 +948,14 @@ public final class ServerWrapper {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return server_network.ServerWrapper.internal_static_server_network_TrackerTorrent_descriptor;
+      return ServerWrapper.internal_static_server_network_TrackerTorrent_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+    protected FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return server_network.ServerWrapper.internal_static_server_network_TrackerTorrent_fieldAccessorTable
+      return ServerWrapper.internal_static_server_network_TrackerTorrent_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              server_network.ServerWrapper.TrackerTorrent.class, server_network.ServerWrapper.TrackerTorrent.Builder.class);
+              TrackerTorrent.class, Builder.class);
     }
 
     public static final int CONTENT_FIELD_NUMBER = 1;
@@ -999,15 +999,15 @@ public final class ServerWrapper {
       return size;
     }
 
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
+    @Override
+    public boolean equals(final Object obj) {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof server_network.ServerWrapper.TrackerTorrent)) {
+      if (!(obj instanceof TrackerTorrent)) {
         return super.equals(obj);
       }
-      server_network.ServerWrapper.TrackerTorrent other = (server_network.ServerWrapper.TrackerTorrent) obj;
+      TrackerTorrent other = (TrackerTorrent) obj;
 
       boolean result = true;
       result = result && getContent()
@@ -1016,7 +1016,7 @@ public final class ServerWrapper {
       return result;
     }
 
-    @java.lang.Override
+    @Override
     public int hashCode() {
       if (memoizedHashCode != 0) {
         return memoizedHashCode;
@@ -1030,69 +1030,69 @@ public final class ServerWrapper {
       return hash;
     }
 
-    public static server_network.ServerWrapper.TrackerTorrent parseFrom(
+    public static TrackerTorrent parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static server_network.ServerWrapper.TrackerTorrent parseFrom(
+    public static TrackerTorrent parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static server_network.ServerWrapper.TrackerTorrent parseFrom(
+    public static TrackerTorrent parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static server_network.ServerWrapper.TrackerTorrent parseFrom(
+    public static TrackerTorrent parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static server_network.ServerWrapper.TrackerTorrent parseFrom(byte[] data)
+    public static TrackerTorrent parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static server_network.ServerWrapper.TrackerTorrent parseFrom(
+    public static TrackerTorrent parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static server_network.ServerWrapper.TrackerTorrent parseFrom(java.io.InputStream input)
+    public static TrackerTorrent parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static server_network.ServerWrapper.TrackerTorrent parseFrom(
+    public static TrackerTorrent parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static server_network.ServerWrapper.TrackerTorrent parseDelimitedFrom(java.io.InputStream input)
+    public static TrackerTorrent parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static server_network.ServerWrapper.TrackerTorrent parseDelimitedFrom(
+    public static TrackerTorrent parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static server_network.ServerWrapper.TrackerTorrent parseFrom(
+    public static TrackerTorrent parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static server_network.ServerWrapper.TrackerTorrent parseFrom(
+    public static TrackerTorrent parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -1104,7 +1104,7 @@ public final class ServerWrapper {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(server_network.ServerWrapper.TrackerTorrent prototype) {
+    public static Builder newBuilder(TrackerTorrent prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() {
@@ -1112,9 +1112,9 @@ public final class ServerWrapper {
           ? new Builder() : new Builder().mergeFrom(this);
     }
 
-    @java.lang.Override
+    @Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -1124,17 +1124,17 @@ public final class ServerWrapper {
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:server_network.TrackerTorrent)
-        server_network.ServerWrapper.TrackerTorrentOrBuilder {
+        TrackerTorrentOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return server_network.ServerWrapper.internal_static_server_network_TrackerTorrent_descriptor;
+        return ServerWrapper.internal_static_server_network_TrackerTorrent_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      protected FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return server_network.ServerWrapper.internal_static_server_network_TrackerTorrent_fieldAccessorTable
+        return ServerWrapper.internal_static_server_network_TrackerTorrent_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                server_network.ServerWrapper.TrackerTorrent.class, server_network.ServerWrapper.TrackerTorrent.Builder.class);
+                TrackerTorrent.class, Builder.class);
       }
 
       // Construct using server_network.ServerWrapper.TrackerTorrent.newBuilder()
@@ -1143,7 +1143,7 @@ public final class ServerWrapper {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+          BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -1161,23 +1161,23 @@ public final class ServerWrapper {
 
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return server_network.ServerWrapper.internal_static_server_network_TrackerTorrent_descriptor;
+        return ServerWrapper.internal_static_server_network_TrackerTorrent_descriptor;
       }
 
-      public server_network.ServerWrapper.TrackerTorrent getDefaultInstanceForType() {
-        return server_network.ServerWrapper.TrackerTorrent.getDefaultInstance();
+      public TrackerTorrent getDefaultInstanceForType() {
+        return TrackerTorrent.getDefaultInstance();
       }
 
-      public server_network.ServerWrapper.TrackerTorrent build() {
-        server_network.ServerWrapper.TrackerTorrent result = buildPartial();
+      public TrackerTorrent build() {
+        TrackerTorrent result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public server_network.ServerWrapper.TrackerTorrent buildPartial() {
-        server_network.ServerWrapper.TrackerTorrent result = new server_network.ServerWrapper.TrackerTorrent(this);
+      public TrackerTorrent buildPartial() {
+        TrackerTorrent result = new TrackerTorrent(this);
         result.content_ = content_;
         onBuilt();
         return result;
@@ -1188,7 +1188,7 @@ public final class ServerWrapper {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -1201,25 +1201,25 @@ public final class ServerWrapper {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
+          int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof server_network.ServerWrapper.TrackerTorrent) {
-          return mergeFrom((server_network.ServerWrapper.TrackerTorrent)other);
+        if (other instanceof TrackerTorrent) {
+          return mergeFrom((TrackerTorrent)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(server_network.ServerWrapper.TrackerTorrent other) {
-        if (other == server_network.ServerWrapper.TrackerTorrent.getDefaultInstance()) return this;
+      public Builder mergeFrom(TrackerTorrent other) {
+        if (other == TrackerTorrent.getDefaultInstance()) return this;
         if (other.getContent() != com.google.protobuf.ByteString.EMPTY) {
           setContent(other.getContent());
         }
@@ -1236,11 +1236,11 @@ public final class ServerWrapper {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        server_network.ServerWrapper.TrackerTorrent parsedMessage = null;
+        TrackerTorrent parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (server_network.ServerWrapper.TrackerTorrent) e.getUnfinishedMessage();
+          parsedMessage = (TrackerTorrent) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -1293,12 +1293,12 @@ public final class ServerWrapper {
     }
 
     // @@protoc_insertion_point(class_scope:server_network.TrackerTorrent)
-    private static final server_network.ServerWrapper.TrackerTorrent DEFAULT_INSTANCE;
+    private static final TrackerTorrent DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new server_network.ServerWrapper.TrackerTorrent();
+      DEFAULT_INSTANCE = new TrackerTorrent();
     }
 
-    public static server_network.ServerWrapper.TrackerTorrent getDefaultInstance() {
+    public static TrackerTorrent getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
@@ -1316,12 +1316,12 @@ public final class ServerWrapper {
       return PARSER;
     }
 
-    @java.lang.Override
+    @Override
     public com.google.protobuf.Parser<TrackerTorrent> getParserForType() {
       return PARSER;
     }
 
-    public server_network.ServerWrapper.TrackerTorrent getDefaultInstanceForType() {
+    public TrackerTorrent getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -1338,11 +1338,11 @@ public final class ServerWrapper {
     /**
      * <code>.server_network.FrontEndTorrent frontEndTorrent = 1;</code>
      */
-    server_network.ServerWrapper.FrontEndTorrent getFrontEndTorrent();
+    FrontEndTorrent getFrontEndTorrent();
     /**
      * <code>.server_network.FrontEndTorrent frontEndTorrent = 1;</code>
      */
-    server_network.ServerWrapper.FrontEndTorrentOrBuilder getFrontEndTorrentOrBuilder();
+    FrontEndTorrentOrBuilder getFrontEndTorrentOrBuilder();
 
     /**
      * <code>.server_network.TrackerTorrent trackerTorrent = 2;</code>
@@ -1351,13 +1351,13 @@ public final class ServerWrapper {
     /**
      * <code>.server_network.TrackerTorrent trackerTorrent = 2;</code>
      */
-    server_network.ServerWrapper.TrackerTorrent getTrackerTorrent();
+    TrackerTorrent getTrackerTorrent();
     /**
      * <code>.server_network.TrackerTorrent trackerTorrent = 2;</code>
      */
-    server_network.ServerWrapper.TrackerTorrentOrBuilder getTrackerTorrentOrBuilder();
+    TrackerTorrentOrBuilder getTrackerTorrentOrBuilder();
 
-    public server_network.ServerWrapper.ServerMessage.MsgCase getMsgCase();
+    public ServerMessage.MsgCase getMsgCase();
   }
   /**
    * Protobuf type {@code server_network.ServerMessage}
@@ -1374,7 +1374,7 @@ public final class ServerWrapper {
     private ServerMessage() {
     }
 
-    @java.lang.Override
+    @Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
       return this.unknownFields;
@@ -1403,28 +1403,28 @@ public final class ServerWrapper {
               break;
             }
             case 10: {
-              server_network.ServerWrapper.FrontEndTorrent.Builder subBuilder = null;
+              FrontEndTorrent.Builder subBuilder = null;
               if (msgCase_ == 1) {
-                subBuilder = ((server_network.ServerWrapper.FrontEndTorrent) msg_).toBuilder();
+                subBuilder = ((FrontEndTorrent) msg_).toBuilder();
               }
               msg_ =
-                  input.readMessage(server_network.ServerWrapper.FrontEndTorrent.parser(), extensionRegistry);
+                  input.readMessage(FrontEndTorrent.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom((server_network.ServerWrapper.FrontEndTorrent) msg_);
+                subBuilder.mergeFrom((FrontEndTorrent) msg_);
                 msg_ = subBuilder.buildPartial();
               }
               msgCase_ = 1;
               break;
             }
             case 18: {
-              server_network.ServerWrapper.TrackerTorrent.Builder subBuilder = null;
+              TrackerTorrent.Builder subBuilder = null;
               if (msgCase_ == 2) {
-                subBuilder = ((server_network.ServerWrapper.TrackerTorrent) msg_).toBuilder();
+                subBuilder = ((TrackerTorrent) msg_).toBuilder();
               }
               msg_ =
-                  input.readMessage(server_network.ServerWrapper.TrackerTorrent.parser(), extensionRegistry);
+                  input.readMessage(TrackerTorrent.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom((server_network.ServerWrapper.TrackerTorrent) msg_);
+                subBuilder.mergeFrom((TrackerTorrent) msg_);
                 msg_ = subBuilder.buildPartial();
               }
               msgCase_ = 2;
@@ -1444,18 +1444,18 @@ public final class ServerWrapper {
     }
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return server_network.ServerWrapper.internal_static_server_network_ServerMessage_descriptor;
+      return ServerWrapper.internal_static_server_network_ServerMessage_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+    protected FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return server_network.ServerWrapper.internal_static_server_network_ServerMessage_fieldAccessorTable
+      return ServerWrapper.internal_static_server_network_ServerMessage_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              server_network.ServerWrapper.ServerMessage.class, server_network.ServerWrapper.ServerMessage.Builder.class);
+              ServerMessage.class, Builder.class);
     }
 
     private int msgCase_ = 0;
-    private java.lang.Object msg_;
+    private Object msg_;
     public enum MsgCase
         implements com.google.protobuf.Internal.EnumLite {
       FRONTENDTORRENT(1),
@@ -1468,7 +1468,7 @@ public final class ServerWrapper {
       /**
        * @deprecated Use {@link #forNumber(int)} instead.
        */
-      @java.lang.Deprecated
+      @Deprecated
       public static MsgCase valueOf(int value) {
         return forNumber(value);
       }
@@ -1502,20 +1502,20 @@ public final class ServerWrapper {
     /**
      * <code>.server_network.FrontEndTorrent frontEndTorrent = 1;</code>
      */
-    public server_network.ServerWrapper.FrontEndTorrent getFrontEndTorrent() {
+    public FrontEndTorrent getFrontEndTorrent() {
       if (msgCase_ == 1) {
-         return (server_network.ServerWrapper.FrontEndTorrent) msg_;
+         return (FrontEndTorrent) msg_;
       }
-      return server_network.ServerWrapper.FrontEndTorrent.getDefaultInstance();
+      return FrontEndTorrent.getDefaultInstance();
     }
     /**
      * <code>.server_network.FrontEndTorrent frontEndTorrent = 1;</code>
      */
-    public server_network.ServerWrapper.FrontEndTorrentOrBuilder getFrontEndTorrentOrBuilder() {
+    public FrontEndTorrentOrBuilder getFrontEndTorrentOrBuilder() {
       if (msgCase_ == 1) {
-         return (server_network.ServerWrapper.FrontEndTorrent) msg_;
+         return (FrontEndTorrent) msg_;
       }
-      return server_network.ServerWrapper.FrontEndTorrent.getDefaultInstance();
+      return FrontEndTorrent.getDefaultInstance();
     }
 
     public static final int TRACKERTORRENT_FIELD_NUMBER = 2;
@@ -1528,20 +1528,20 @@ public final class ServerWrapper {
     /**
      * <code>.server_network.TrackerTorrent trackerTorrent = 2;</code>
      */
-    public server_network.ServerWrapper.TrackerTorrent getTrackerTorrent() {
+    public TrackerTorrent getTrackerTorrent() {
       if (msgCase_ == 2) {
-         return (server_network.ServerWrapper.TrackerTorrent) msg_;
+         return (TrackerTorrent) msg_;
       }
-      return server_network.ServerWrapper.TrackerTorrent.getDefaultInstance();
+      return TrackerTorrent.getDefaultInstance();
     }
     /**
      * <code>.server_network.TrackerTorrent trackerTorrent = 2;</code>
      */
-    public server_network.ServerWrapper.TrackerTorrentOrBuilder getTrackerTorrentOrBuilder() {
+    public TrackerTorrentOrBuilder getTrackerTorrentOrBuilder() {
       if (msgCase_ == 2) {
-         return (server_network.ServerWrapper.TrackerTorrent) msg_;
+         return (TrackerTorrent) msg_;
       }
-      return server_network.ServerWrapper.TrackerTorrent.getDefaultInstance();
+      return TrackerTorrent.getDefaultInstance();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -1557,10 +1557,10 @@ public final class ServerWrapper {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (msgCase_ == 1) {
-        output.writeMessage(1, (server_network.ServerWrapper.FrontEndTorrent) msg_);
+        output.writeMessage(1, (FrontEndTorrent) msg_);
       }
       if (msgCase_ == 2) {
-        output.writeMessage(2, (server_network.ServerWrapper.TrackerTorrent) msg_);
+        output.writeMessage(2, (TrackerTorrent) msg_);
       }
       unknownFields.writeTo(output);
     }
@@ -1572,26 +1572,26 @@ public final class ServerWrapper {
       size = 0;
       if (msgCase_ == 1) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, (server_network.ServerWrapper.FrontEndTorrent) msg_);
+          .computeMessageSize(1, (FrontEndTorrent) msg_);
       }
       if (msgCase_ == 2) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, (server_network.ServerWrapper.TrackerTorrent) msg_);
+          .computeMessageSize(2, (TrackerTorrent) msg_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
+    @Override
+    public boolean equals(final Object obj) {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof server_network.ServerWrapper.ServerMessage)) {
+      if (!(obj instanceof ServerMessage)) {
         return super.equals(obj);
       }
-      server_network.ServerWrapper.ServerMessage other = (server_network.ServerWrapper.ServerMessage) obj;
+      ServerMessage other = (ServerMessage) obj;
 
       boolean result = true;
       result = result && getMsgCase().equals(
@@ -1613,7 +1613,7 @@ public final class ServerWrapper {
       return result;
     }
 
-    @java.lang.Override
+    @Override
     public int hashCode() {
       if (memoizedHashCode != 0) {
         return memoizedHashCode;
@@ -1637,69 +1637,69 @@ public final class ServerWrapper {
       return hash;
     }
 
-    public static server_network.ServerWrapper.ServerMessage parseFrom(
+    public static ServerMessage parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static server_network.ServerWrapper.ServerMessage parseFrom(
+    public static ServerMessage parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static server_network.ServerWrapper.ServerMessage parseFrom(
+    public static ServerMessage parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static server_network.ServerWrapper.ServerMessage parseFrom(
+    public static ServerMessage parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static server_network.ServerWrapper.ServerMessage parseFrom(byte[] data)
+    public static ServerMessage parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static server_network.ServerWrapper.ServerMessage parseFrom(
+    public static ServerMessage parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static server_network.ServerWrapper.ServerMessage parseFrom(java.io.InputStream input)
+    public static ServerMessage parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static server_network.ServerWrapper.ServerMessage parseFrom(
+    public static ServerMessage parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
-    public static server_network.ServerWrapper.ServerMessage parseDelimitedFrom(java.io.InputStream input)
+    public static ServerMessage parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
-    public static server_network.ServerWrapper.ServerMessage parseDelimitedFrom(
+    public static ServerMessage parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static server_network.ServerWrapper.ServerMessage parseFrom(
+    public static ServerMessage parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
-    public static server_network.ServerWrapper.ServerMessage parseFrom(
+    public static ServerMessage parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -1711,7 +1711,7 @@ public final class ServerWrapper {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(server_network.ServerWrapper.ServerMessage prototype) {
+    public static Builder newBuilder(ServerMessage prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() {
@@ -1719,9 +1719,9 @@ public final class ServerWrapper {
           ? new Builder() : new Builder().mergeFrom(this);
     }
 
-    @java.lang.Override
+    @Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -1731,17 +1731,17 @@ public final class ServerWrapper {
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:server_network.ServerMessage)
-        server_network.ServerWrapper.ServerMessageOrBuilder {
+        ServerMessageOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return server_network.ServerWrapper.internal_static_server_network_ServerMessage_descriptor;
+        return ServerWrapper.internal_static_server_network_ServerMessage_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      protected FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return server_network.ServerWrapper.internal_static_server_network_ServerMessage_fieldAccessorTable
+        return ServerWrapper.internal_static_server_network_ServerMessage_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                server_network.ServerWrapper.ServerMessage.class, server_network.ServerWrapper.ServerMessage.Builder.class);
+                ServerMessage.class, Builder.class);
       }
 
       // Construct using server_network.ServerWrapper.ServerMessage.newBuilder()
@@ -1750,7 +1750,7 @@ public final class ServerWrapper {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+          BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
@@ -1768,23 +1768,23 @@ public final class ServerWrapper {
 
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return server_network.ServerWrapper.internal_static_server_network_ServerMessage_descriptor;
+        return ServerWrapper.internal_static_server_network_ServerMessage_descriptor;
       }
 
-      public server_network.ServerWrapper.ServerMessage getDefaultInstanceForType() {
-        return server_network.ServerWrapper.ServerMessage.getDefaultInstance();
+      public ServerMessage getDefaultInstanceForType() {
+        return ServerMessage.getDefaultInstance();
       }
 
-      public server_network.ServerWrapper.ServerMessage build() {
-        server_network.ServerWrapper.ServerMessage result = buildPartial();
+      public ServerMessage build() {
+        ServerMessage result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
 
-      public server_network.ServerWrapper.ServerMessage buildPartial() {
-        server_network.ServerWrapper.ServerMessage result = new server_network.ServerWrapper.ServerMessage(this);
+      public ServerMessage buildPartial() {
+        ServerMessage result = new ServerMessage(this);
         if (msgCase_ == 1) {
           if (frontEndTorrentBuilder_ == null) {
             result.msg_ = msg_;
@@ -1809,7 +1809,7 @@ public final class ServerWrapper {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -1822,25 +1822,25 @@ public final class ServerWrapper {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
+          int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof server_network.ServerWrapper.ServerMessage) {
-          return mergeFrom((server_network.ServerWrapper.ServerMessage)other);
+        if (other instanceof ServerMessage) {
+          return mergeFrom((ServerMessage)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(server_network.ServerWrapper.ServerMessage other) {
-        if (other == server_network.ServerWrapper.ServerMessage.getDefaultInstance()) return this;
+      public Builder mergeFrom(ServerMessage other) {
+        if (other == ServerMessage.getDefaultInstance()) return this;
         switch (other.getMsgCase()) {
           case FRONTENDTORRENT: {
             mergeFrontEndTorrent(other.getFrontEndTorrent());
@@ -1867,11 +1867,11 @@ public final class ServerWrapper {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
-        server_network.ServerWrapper.ServerMessage parsedMessage = null;
+        ServerMessage parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (server_network.ServerWrapper.ServerMessage) e.getUnfinishedMessage();
+          parsedMessage = (ServerMessage) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -1881,7 +1881,7 @@ public final class ServerWrapper {
         return this;
       }
       private int msgCase_ = 0;
-      private java.lang.Object msg_;
+      private Object msg_;
       public MsgCase
           getMsgCase() {
         return MsgCase.forNumber(
@@ -1897,7 +1897,7 @@ public final class ServerWrapper {
 
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          server_network.ServerWrapper.FrontEndTorrent, server_network.ServerWrapper.FrontEndTorrent.Builder, server_network.ServerWrapper.FrontEndTorrentOrBuilder> frontEndTorrentBuilder_;
+          FrontEndTorrent, FrontEndTorrent.Builder, FrontEndTorrentOrBuilder> frontEndTorrentBuilder_;
       /**
        * <code>.server_network.FrontEndTorrent frontEndTorrent = 1;</code>
        */
@@ -1907,23 +1907,23 @@ public final class ServerWrapper {
       /**
        * <code>.server_network.FrontEndTorrent frontEndTorrent = 1;</code>
        */
-      public server_network.ServerWrapper.FrontEndTorrent getFrontEndTorrent() {
+      public FrontEndTorrent getFrontEndTorrent() {
         if (frontEndTorrentBuilder_ == null) {
           if (msgCase_ == 1) {
-            return (server_network.ServerWrapper.FrontEndTorrent) msg_;
+            return (FrontEndTorrent) msg_;
           }
-          return server_network.ServerWrapper.FrontEndTorrent.getDefaultInstance();
+          return FrontEndTorrent.getDefaultInstance();
         } else {
           if (msgCase_ == 1) {
             return frontEndTorrentBuilder_.getMessage();
           }
-          return server_network.ServerWrapper.FrontEndTorrent.getDefaultInstance();
+          return FrontEndTorrent.getDefaultInstance();
         }
       }
       /**
        * <code>.server_network.FrontEndTorrent frontEndTorrent = 1;</code>
        */
-      public Builder setFrontEndTorrent(server_network.ServerWrapper.FrontEndTorrent value) {
+      public Builder setFrontEndTorrent(FrontEndTorrent value) {
         if (frontEndTorrentBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -1940,7 +1940,7 @@ public final class ServerWrapper {
        * <code>.server_network.FrontEndTorrent frontEndTorrent = 1;</code>
        */
       public Builder setFrontEndTorrent(
-          server_network.ServerWrapper.FrontEndTorrent.Builder builderForValue) {
+          FrontEndTorrent.Builder builderForValue) {
         if (frontEndTorrentBuilder_ == null) {
           msg_ = builderForValue.build();
           onChanged();
@@ -1953,11 +1953,11 @@ public final class ServerWrapper {
       /**
        * <code>.server_network.FrontEndTorrent frontEndTorrent = 1;</code>
        */
-      public Builder mergeFrontEndTorrent(server_network.ServerWrapper.FrontEndTorrent value) {
+      public Builder mergeFrontEndTorrent(FrontEndTorrent value) {
         if (frontEndTorrentBuilder_ == null) {
           if (msgCase_ == 1 &&
-              msg_ != server_network.ServerWrapper.FrontEndTorrent.getDefaultInstance()) {
-            msg_ = server_network.ServerWrapper.FrontEndTorrent.newBuilder((server_network.ServerWrapper.FrontEndTorrent) msg_)
+              msg_ != FrontEndTorrent.getDefaultInstance()) {
+            msg_ = FrontEndTorrent.newBuilder((FrontEndTorrent) msg_)
                 .mergeFrom(value).buildPartial();
           } else {
             msg_ = value;
@@ -1994,35 +1994,35 @@ public final class ServerWrapper {
       /**
        * <code>.server_network.FrontEndTorrent frontEndTorrent = 1;</code>
        */
-      public server_network.ServerWrapper.FrontEndTorrent.Builder getFrontEndTorrentBuilder() {
+      public FrontEndTorrent.Builder getFrontEndTorrentBuilder() {
         return getFrontEndTorrentFieldBuilder().getBuilder();
       }
       /**
        * <code>.server_network.FrontEndTorrent frontEndTorrent = 1;</code>
        */
-      public server_network.ServerWrapper.FrontEndTorrentOrBuilder getFrontEndTorrentOrBuilder() {
+      public FrontEndTorrentOrBuilder getFrontEndTorrentOrBuilder() {
         if ((msgCase_ == 1) && (frontEndTorrentBuilder_ != null)) {
           return frontEndTorrentBuilder_.getMessageOrBuilder();
         } else {
           if (msgCase_ == 1) {
-            return (server_network.ServerWrapper.FrontEndTorrent) msg_;
+            return (FrontEndTorrent) msg_;
           }
-          return server_network.ServerWrapper.FrontEndTorrent.getDefaultInstance();
+          return FrontEndTorrent.getDefaultInstance();
         }
       }
       /**
        * <code>.server_network.FrontEndTorrent frontEndTorrent = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          server_network.ServerWrapper.FrontEndTorrent, server_network.ServerWrapper.FrontEndTorrent.Builder, server_network.ServerWrapper.FrontEndTorrentOrBuilder> 
+          FrontEndTorrent, FrontEndTorrent.Builder, FrontEndTorrentOrBuilder>
           getFrontEndTorrentFieldBuilder() {
         if (frontEndTorrentBuilder_ == null) {
           if (!(msgCase_ == 1)) {
-            msg_ = server_network.ServerWrapper.FrontEndTorrent.getDefaultInstance();
+            msg_ = FrontEndTorrent.getDefaultInstance();
           }
           frontEndTorrentBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              server_network.ServerWrapper.FrontEndTorrent, server_network.ServerWrapper.FrontEndTorrent.Builder, server_network.ServerWrapper.FrontEndTorrentOrBuilder>(
-                  (server_network.ServerWrapper.FrontEndTorrent) msg_,
+              FrontEndTorrent, FrontEndTorrent.Builder, FrontEndTorrentOrBuilder>(
+                  (FrontEndTorrent) msg_,
                   getParentForChildren(),
                   isClean());
           msg_ = null;
@@ -2033,7 +2033,7 @@ public final class ServerWrapper {
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          server_network.ServerWrapper.TrackerTorrent, server_network.ServerWrapper.TrackerTorrent.Builder, server_network.ServerWrapper.TrackerTorrentOrBuilder> trackerTorrentBuilder_;
+          TrackerTorrent, TrackerTorrent.Builder, TrackerTorrentOrBuilder> trackerTorrentBuilder_;
       /**
        * <code>.server_network.TrackerTorrent trackerTorrent = 2;</code>
        */
@@ -2043,23 +2043,23 @@ public final class ServerWrapper {
       /**
        * <code>.server_network.TrackerTorrent trackerTorrent = 2;</code>
        */
-      public server_network.ServerWrapper.TrackerTorrent getTrackerTorrent() {
+      public TrackerTorrent getTrackerTorrent() {
         if (trackerTorrentBuilder_ == null) {
           if (msgCase_ == 2) {
-            return (server_network.ServerWrapper.TrackerTorrent) msg_;
+            return (TrackerTorrent) msg_;
           }
-          return server_network.ServerWrapper.TrackerTorrent.getDefaultInstance();
+          return TrackerTorrent.getDefaultInstance();
         } else {
           if (msgCase_ == 2) {
             return trackerTorrentBuilder_.getMessage();
           }
-          return server_network.ServerWrapper.TrackerTorrent.getDefaultInstance();
+          return TrackerTorrent.getDefaultInstance();
         }
       }
       /**
        * <code>.server_network.TrackerTorrent trackerTorrent = 2;</code>
        */
-      public Builder setTrackerTorrent(server_network.ServerWrapper.TrackerTorrent value) {
+      public Builder setTrackerTorrent(TrackerTorrent value) {
         if (trackerTorrentBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -2076,7 +2076,7 @@ public final class ServerWrapper {
        * <code>.server_network.TrackerTorrent trackerTorrent = 2;</code>
        */
       public Builder setTrackerTorrent(
-          server_network.ServerWrapper.TrackerTorrent.Builder builderForValue) {
+          TrackerTorrent.Builder builderForValue) {
         if (trackerTorrentBuilder_ == null) {
           msg_ = builderForValue.build();
           onChanged();
@@ -2089,11 +2089,11 @@ public final class ServerWrapper {
       /**
        * <code>.server_network.TrackerTorrent trackerTorrent = 2;</code>
        */
-      public Builder mergeTrackerTorrent(server_network.ServerWrapper.TrackerTorrent value) {
+      public Builder mergeTrackerTorrent(TrackerTorrent value) {
         if (trackerTorrentBuilder_ == null) {
           if (msgCase_ == 2 &&
-              msg_ != server_network.ServerWrapper.TrackerTorrent.getDefaultInstance()) {
-            msg_ = server_network.ServerWrapper.TrackerTorrent.newBuilder((server_network.ServerWrapper.TrackerTorrent) msg_)
+              msg_ != TrackerTorrent.getDefaultInstance()) {
+            msg_ = TrackerTorrent.newBuilder((TrackerTorrent) msg_)
                 .mergeFrom(value).buildPartial();
           } else {
             msg_ = value;
@@ -2130,35 +2130,35 @@ public final class ServerWrapper {
       /**
        * <code>.server_network.TrackerTorrent trackerTorrent = 2;</code>
        */
-      public server_network.ServerWrapper.TrackerTorrent.Builder getTrackerTorrentBuilder() {
+      public TrackerTorrent.Builder getTrackerTorrentBuilder() {
         return getTrackerTorrentFieldBuilder().getBuilder();
       }
       /**
        * <code>.server_network.TrackerTorrent trackerTorrent = 2;</code>
        */
-      public server_network.ServerWrapper.TrackerTorrentOrBuilder getTrackerTorrentOrBuilder() {
+      public TrackerTorrentOrBuilder getTrackerTorrentOrBuilder() {
         if ((msgCase_ == 2) && (trackerTorrentBuilder_ != null)) {
           return trackerTorrentBuilder_.getMessageOrBuilder();
         } else {
           if (msgCase_ == 2) {
-            return (server_network.ServerWrapper.TrackerTorrent) msg_;
+            return (TrackerTorrent) msg_;
           }
-          return server_network.ServerWrapper.TrackerTorrent.getDefaultInstance();
+          return TrackerTorrent.getDefaultInstance();
         }
       }
       /**
        * <code>.server_network.TrackerTorrent trackerTorrent = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          server_network.ServerWrapper.TrackerTorrent, server_network.ServerWrapper.TrackerTorrent.Builder, server_network.ServerWrapper.TrackerTorrentOrBuilder> 
+          TrackerTorrent, TrackerTorrent.Builder, TrackerTorrentOrBuilder>
           getTrackerTorrentFieldBuilder() {
         if (trackerTorrentBuilder_ == null) {
           if (!(msgCase_ == 2)) {
-            msg_ = server_network.ServerWrapper.TrackerTorrent.getDefaultInstance();
+            msg_ = TrackerTorrent.getDefaultInstance();
           }
           trackerTorrentBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              server_network.ServerWrapper.TrackerTorrent, server_network.ServerWrapper.TrackerTorrent.Builder, server_network.ServerWrapper.TrackerTorrentOrBuilder>(
-                  (server_network.ServerWrapper.TrackerTorrent) msg_,
+              TrackerTorrent, TrackerTorrent.Builder, TrackerTorrentOrBuilder>(
+                  (TrackerTorrent) msg_,
                   getParentForChildren(),
                   isClean());
           msg_ = null;
@@ -2182,12 +2182,12 @@ public final class ServerWrapper {
     }
 
     // @@protoc_insertion_point(class_scope:server_network.ServerMessage)
-    private static final server_network.ServerWrapper.ServerMessage DEFAULT_INSTANCE;
+    private static final ServerMessage DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new server_network.ServerWrapper.ServerMessage();
+      DEFAULT_INSTANCE = new ServerMessage();
     }
 
-    public static server_network.ServerWrapper.ServerMessage getDefaultInstance() {
+    public static ServerMessage getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
@@ -2205,12 +2205,12 @@ public final class ServerWrapper {
       return PARSER;
     }
 
-    @java.lang.Override
+    @Override
     public com.google.protobuf.Parser<ServerMessage> getParserForType() {
       return PARSER;
     }
 
-    public server_network.ServerWrapper.ServerMessage getDefaultInstanceForType() {
+    public ServerMessage getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -2239,7 +2239,7 @@ public final class ServerWrapper {
   private static  com.google.protobuf.Descriptors.FileDescriptor
       descriptor;
   static {
-    java.lang.String[] descriptorData = {
+    String[] descriptorData = {
       "\n\024server_wrapper.proto\022\016server_network\"K" +
       "\n\017FrontEndTorrent\022\n\n\002id\030\001 \001(\t\022\014\n\004user\030\002 " +
       "\001(\t\022\r\n\005group\030\003 \001(\t\022\017\n\007content\030\004 \001(\014\"!\n\016T" +
@@ -2266,19 +2266,19 @@ public final class ServerWrapper {
     internal_static_server_network_FrontEndTorrent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_server_network_FrontEndTorrent_descriptor,
-        new java.lang.String[] { "Id", "User", "Group", "Content", });
+        new String[] { "Id", "User", "Group", "Content", });
     internal_static_server_network_TrackerTorrent_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_server_network_TrackerTorrent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_server_network_TrackerTorrent_descriptor,
-        new java.lang.String[] { "Content", });
+        new String[] { "Content", });
     internal_static_server_network_ServerMessage_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_server_network_ServerMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_server_network_ServerMessage_descriptor,
-        new java.lang.String[] { "FrontEndTorrent", "TrackerTorrent", "Msg", });
+        new String[] { "FrontEndTorrent", "TrackerTorrent", "Msg", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
