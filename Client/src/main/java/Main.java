@@ -124,7 +124,7 @@ public class Main {
                     ArrayList<String> trc = new ArrayList<String>();
                     //TODO: This IP must be dynamic
 
-                    trc.add("http://192.168.43.243:6969/announce");
+                    trc.add("http://138.68.151.167:6969/announce");
                     trc.add("http://192.168.43.288:6969/announce");
 
                     t = TorrentUtil.createTorrent(path, username, trc);
@@ -220,7 +220,7 @@ public class Main {
                 .handler(new TorrentListenerInitializer(available));
                 // Make a new connection.
 
-                ch = b.connect("192.168.43.243", 5000).sync().channel();
+                ch = b.connect("138.68.151.167", 5000).sync().channel();
 
                 // Get the handler instance to initiate the request.
                 //TorrentClientHandler handler = ch.pipeline().get(TorrentClientHandler.class);
