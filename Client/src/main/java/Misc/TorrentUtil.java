@@ -1,4 +1,5 @@
 package Misc;
+import Network.ServerWrapper;
 import Network.TorrentWrapperOuterClass;
 import Offline.Offline;
 import Offline.Utils.LocalAddresses;
@@ -200,9 +201,10 @@ public class TorrentUtil {
         c.share(-1);
 
         //Creates a protobuf to send file info
-        TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
+        //TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
+        ServerWrapper.TrackerTorrent sw = ServerWrapper.TrackerTorrent.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
         //Escreve e espera pela escrita no socket
-        ch.writeAndFlush(tw).sync();
+        ch.writeAndFlush(sw).sync();
 
         return c;
     }
