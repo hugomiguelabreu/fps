@@ -1,6 +1,9 @@
+import Handlers.AutenticationInitializer;
 import Handlers.TorrentListenerInitializer;
 import Misc.FileUtils;
 import Misc.TorrentUtil;
+import Network.AccountOuterClass;
+import Network.ClientWrapper;
 import Offline.Offline;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.client.SharedTorrent;
@@ -9,6 +12,7 @@ import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -26,19 +30,28 @@ import java.net.*;
 import java.nio.channels.UnsupportedAddressTypeException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.SynchronousQueue;
 
 public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Object.class);
     private static ArrayList<Client> activeClients;
     private static EventLoopGroup group = null;
+    private static SynchronousQueue<Boolean> queue;
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
 
         Scanner sc = new Scanner(System.in);
         String input;
+
+        Channel frontCh = null;
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        queue = new SynchronousQueue<Boolean>();
         String username = "default";
         String password, name;
+
         Torrent t = null;
         ArrayList<Torrent> available = new ArrayList<>();
         Channel ch = null;
@@ -47,6 +60,8 @@ public class Main {
         activeClients = new ArrayList<>();
 
         System.out.println("Started client");
+
+        //frontCh = startClientFrontServer();
 
         while (true){
 
@@ -60,7 +75,7 @@ public class Main {
                 username = sc.nextLine();
                 System.out.println("password:");
                 password = sc.nextLine();
-                if(login(username, password)){
+                if(login(username, password, frontCh, result)){
                     System.out.println("logged in");
                     break;
                 }
@@ -73,7 +88,7 @@ public class Main {
                 password = sc.nextLine();
                 System.out.println("name:");
                 name = sc.nextLine();
-                if(register(username, password, name)){
+                if(register(username, password, name, frontCh)){
                     System.out.println("registed");
                     break;
                 }
@@ -109,7 +124,8 @@ public class Main {
                     ArrayList<String> trc = new ArrayList<String>();
                     //TODO: This IP must be dynamic
 
-                    trc.add("http://138.68.151.167:6969/announce");
+                    trc.add("http://192.168.43.243:6969/announce");
+                    trc.add("http://192.168.43.288:6969/announce");
 
                     t = TorrentUtil.createTorrent(path, username, trc);
 
@@ -192,7 +208,10 @@ public class Main {
     }
 
     private static Channel startClient(ArrayList<Torrent> available) throws SocketException, UnknownHostException {
-        group = new NioEventLoopGroup();
+
+        if(group == null)
+            group = new NioEventLoopGroup();
+
         Channel ch = null;
         try {
             Bootstrap b = new Bootstrap();
@@ -201,7 +220,7 @@ public class Main {
                 .handler(new TorrentListenerInitializer(available));
                 // Make a new connection.
 
-                ch = b.connect("138.68.151.167", 5000).sync().channel();
+                ch = b.connect("192.168.43.243", 5000).sync().channel();
 
                 // Get the handler instance to initiate the request.
                 //TorrentClientHandler handler = ch.pipeline().get(TorrentClientHandler.class);
@@ -220,50 +239,94 @@ public class Main {
         return ch;
     }
 
-    private static boolean login(String username, String password){
+    private static Channel startClientFrontServer(){
+
+        if(group == null)
+            group = new NioEventLoopGroup();
+
+        Channel ch = null;
+        try {
+            Bootstrap b = new Bootstrap();
+            b.group(group)
+                    .channel(NioSocketChannel.class)
+                    .handler(new AutenticationInitializer(queue));
+            // Make a new connection.
+
+
+            ch = b.connect("localhost", 2000).sync().channel();
+
+            // Get the handler instance to initiate the request.
+            //TorrentClientHandler handler = ch.pipeline().get(TorrentClientHandler.class);
+            // Request and get the response.
+            //List<String> response = handler.getLocalTimes(CITIES);
+            // Close the connection.
+            //sch.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ch;
+        } finally {
+            //group.shutdownGracefully();
+        }
+
+        return ch;
+    }
+
+    private static boolean login(String username, String password, Channel frontCh, CompletableFuture<Boolean> result){
 
         return true;
 
+//        boolean ret;
+//
 //        AccountOuterClass.Account request = AccountOuterClass.Account.newBuilder()
 //                .setType(false) // register -> true , login -> false
 //                .setUsername(username)
 //                .setPassword(password)
 //                .setName("").build();
 //
+//        frontCh.writeAndFlush(request);
+//
 //        try {
-//            //TODO mudar endereco
-//            Socket socket = new Socket("localhost" , 2184);
-//            request.writeDelimitedTo(socket.getOutputStream());
+//            ret = result.get();
+//            result = new CompletableFuture<>();
+//            return ret;
 //
-//            ResponseOuterClass.Response response = ResponseOuterClass.Response.parseDelimitedFrom(socket.getInputStream());
-//
-//            return response.getRep();
-//
-//        } catch (IOException e) {
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//            return false;
+//        } catch (ExecutionException e) {
 //            e.printStackTrace();
 //            return false;
 //        }
+
     }
 
-    private static boolean register(String username, String password, String name){
+    private static boolean register(String username, String password, String name, Channel frontCh) throws InterruptedException {
 
         return true;
 
-//        AccountOuterClass.Account request = AccountOuterClass.Account.newBuilder()
-//                .setType(true) // register -> true , login -> false
+//        boolean ret;
+//
+//        ClientWrapper.Register request = ClientWrapper.Register.newBuilder()
 //                .setUsername(username)
 //                .setPassword(password)
 //                .setName(name).build();
 //
+//        ClientWrapper.ClientMessage cw = ClientWrapper.ClientMessage.newBuilder()
+//                .setRegister(request)
+//                .build();
+//
+//        System.out.println("write channel");
+//
+//        frontCh.writeAndFlush(cw).sync();
+//
+//        System.out.println("write channel done");
+//
 //        try {
-//            Socket socket = new Socket("localhost" , 2184);
-//            request.writeDelimitedTo(socket.getOutputStream());
-//
-//            ResponseOuterClass.Response response = ResponseOuterClass.Response.parseDelimitedFrom(socket.getInputStream());
-//
-//            return response.getRep();
-//
-//        } catch (IOException e) {
+//            ret = queue.take();
+//            System.out.println("ret = " + ret);
+//            return ret;
+//        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //            return false;
 //        }
