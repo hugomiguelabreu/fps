@@ -201,7 +201,6 @@ public class Main {
         if(group != null)
             group.shutdownGracefully();
 
-
         System.exit(0);
 
         //TODO:Terminar todos os clientes/tarckers abertos
@@ -230,10 +229,7 @@ public class Main {
                 //sch.close();
         } catch (Exception e) {
             e.printStackTrace();
-
             return ch;
-        } finally {
-            //group.shutdownGracefully();
         }
 
         return ch;

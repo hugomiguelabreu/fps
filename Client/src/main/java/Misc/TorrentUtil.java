@@ -159,8 +159,6 @@ public class TorrentUtil {
 
         });
 
-        //TODO: return client
-
         //Creates a protobuf to send file info
         TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
         //Offline sends to all users
@@ -191,6 +189,13 @@ public class TorrentUtil {
                 whatismyip.openStream()));
         String ip = in.readLine(); //you get the IP as a String
 
+        //Creates a protobuf to send file info
+        //TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
+        ServerWrapper.TrackerTorrent sw = ServerWrapper.TrackerTorrent.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
+        //Escreve e espera pela escrita no socket
+        ch.writeAndFlush(sw).sync();
+        //Após iniciada a intenção, iniciamos o cliente.
+
         SharedTorrent st = new SharedTorrent(t, dest.getParentFile());
         //TODO: return client
         Client c = new Client(
@@ -199,12 +204,6 @@ public class TorrentUtil {
                 username);
 
         c.share(-1);
-
-        //Creates a protobuf to send file info
-        //TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
-        ServerWrapper.TrackerTorrent sw = ServerWrapper.TrackerTorrent.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
-        //Escreve e espera pela escrita no socket
-        ch.writeAndFlush(sw).sync();
 
         return c;
     }
