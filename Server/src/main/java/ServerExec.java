@@ -47,8 +47,10 @@ public class ServerExec {
             if(c!=null)
                 c.stop();
         }
+
         tck.stop();
         ms.shutdown();
+        System.exit(0);
     }
 
 }

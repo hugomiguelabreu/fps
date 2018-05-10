@@ -17,7 +17,6 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrap
     private Map<String, Client> openClients;
 
     public TorrentServerHandler(Tracker trackedTorrentsParam, Map<String, Client> openClientsParam) {
-        super(false);
         this.openClients = openClientsParam;
         this.tck = trackedTorrentsParam;
     }

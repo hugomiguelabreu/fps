@@ -42,10 +42,9 @@ public class MainServer extends Thread{
             //Wait for channel to close
             cf.channel().closeFuture().sync();
             System.out.println("Server shutting down.");
-
         } catch (InterruptedException e) {
             e.printStackTrace();
-        } finally {
+        } finally{
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
