@@ -1,0 +1,13 @@
+syntax = "proto3";
+package server_network;
+
+message ServerMessage {
+    string torrentHexId = 1;
+    enum Type {
+        GET = 0; // I need the file
+        DELETE = 1; // I deleted the file
+    }
+    Type type = 2;
+    string server_ip = 3;
+    int32 server_cli_port = 4;
+}

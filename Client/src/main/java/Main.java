@@ -218,15 +218,8 @@ public class Main {
                 .channel(NioSocketChannel.class)
                 .handler(new TorrentListenerInitializer(available));
                 // Make a new connection.
-
                 ch = b.connect("138.68.151.167", 5000).sync().channel();
 
-                // Get the handler instance to initiate the request.
-                //TorrentClientHandler handler = ch.pipeline().get(TorrentClientHandler.class);
-                // Request and get the response.
-                //List<String> response = handler.getLocalTimes(CITIES);
-                // Close the connection.
-                //sch.close();
         } catch (Exception e) {
             e.printStackTrace();
             return ch;
