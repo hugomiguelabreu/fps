@@ -18,6 +18,7 @@ import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+import server_network.Interserver;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
@@ -191,9 +192,10 @@ public class TorrentUtil {
 
         //Creates a protobuf to send file info
         //TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
-        ServerWrapper.TrackerTorrent sw = ServerWrapper.TrackerTorrent.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
+        Interserver.TorrentMessage sw = Interserver.TorrentMessage.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
+        Interserver.Message m = Interserver.Message.newBuilder().setTm(sw).build();
         //Escreve e espera pela escrita no socket
-        ch.writeAndFlush(sw).sync();
+        ch.writeAndFlush(m).sync();
         //Após iniciada a intenção, iniciamos o cliente.
 
         SharedTorrent st = new SharedTorrent(t, dest.getParentFile());
