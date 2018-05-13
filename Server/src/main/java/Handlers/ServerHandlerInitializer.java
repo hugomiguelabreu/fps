@@ -9,17 +9,17 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
-import server_network.ServerWrapper;
+import server_network.Interserver;
 
 import java.util.Map;
 
 
-public class TorrentServerInitializer extends ChannelInitializer<SocketChannel>{
+public class ServerHandlerInitializer extends ChannelInitializer<SocketChannel>{
 
     private Tracker trackedTorrents;
     private Map<String, Client> openClients;
 
-    public TorrentServerInitializer(Tracker trackedTorrentsParam, Map<String, Client> openClientsParam){
+    public ServerHandlerInitializer(Tracker trackedTorrentsParam, Map<String, Client> openClientsParam){
         this.openClients = openClientsParam;
         this.trackedTorrents = trackedTorrentsParam;
     }
@@ -29,9 +29,9 @@ public class TorrentServerInitializer extends ChannelInitializer<SocketChannel>{
         ChannelPipeline p = ch.pipeline();
 
         p.addLast(new ProtobufVarint32FrameDecoder());
-        p.addLast(new ProtobufDecoder(ServerWrapper.ServerMessage.getDefaultInstance().getTrackerTorrent()));
+        p.addLast(new ProtobufDecoder(Interserver.Message.getDefaultInstance()));
         p.addLast(new ProtobufVarint32LengthFieldPrepender());
         p.addLast(new ProtobufEncoder());
-        p.addLast(new TorrentServerHandler(trackedTorrents, openClients));
+        p.addLast(new ServerHandler(this.trackedTorrents, this.openClients));
     }
 }
