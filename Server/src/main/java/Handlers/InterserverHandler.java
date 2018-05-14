@@ -23,11 +23,13 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Interserver.InterServerMessage message) throws Exception {
         System.out.println("Handle peer injection or Deletion");
-        System.out.println(message.getTypeOp());
-        System.out.println(message.getServerIp().toStringUtf8());
-        System.out.println(message.getServerCliPort());
+        
+        boolean type = message.getTypeOp();
+        String ip = message.getServerIp().toStringUtf8();
+        int port = message.getServerCliPort();
         String torrentId = message.getTorrentHexId().toStringUtf8();
         System.out.println(torrentId);
+
         if(openClients.containsKey(torrentId)){
             //We're handling that torrent.
             Peer localCli = openClients.get(torrentId).getPeerSpec();

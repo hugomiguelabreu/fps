@@ -13,7 +13,10 @@ import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+
+import java.io.IOException;
 import java.net.Socket;
+import java.net.URI;
 import java.util.Map;
 
 public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrapper.ServerMessage> {
@@ -39,19 +42,8 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrap
         TrackedTorrent tt =  TorrentUtil.announceTrackedTorrentWithObservers(tck, t, openClients);
 
         Peer cli = serverCli.getPeerSpec();
-        tt.injectPeer(new TrackedPeer(t, cli.getIp(), cli.getPort(), cli.getPeerId())); //INJETA-SE A SI PRÓPRIO?
-        Socket s = new Socket("localhost", 8989);
-        Interserver.InterServerMessage im = Interserver.InterServerMessage.newBuilder()
-                .setTypeOp(true)
-                .setServerIp(ByteString.copyFromUtf8(serverCli.getPeerSpec().getIp()))
-                .setServerCliPort(serverCli.getPeerSpec().getPort())
-                .setTorrentHexId(ByteString.copyFromUtf8(tt.getHexInfoHash()))
-                .build();
-        im.writeDelimitedTo(s.getOutputStream());
-        s.getOutputStream().flush();
-        s.getOutputStream().close();
-        s.close();
-
+        tt.injectPeer(new TrackedPeer(t, cli.getIp(), cli.getPort(), cli.getPeerId()));
+        injectionRequest(cli, tt);
     }
 
     @Override
@@ -63,5 +55,22 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrap
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
         ctx.close();
+    }
+
+    private void injectionRequest(Peer peer, TrackedTorrent tt) throws IOException {
+        //Inject peer in each of the trackers
+        for(URI tracker: tt.getAnnounceList().get(0)) {
+            Socket s = new Socket(tracker.getHost(), tracker.getPort());
+            Interserver.InterServerMessage im = Interserver.InterServerMessage.newBuilder()
+                    .setTypeOp(true)
+                    .setServerIp(ByteString.copyFromUtf8(peer.getIp()))
+                    .setServerCliPort(peer.getPort())
+                    .setTorrentHexId(ByteString.copyFromUtf8(tt.getHexInfoHash()))
+                    .build();
+            im.writeDelimitedTo(s.getOutputStream());
+            s.getOutputStream().flush();
+            s.getOutputStream().close();
+            s.close();
+        }
     }
 }
