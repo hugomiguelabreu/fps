@@ -1,6 +1,7 @@
 package Core;
 
-import Handlers.ServerHandlerInitializer;
+import Handlers.InterserverInitializer;
+import Handlers.TorrentServerInitializer;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.bootstrap.ServerBootstrap;
@@ -11,7 +12,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.util.Map;
 
-public class MainServer extends Thread{
+public class InterserverListener extends Thread{
+
     private int port;
     private ChannelFuture cf;
     private EventLoopGroup workerGroup;
@@ -19,7 +21,7 @@ public class MainServer extends Thread{
     private Tracker tck;
     private Map<String, Client> clients;
 
-    public MainServer(int portParam, Tracker tckParam, Map<String, Client> clientsParam){
+    public InterserverListener(int portParam, Tracker tckParam, Map<String, Client> clientsParam){
         this.port = portParam;
         this.tck = tckParam;
         this.clients = clientsParam;
@@ -29,21 +31,21 @@ public class MainServer extends Thread{
         this.workerGroup = new NioEventLoopGroup();
     }
 
-    public void run(){
+    public void run() {
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new ServerHandlerInitializer(tck, clients));
+                    .childHandler(new InterserverInitializer(tck, clients));
 
             cf = b.bind(port).sync();
             //Wait for channel to close
             cf.channel().closeFuture().sync();
 
-            System.out.println("Server shutting down.");
+            System.out.println("Interserver shutting down.");
         } catch (InterruptedException e) {
             e.printStackTrace();
-        } finally{
+        } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
