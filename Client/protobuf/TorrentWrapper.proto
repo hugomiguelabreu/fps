@@ -1,5 +1,0 @@
-syntax = "proto3";
-package Network;
-message TorrentWrapper{
-    bytes content = 1;
-}

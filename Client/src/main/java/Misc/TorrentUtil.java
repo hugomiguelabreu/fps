@@ -1,6 +1,6 @@
 package Misc;
-import Network.ServerWrapper;
-import Network.TorrentWrapperOuterClass;
+
+import Network.ClientWrapper;
 import Offline.Offline;
 import Offline.Utils.LocalAddresses;
 import Offline.Utils.User;
@@ -160,7 +160,14 @@ public class TorrentUtil {
         });
 
         //Creates a protobuf to send file info
-        TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
+
+        ClientWrapper.TorrentWrapper tw = ClientWrapper.TorrentWrapper.newBuilder()
+                .setContent(ByteString.copyFrom(t.getEncoded()))
+                .build();
+
+        ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
+                .setTorrentWrapper(tw).build();
+
         //Offline sends to all users
         ConcurrentHashMap<String, User> foundUsers = Offline.listener.getUsers();
 
@@ -173,7 +180,7 @@ public class TorrentUtil {
 
                 System.out.println("Sending to: " + entry.getKey());
                 Socket s = new Socket(entry.getValue().getIpv4(), 5558);
-                tw.writeDelimitedTo(s.getOutputStream());
+                wrapper.writeDelimitedTo(s.getOutputStream()); //TODO mudar o o wrapper no socket que recebe
             }
         }
 
@@ -190,10 +197,16 @@ public class TorrentUtil {
         String ip = in.readLine(); //you get the IP as a String
 
         //Creates a protobuf to send file info
-        //TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
-        ServerWrapper.TrackerTorrent sw = ServerWrapper.TrackerTorrent.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
+
+        ClientWrapper.TorrentWrapper sw = ClientWrapper.TorrentWrapper.newBuilder()
+                .setContent(ByteString.copyFrom(t.getEncoded()))
+                .build();
+
+        ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
+                .setTorrentWrapper(sw).build();
+
         //Escreve e espera pela escrita no socket
-        ch.writeAndFlush(sw).sync();
+        ch.writeAndFlush(wrapper).sync();
         //Após iniciada a intenção, iniciamos o cliente.
 
         SharedTorrent st = new SharedTorrent(t, dest.getParentFile());

@@ -2,7 +2,6 @@ import Handlers.AutenticationInitializer;
 import Handlers.TorrentListenerInitializer;
 import Misc.FileUtils;
 import Misc.TorrentUtil;
-import Network.AccountOuterClass;
 import Network.ClientWrapper;
 import Offline.Offline;
 import com.turn.ttorrent.client.Client;
@@ -274,7 +273,7 @@ public class Main {
 
 //        boolean ret;
 //
-//        AccountOuterClass.Account request = AccountOuterClass.Account.newBuilder()
+
 //                .setType(false) // register -> true , login -> false
 //                .setUsername(username)
 //                .setPassword(password)
@@ -297,9 +296,32 @@ public class Main {
 
     }
 
-    private static boolean register(String username, String password, String name, Channel frontCh) throws InterruptedException {
+    private static boolean register(String username, String password, String name, Channel frontCh) throws InterruptedException, IOException {
 
-        return true;
+        Socket socket = new Socket("localhost", 2000);
+        boolean ret;
+
+        ClientWrapper.Register request = ClientWrapper.Register.newBuilder()
+                .setUsername(username)
+                .setPassword(password)
+                .setName(name).build();
+
+        ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
+                .setRegister(request).build();
+
+        socket.getOutputStream().write(wrapper.getSerializedSize());
+        wrapper.writeTo(socket.getOutputStream());
+        //System.out.println(ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep());
+
+        System.out.println(username + " : " + ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep());
+
+        return false;
+
+//        ret = queue.take();
+//            System.out.println("ret = " + ret);
+//            return ret;
+
+        //return true;
 
 //        boolean ret;
 //
