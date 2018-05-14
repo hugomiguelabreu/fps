@@ -1,5 +1,6 @@
 package Handlers;
 
+import Network.ClientWrapper;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 

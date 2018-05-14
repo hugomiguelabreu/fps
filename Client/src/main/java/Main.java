@@ -2,6 +2,7 @@ import Handlers.AutenticationInitializer;
 import Handlers.TorrentListenerInitializer;
 import Misc.FileUtils;
 import Misc.TorrentUtil;
+import Network.ClientWrapper;
 import Offline.Offline;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.client.SharedTorrent;
