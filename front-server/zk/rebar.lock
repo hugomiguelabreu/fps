@@ -1,4 +1,8 @@
 [{<<"erlzk">>,
   {git,"git://github.com/huaban/erlzk.git",
        {ref,"aa7190ee2343ac1341cea3edc9b9eea36c591708"}},
+  0},
+ {<<"jiffy">>,
+  {git,"https://github.com/davisp/jiffy.git",
+       {ref,"7ecd610286a6cfbf3008d33deff081a6b28648c4"}},
   0}].

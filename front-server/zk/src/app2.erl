@@ -5,5 +5,5 @@
 start(ID) ->
 	spawn(zk, init, ["localhost", 2184]),
 	spawn(data, init, []),
-	spawn(server_comm, init, [3001]),
+	spawn(server_comm, init, [3001, ID]),
 	spawn(auth, init, [ID, 2001]).

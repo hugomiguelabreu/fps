@@ -32,7 +32,7 @@ public class Client implements Runnable{
             socket.getOutputStream().write(wrapper.getSerializedSize());
             wrapper.writeTo(socket.getOutputStream());
             System.out.println(Wrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep());
-            Thread.sleep(3000);
+            Thread.sleep(2000);
 
             if (username.equals("jib")){
                 Wrapper.TorrentWrapper torr = Wrapper.TorrentWrapper.newBuilder()
@@ -47,6 +47,7 @@ public class Client implements Runnable{
             }
             System.out.println(username + " : " + Wrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getTorrentWrapper());
             socket.close();
+
 
         } catch (Exception e) { e.printStackTrace();}
     }
