@@ -17,7 +17,8 @@ public class Client implements Runnable{
     public void run() {
         Socket socket = null;
         try {
-            if(username.equals("jib"))
+
+            if(username.equals("jib") || username.equals("cr7"))
                 socket = new Socket("localhost"  , 2000);
             else
                 socket = new Socket("localhost"  , 2001);
@@ -53,8 +54,8 @@ public class Client implements Runnable{
     }
 
     public static void main(String[] args) {
-        (new Thread(new Client("jib", "asd"))).start();
-        (new Thread(new Client("divisao", "123"))).start();
+        //(new Thread(new Client("jib", "asd"))).start();
+        //(new Thread(new Client("divisao", "123"))).start();
         (new Thread(new Client("cr7", "123"))).start();
     }
 }

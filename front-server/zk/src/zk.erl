@@ -1,5 +1,5 @@
 -module(zk).
--export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/2, setOffline/1, getGroupUsers/1, getTrackerList/0, getFrontSv/1, newTorrent/3, setUnreceivedTorrent/3, getTracker/1]).
+-export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/2, setOffline/1, getGroupUsers/1, getTrackerList/0, getFrontSv/1, newTorrent/3, setUnreceivedTorrent/3, getTracker/1, getNewContent/1]).
 
 
 init(Host, Port) ->
@@ -55,6 +55,10 @@ loop(Pid) ->
     		V = newTorrent(TID, U, G, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
+    	{{new_content, U}, From} ->
+    		V = getNewContent(U, Pid),
+			From ! {?MODULE, V},
+    		loop(Pid);	
     	{{unreceived_torrent, TID, U, G}, From} ->
     		V = setUnreceivedTorrent(TID, U, G, Pid),
 			From ! {?MODULE, V},
@@ -76,6 +80,7 @@ register(Pid, Username, Password, Name) ->
 	SvPath   = "/users/" ++ Username ++ "/sv",
 	NamePath = "/users/" ++ Username ++ "/name",
 	OnPath   = "/users/" ++ Username ++ "/online",
+	Missing  = "/users/" ++ Username ++ "/missing",
 
 	case erlzk:create(Pid, UserPath, list_to_binary(Password)) of
 		{error, _} -> error;
@@ -83,6 +88,7 @@ register(Pid, Username, Password, Name) ->
 			erlzk:create(Pid, NamePath, list_to_binary(Name)),
 			erlzk:create(Pid, SvPath, list_to_binary("")),
 			erlzk:create(Pid, OnPath, list_to_binary("false")),
+			erlzk:create(Pid, Missing, list_to_binary("")),
 			ok
 	end.
 
@@ -247,22 +253,28 @@ newTorrent(TID, U, G) -> rpc({new_torrent, TID, U, G}).
 newTorrent(TID, User, Group, PID) ->
 	GroupPath = "/groups/" ++ Group ++ "/torrents/" ++ TID,
 	erlzk:create(PID, GroupPath, list_to_binary(User)),
-	erlzk:create(PID, GroupPath ++ "/torrent/", list_to_binary("")),
 	erlzk:create(PID, GroupPath ++ "/file/", list_to_binary("")),
 	ok.	
 
 setUnreceivedTorrent(TID, U, G) -> rpc({unreceived_torrent, TID, U, G}). 
 setUnreceivedTorrent(TID, User, Group, PID) -> 
-	GroupPath = "/groups/" ++ Group ++ "/torrents/" ++ TID ++ "/torrent/" ++ User,
-	erlzk:create(PID, GroupPath ++ User, list_to_binary("")),
+	Path = "/users/" ++ User ++ "/missing/" ++ TID,
+	erlzk:create(PID, Path, list_to_binary(Group)),
 	ok.	
 
-		
 
-
-
-
-
+getNewContent(U) -> rpc({new_content, U}).
+getNewContent(User, PID) ->
+	Path = "/users/" ++ User ++ "/missing",
+	R = erlzk:get_children(PID, Path),
+	case R of
+		{ok, L} ->
+			{ok, L};
+		{error, no_node} ->
+			no_group;
+		_ ->
+			error
+	end.
 
 	
 

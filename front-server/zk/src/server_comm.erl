@@ -31,7 +31,7 @@ msgDecriptor(Data, ID) ->
 	case T of
 		frontEndTorrent ->
 			{'FrontEndTorrent', TID, UserList, Group, Content} = D,
-			sendTracker(integer_to_list(ID), Content),
+			%sendTracker(integer_to_list(ID), Content),
 			lists:foreach( fun(User) ->
 				case data:get_pid(User) of
 					{ok, Pid} ->
