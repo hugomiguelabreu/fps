@@ -27,7 +27,7 @@ public class TorrentListenerInitializer extends ChannelInitializer<SocketChannel
 
         ChannelPipeline p = socketChannel.pipeline();
         p.addLast(new ProtobufVarint32FrameDecoder());
-        p.addLast(new ProtobufDecoder(ClientWrapper.TorrentWrapper.getDefaultInstance()));
+        p.addLast(new ProtobufDecoder(ClientWrapper.ClientMessage.getDefaultInstance()));
 
         p.addLast(new ProtobufVarint32LengthFieldPrepender());
         p.addLast(new ProtobufEncoder());

@@ -2,16 +2,13 @@ import Handlers.AutenticationInitializer;
 import Handlers.TorrentListenerInitializer;
 import Misc.FileUtils;
 import Misc.TorrentUtil;
-import Network.ClientWrapper;
 import Offline.Offline;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
-import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -21,16 +18,13 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.*;
-import java.nio.channels.UnsupportedAddressTypeException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.SynchronousQueue;
 
 public class Main {

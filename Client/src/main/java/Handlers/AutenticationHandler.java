@@ -1,11 +1,8 @@
 package Handlers;
 
-import Network.ClientWrapper;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.concurrent.Future;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.SynchronousQueue;
 
 public class AutenticationHandler extends SimpleChannelInboundHandler<ClientWrapper.Response> {

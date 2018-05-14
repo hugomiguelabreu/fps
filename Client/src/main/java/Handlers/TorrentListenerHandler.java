@@ -9,7 +9,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.util.ArrayList;
 
-public class TorrentListenerHandler extends SimpleChannelInboundHandler<ClientWrapper.TorrentWrapper> {
+public class TorrentListenerHandler extends SimpleChannelInboundHandler<ClientWrapper.ClientMessage> {
 
     private ArrayList<Torrent> available;
 
@@ -19,10 +19,11 @@ public class TorrentListenerHandler extends SimpleChannelInboundHandler<ClientWr
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, ClientWrapper.TorrentWrapper torrentWrapper) throws Exception {
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, ClientWrapper.ClientMessage torrentWrapper) throws Exception {
         //TODO: Check if all of them will seed
+
         Torrent t = new Torrent(
-                torrentWrapper.getContent().toByteArray(),
+                torrentWrapper.getTorrentWrapper().getContent().toByteArray(),
                 true);
         available.add(t);
         FileUtils.addTorrent(t);
