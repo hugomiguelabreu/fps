@@ -1,6 +1,7 @@
 import Core.MainServer;
 import Util.FileUtils;
 import com.turn.ttorrent.client.Client;
+import com.turn.ttorrent.client.peer.SharingPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import org.xml.sax.SAXException;
@@ -40,6 +41,13 @@ public class ServerExec {
                 System.out.println(t.getName());
                 System.out.println(t.getCreatedBy());
                 System.out.println("---------------------------");
+            }
+
+            for(Client c : clients.values()){
+                System.out.println("CLIENT:");
+                for (SharingPeer p : c.getPeers()){
+                    System.out.println(p.getIp());
+                }
             }
         }
 

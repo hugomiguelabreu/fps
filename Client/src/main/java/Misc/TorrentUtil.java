@@ -18,6 +18,7 @@ import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+import server_network.Interserver;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
@@ -196,7 +197,7 @@ public class TorrentUtil {
                 whatismyip.openStream()));
         String ip = in.readLine(); //you get the IP as a String
 
-        //Creates a protobuf to send file info
+        //Creates a protobuf to send file inf
 
         ClientWrapper.TorrentWrapper sw = ClientWrapper.TorrentWrapper.newBuilder()
                 .setContent(ByteString.copyFrom(t.getEncoded()))

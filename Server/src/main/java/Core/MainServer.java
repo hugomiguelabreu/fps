@@ -1,6 +1,6 @@
 package Core;
 
-import Handlers.TorrentServerInitializer;
+import Handlers.ServerHandlerInitializer;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.bootstrap.ServerBootstrap;
@@ -9,9 +9,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class MainServer extends Thread{
     private int port;
@@ -36,11 +34,12 @@ public class MainServer extends Thread{
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new TorrentServerInitializer(tck, clients));
+                    .childHandler(new ServerHandlerInitializer(tck, clients));
 
             cf = b.bind(port).sync();
             //Wait for channel to close
             cf.channel().closeFuture().sync();
+
             System.out.println("Server shutting down.");
         } catch (InterruptedException e) {
             e.printStackTrace();

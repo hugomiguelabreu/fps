@@ -1,0 +1,18 @@
+syntax = "proto3";
+package server_network;
+
+message ServerMessage {
+    bytes torrentHexId = 1;
+    bool type_op = 2;
+    bytes server_ip = 3;
+    int32 server_cli_port = 4;
+}
+
+message TorrentMessage {
+    bytes content = 1;
+}
+
+message Message{
+    ServerMessage sm = 1;
+    TorrentMessage tm = 2;
+}
