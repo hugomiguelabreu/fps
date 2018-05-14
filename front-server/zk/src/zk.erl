@@ -166,15 +166,16 @@ getGroupUsers(Name, PID) ->
 	R = erlzk:get_children(PID,GroupPath),
 	case R of
 		{ok, L} ->
-			{ok, lists:map(fun(X) -> getLoc(PID, X) end, L)};
+			{ok, getLoc(L, #{}, PID)};
 		{error, no_node} ->
 			no_group;
 		_ ->
 			error
 	end.
 
-
-getLoc(PID, User) ->
+getLoc([], Map, _) -> Map;
+getLoc(Users, Map, PID) ->	
+	[User | Tail] = Users,
 	case erlzk:get_data(PID, "/users/" ++ User ++ "/online") of
 		{error, _} ->
 		 	error;
@@ -185,10 +186,22 @@ getLoc(PID, User) ->
 		 				{error, _} ->
 		 					error;
 						{ok,{LOC,_}} ->
-							{binary_to_list(LOC),User}
+							case maps:is_key(binary_to_list(LOC), Map) of
+								false ->
+									getLoc(Tail,maps:put(binary_to_list(LOC),[User],Map),PID);
+								true ->
+									L = lists:merge(maps:get(binary_to_list(LOC), Map), [User]),
+									getLoc(Tail,maps:put(binary_to_list(LOC),L,Map),PID)
+							end
 					end;
 				"false" ->
-					{'offline', User}
+					case maps:is_key(offline, Map) of
+						false ->
+							getLoc(Tail,maps:put(offline,[User],Map),PID);
+						true ->
+							L = lists:merge(maps:get(offline, Map), [User]),
+							getLoc(Tail,maps:put(offline,L,Map),PID)
+					end
 			end
 
  	end.

@@ -108,7 +108,6 @@ loggedLoop(Socket, Username, ID) ->
 
 		{Username, unpacked_torrent, Group, Data} ->
 			io:format("> received from another server and redirected\n"),
-			sendTracker(integer_to_list(ID), Data),
 			Wrapped = client_wrapper:encode_msg(#'ClientMessage'{msg = {torrentWrapper,#'TorrentWrapper'{group=Group, content=Data}}}),
 			gen_tcp:send(Socket, Wrapped),
 			loggedLoop(Socket, Username, ID)
@@ -169,24 +168,30 @@ redirect(ProtoTorrent, ID, CurrentUser) ->
 	sendTracker(ID,ProtoTorrent#'TorrentWrapper'.content),
 
 	case zk:getGroupUsers(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
-		{ok, L} ->
-			lists:foreach(fun({Loc,User}) ->
-							case Loc of
-								ID ->
-									UserPid = data:get_pid(User),
-									case UserPid of
-										{ok, Pid} ->
-											Pid ! {User, packed_torrent, ProtoTorrent};
-										error ->
-											zk:setUnreceivedTorrent(TID, User, binary_to_list(ProtoTorrent#'TorrentWrapper'.group))
-									end;
+		{ok, UsersMap} ->
+			io:format("Ola3"),		
+			lists:foreach(fun(ServerID) ->
+							case ServerID of
 								offline ->
-									zk:setUnreceivedTorrent(TID, User, binary_to_list(ProtoTorrent#'TorrentWrapper'.group));
+									UsersOffline = maps:get(offline,UsersMap),
+									lists:foreach(fun(Usr) -> 
+										zk:setUnreceivedTorrent(TID, Usr, binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) end, UsersOffline);
+								ID ->
+									lists:foreach(fun(Usr) -> 
+										UsrPid = data:get_pid(Usr),
+										case UsrPid of
+											{ok, Pid} ->
+												Pid ! {Usr, packed_torrent, ProtoTorrent};
+											error ->
+												zk:setUnreceivedTorrent(TID, Usr, binary_to_list(ProtoTorrent#'TorrentWrapper'.group))
+										end
+									 end, maps:get(ID, UsersMap));
 								_ ->
 									{'TorrentWrapper', _, Content} = ProtoTorrent,
-									server_comm:sendFrontServer(Loc, User, binary_to_list(ProtoTorrent#'TorrentWrapper'.group), TID, Content)
+									UsersSv = lists:concat(lists:join(";",maps:get(ServerID,UsersMap))),
+									server_comm:sendFrontServer(ServerID, UsersSv, binary_to_list(ProtoTorrent#'TorrentWrapper'.group), TID, Content)
 							end
-						  end, L);
+						  end, maps:keys(UsersMap));
 		no_group ->
 			io:format("error: group doesn't exist\n");
 
@@ -197,7 +202,7 @@ redirect(ProtoTorrent, ID, CurrentUser) ->
 
 sendTracker(ID, Data) ->
 	TrackerLOC = zk:getTracker(ID),
-
+	io:format(TrackerLOC),
 	case TrackerLOC of 
 		error ->
 			io:format(">>> error: getting tracker\n");

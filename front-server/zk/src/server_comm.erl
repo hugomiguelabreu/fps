@@ -1,43 +1,45 @@
 -module(server_comm).
--export([init/1, sendFrontServer/5]).
+-export([init/2, sendFrontServer/5]).
 -include("server_wrapper.hrl").
 
-init(Port) ->
+init(Port, ID) ->
 	{ok, LSock} = gen_tcp:listen(Port, [binary, {reuseaddr, true}, {packet, 1}]),
 	io:format("> Listening for server communication\n"),
-	acceptor(LSock),
+	acceptor(LSock, ID),
 	receive 
 		keep_me_alive->
 		 io:format("keep_me_alive")
 	end.		
 
-acceptor(LSock) ->
+acceptor(LSock, ID) ->
 	{ok, Socket} = gen_tcp:accept(LSock),
-	spawn(fun() -> acceptor(LSock) end),
-	receiveMsg(Socket).
+	spawn(fun() -> acceptor(LSock, ID) end),
+	receiveMsg(Socket, ID).
 
-receiveMsg(Socket) ->
+receiveMsg(Socket, ID) ->
 	receive 
 		{tcp, Socket, Data} ->
-			msgDecriptor(Data);
+			msgDecriptor(Data, ID);
 		{error, _} ->
 			io:format("closed\n");
 		_ ->
 		 	io:format("error\n")
 	end.
 
-msgDecriptor(Data) ->
+msgDecriptor(Data, ID) ->
 	{_, {T, D}} =  server_wrapper:decode_msg(Data, 'ServerMessage'),
-	io:format(T),
 	case T of
 		frontEndTorrent ->
-			{'FrontEndTorrent', ID, User, Group, Content} = D,
-			case data:get_pid(binary_to_list(User)) of
-				{ok, Pid} ->
-					Pid ! {binary_to_list(User), unpacked_torrent, binary_to_list(Group), Content};
-				_ ->
-					zk:setUnreceivedTorrent(binary_to_list(ID), binary_to_list(User), binary_to_list(Group))
-			end	
+			{'FrontEndTorrent', TID, UserList, Group, Content} = D,
+			sendTracker(integer_to_list(ID), Content),
+			lists:foreach( fun(User) ->
+				case data:get_pid(User) of
+					{ok, Pid} ->
+						Pid ! {User, unpacked_torrent, binary_to_list(Group), Content};
+					_ ->
+						zk:setUnreceivedTorrent(binary_to_list(TID), User, binary_to_list(Group))
+				end
+			end, string:tokens(binary_to_list(UserList),";"))
 	end.
 
 sendFrontServer(Loc, User, Group, TID, Data) ->
@@ -57,3 +59,23 @@ sendFrontServer(Loc, User, Group, TID, Data) ->
 	    	end
 	end.
 
+
+sendTracker(ID, Data) ->
+	TrackerLOC = zk:getTracker(ID),
+
+	case TrackerLOC of 
+		error ->
+			io:format(">>> error: getting tracker\n");
+		_ ->
+			[T_IP,T_PORT] = string:split(TrackerLOC,":"),
+
+			Msg = server_wrapper:encode_msg(#'ServerMessage'{msg = {trackerTorrent, #'TrackerTorrent'{content=Data}}}),
+			case gen_tcp:connect(T_IP, list_to_integer(T_PORT), [binary, {reuseaddr, true}, {packet, 1}]) of
+				{ok, TrackerSocket} ->
+		    		gen_tcp:send(TrackerSocket, Msg),
+		    		gen_tcp:close(TrackerSocket),
+		    		io:format("> Sent to Tracker\n");
+		    	{error, Reason} ->
+		    		Reason
+	    	end
+	end.
