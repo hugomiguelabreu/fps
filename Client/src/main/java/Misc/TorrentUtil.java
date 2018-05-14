@@ -1,5 +1,6 @@
 package Misc;
-import Network.TorrentWrapperOuterClass;
+
+import Network.ClientWrapper;
 import Offline.Offline;
 import Offline.Utils.LocalAddresses;
 import Offline.Utils.User;
@@ -17,6 +18,7 @@ import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+import server_network.Interserver;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
@@ -98,17 +100,16 @@ public class TorrentUtil {
      * @throws NoSuchAlgorithmException
      */
 
-    public static void upload(Torrent t, String path, Tracker tck, String username) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
+    public static Client upload(Torrent t, String path, Tracker tck, String username) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
         ArrayList<LocalAddresses> ownAddresses = Offline.findLocalAddresses();
         File dest = new File(path);
-        //Seeding starts.
 
         SharedTorrent st = new SharedTorrent(t, dest.getParentFile());
 
 
         Client c = new Client(
                 InetAddress.getByName(ownAddresses.get(0).getIpv4()),
-                st);
+                st, username);
 
         c.share(-1);
 
@@ -117,42 +118,57 @@ public class TorrentUtil {
 
         tr.addObserver((o,arg) -> {
 
-            TrackedPeer p = (TrackedPeer) arg;
-            //System.out.println("tr id:" + tr.getName());
+            try{
 
-            if(p.getLeft() == 0){
+                TrackedPeer p = (TrackedPeer) arg;
+                //System.out.println("tr id:" + tr.getName());
 
-                byte[] b = new byte[p.getPeerId().limit()];
-                p.getPeerId().get(b, 0,p.getPeerId().limit());
-                String id = new String(b);
+                if(p.getLeft() == 0 && p.getState() != TrackedPeer.PeerState.UNKNOWN && p.getState() != TrackedPeer.PeerState.STOPPED){
 
-                //System.out.println("id: " + id);
-                //System.out.println("size = " + torrentPeers.get(tr.getHexInfoHash()).size() );
+                    byte[] b = new byte[p.getPeerId().capacity()];
+                    p.getPeerId().get(b, 0,p.getPeerId().capacity());
+                    String tmp = new String(b);
+                    String id = tmp.replaceAll("-TO0042-", "");
 
-                torrentPeers.get(tr.getHexInfoHash()).remove(id);
-                System.out.println("peer " + id +" completed");
-                //System.out.println("ARRAY = "  + torrentPeers.get(tr.getHexInfoHash()));
 
-                if(torrentPeers.get(tr.getHexInfoHash()).size() == 0){
 
-                    //System.out.println("Tirar torrent do tracker");
-                    tck.remove(t);
-                    c.stop();
+                    //System.out.println("id: " + id);
+                    //System.out.println("size = " + torrentPeers.get(tr.getHexInfoHash()).size() );
 
-                    if(tck.getTrackedTorrents().isEmpty()){
-                        tck.stop();
-                        System.out.println("stop tracker");
+                    torrentPeers.get(tr.getHexInfoHash()).remove(id);
+                    System.out.println("peer " + id +" completed");
+                    //System.out.println("ARRAY = "  + torrentPeers.get(tr.getHexInfoHash()));
+
+                    if(torrentPeers.get(tr.getHexInfoHash()).size() == 0){
+
+                        //System.out.println("Tirar torrent do tracker");
+                        tck.remove(t);
+                        System.out.println("Stop Client");
+                        c.stop();
+
+                        if(tck.getTrackedTorrents().isEmpty()){
+                            tck.stop();
+                            System.out.println("stop tracker");
+                        }
+
+                        //System.out.println("name = " + t.getName());
                     }
-
-                    //System.out.println("name = " + t.getName());
                 }
+            }catch (Exception e){
+                e.printStackTrace();
             }
+
         });
 
-        //TODO: return client
-
         //Creates a protobuf to send file info
-        TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
+
+        ClientWrapper.TorrentWrapper tw = ClientWrapper.TorrentWrapper.newBuilder()
+                .setContent(ByteString.copyFrom(t.getEncoded()))
+                .build();
+
+        ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
+                .setTorrentWrapper(tw).build();
+
         //Offline sends to all users
         ConcurrentHashMap<String, User> foundUsers = Offline.listener.getUsers();
 
@@ -165,10 +181,11 @@ public class TorrentUtil {
 
                 System.out.println("Sending to: " + entry.getKey());
                 Socket s = new Socket(entry.getValue().getIpv4(), 5558);
-                tw.writeDelimitedTo(s.getOutputStream());
+                wrapper.writeDelimitedTo(s.getOutputStream()); //TODO mudar o o wrapper no socket que recebe
             }
         }
 
+        return c;
     }
 
     public static Client upload(Torrent t, String path, Channel ch, String username) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
@@ -180,6 +197,19 @@ public class TorrentUtil {
                 whatismyip.openStream()));
         String ip = in.readLine(); //you get the IP as a String
 
+        //Creates a protobuf to send file inf
+
+        ClientWrapper.TorrentWrapper sw = ClientWrapper.TorrentWrapper.newBuilder()
+                .setContent(ByteString.copyFrom(t.getEncoded()))
+                .build();
+
+        ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
+                .setTorrentWrapper(sw).build();
+
+        //Escreve e espera pela escrita no socket
+        ch.writeAndFlush(wrapper).sync();
+        //Após iniciada a intenção, iniciamos o cliente.
+
         SharedTorrent st = new SharedTorrent(t, dest.getParentFile());
         //TODO: return client
         Client c = new Client(
@@ -188,11 +218,6 @@ public class TorrentUtil {
                 username);
 
         c.share(-1);
-
-        //Creates a protobuf to send file info
-        TorrentWrapperOuterClass.TorrentWrapper tw = TorrentWrapperOuterClass.TorrentWrapper.newBuilder().setContent(ByteString.copyFrom(t.getEncoded())).build();
-        //Escreve e espera pela escrita no socket
-        ch.writeAndFlush(tw).sync();
 
         return c;
     }

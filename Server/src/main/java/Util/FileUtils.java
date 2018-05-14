@@ -27,12 +27,15 @@ public class FileUtils {
         File parent = new File(System.getProperty("user.home") + "/.fps");
         //Ao carregar os torrent não criamos clientes, pois o servidores está a ligar;
         //supostamente, irá iniciar clientes à medida que for necessário.
-        if(parent.exists())
+        if(parent.exists()) {
             for (File f : parent.listFiles()) {
-                Torrent t = Torrent.load(f);
-                //Colocar torrent no tracker para o anunciar.
-                TrackedTorrent tt = TorrentUtil.announceTrackedTorrentWithObservers(tck, t, clients);
+                if (!f.isDirectory()) {
+                    Torrent t = Torrent.load(f);
+                    //Colocar torrent no tracker para o anunciar.
+                    TrackedTorrent tt = TorrentUtil.announceTrackedTorrentWithObservers(tck, t, clients);
+                }
             }
+        }
         return true;
     }
 
