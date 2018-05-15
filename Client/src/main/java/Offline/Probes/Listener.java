@@ -102,6 +102,6 @@ public class Listener extends Thread {
             }
         };
 
-        executor.scheduleAtFixedRate ( r , 4000 , 4000 , TimeUnit.MILLISECONDS ); // ( runnable , initialDelay , period , TimeUnit )
+        executor.scheduleAtFixedRate ( r , 4000 , 3000 , TimeUnit.MILLISECONDS ); // ( runnable , initialDelay , period , TimeUnit )
     }
 }

@@ -49,6 +49,8 @@ public class Main {
 
         System.out.println("Started client");
 
+        //TODO connect to frontEnd
+
         while (true){
 
             System.out.println("[l]login");
@@ -92,8 +94,9 @@ public class Main {
         }else {
             ch = startClient(available);
             if (ch == null) {
-                System.out.println("\u001B[31mError opening socket\u001B[0m");
-                System.exit(2);
+                // System.exit(2);
+                System.out.println("Falling back to Offline");
+                Offline.startProbes(username, available);
             }
         }
 
@@ -212,8 +215,8 @@ public class Main {
 
             } catch (Exception e) {
 
-                System.out.println("invalid frontServer address");
-                e.printStackTrace();
+                System.out.println("\u001B[31mError opening socket\u001B[0m");
+                //e.printStackTrace();
             }
         }
 
