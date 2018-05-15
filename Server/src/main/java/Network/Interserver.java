@@ -37,6 +37,11 @@ public final class Interserver {
      * <code>int32 server_cli_port = 4;</code>
      */
     int getServerCliPort();
+
+    /**
+     * <code>bytes peerId = 5;</code>
+     */
+    com.google.protobuf.ByteString getPeerId();
   }
   /**
    * Protobuf type {@code Network.InterServerMessage}
@@ -54,6 +59,7 @@ public final class Interserver {
       typeOp_ = false;
       serverIp_ = com.google.protobuf.ByteString.EMPTY;
       serverCliPort_ = 0;
+      peerId_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @java.lang.Override
@@ -99,6 +105,11 @@ public final class Interserver {
             case 32: {
 
               serverCliPort_ = input.readInt32();
+              break;
+            }
+            case 42: {
+
+              peerId_ = input.readBytes();
               break;
             }
           }
@@ -160,6 +171,15 @@ public final class Interserver {
       return serverCliPort_;
     }
 
+    public static final int PEERID_FIELD_NUMBER = 5;
+    private com.google.protobuf.ByteString peerId_;
+    /**
+     * <code>bytes peerId = 5;</code>
+     */
+    public com.google.protobuf.ByteString getPeerId() {
+      return peerId_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -184,6 +204,9 @@ public final class Interserver {
       if (serverCliPort_ != 0) {
         output.writeInt32(4, serverCliPort_);
       }
+      if (!peerId_.isEmpty()) {
+        output.writeBytes(5, peerId_);
+      }
     }
 
     public int getSerializedSize() {
@@ -206,6 +229,10 @@ public final class Interserver {
       if (serverCliPort_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(4, serverCliPort_);
+      }
+      if (!peerId_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(5, peerId_);
       }
       memoizedSize = size;
       return size;
@@ -231,6 +258,8 @@ public final class Interserver {
           .equals(other.getServerIp());
       result = result && (getServerCliPort()
           == other.getServerCliPort());
+      result = result && getPeerId()
+          .equals(other.getPeerId());
       return result;
     }
 
@@ -250,6 +279,8 @@ public final class Interserver {
       hash = (53 * hash) + getServerIp().hashCode();
       hash = (37 * hash) + SERVER_CLI_PORT_FIELD_NUMBER;
       hash = (53 * hash) + getServerCliPort();
+      hash = (37 * hash) + PEERID_FIELD_NUMBER;
+      hash = (53 * hash) + getPeerId().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -376,6 +407,8 @@ public final class Interserver {
 
         serverCliPort_ = 0;
 
+        peerId_ = com.google.protobuf.ByteString.EMPTY;
+
         return this;
       }
 
@@ -402,6 +435,7 @@ public final class Interserver {
         result.typeOp_ = typeOp_;
         result.serverIp_ = serverIp_;
         result.serverCliPort_ = serverCliPort_;
+        result.peerId_ = peerId_;
         onBuilt();
         return result;
       }
@@ -454,6 +488,9 @@ public final class Interserver {
         }
         if (other.getServerCliPort() != 0) {
           setServerCliPort(other.getServerCliPort());
+        }
+        if (other.getPeerId() != com.google.protobuf.ByteString.EMPTY) {
+          setPeerId(other.getPeerId());
         }
         onChanged();
         return this;
@@ -590,6 +627,35 @@ public final class Interserver {
         onChanged();
         return this;
       }
+
+      private com.google.protobuf.ByteString peerId_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes peerId = 5;</code>
+       */
+      public com.google.protobuf.ByteString getPeerId() {
+        return peerId_;
+      }
+      /**
+       * <code>bytes peerId = 5;</code>
+       */
+      public Builder setPeerId(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        peerId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes peerId = 5;</code>
+       */
+      public Builder clearPeerId() {
+        
+        peerId_ = getDefaultInstance().getPeerId();
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -653,10 +719,10 @@ public final class Interserver {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021Interserver.proto\022\007Network\"g\n\022InterSer" +
+      "\n\021Interserver.proto\022\007Network\"w\n\022InterSer" +
       "verMessage\022\024\n\014torrentHexId\030\001 \001(\014\022\017\n\007type" +
       "_op\030\002 \001(\010\022\021\n\tserver_ip\030\003 \001(\014\022\027\n\017server_c" +
-      "li_port\030\004 \001(\005b\006proto3"
+      "li_port\030\004 \001(\005\022\016\n\006peerId\030\005 \001(\014b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -675,7 +741,7 @@ public final class Interserver {
     internal_static_Network_InterServerMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Network_InterServerMessage_descriptor,
-        new java.lang.String[] { "TorrentHexId", "TypeOp", "ServerIp", "ServerCliPort", });
+        new java.lang.String[] { "TorrentHexId", "TypeOp", "ServerIp", "ServerCliPort", "PeerId", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

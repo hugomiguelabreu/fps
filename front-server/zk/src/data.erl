@@ -92,3 +92,10 @@ incrementAndGet() ->
 		end
 	end,
 	mnesia:activity(transaction, F).
+
+%% ========
+%% FILES
+%% ========
+
+writeFile(Name, File) ->
+	file:write_file("./torrents/" ++ Name, File).

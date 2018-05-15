@@ -16,15 +16,15 @@ import java.util.Map;
 
 public class FileUtils {
 
-    public static String fileDir = System.getProperty( "user.home" ) + "/.fps/files/";
+    public static String fileDir = System.getProperty( "user.home" ) + "/.fps-server/files2/";
 
     public static void initDir(){
-        new File(System.getProperty( "user.home" ) + "/.fps").mkdirs();
-        new File(System.getProperty( "user.home" ) + "/.fps/files").mkdirs();
+        new File(System.getProperty( "user.home" ) + "/.fps-server").mkdirs();
+        new File(System.getProperty( "user.home" ) + "/.fps-server/files2").mkdirs();
     }
 
     public static boolean loadTorrents(Tracker tck, Map<String, Client> clients) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
-        File parent = new File(System.getProperty("user.home") + "/.fps");
+        File parent = new File(System.getProperty("user.home") + "/.fps-server");
         //Ao carregar os torrent não criamos clientes, pois o servidores está a ligar;
         //supostamente, irá iniciar clientes à medida que for necessário.
         if(parent.exists()) {
@@ -41,14 +41,14 @@ public class FileUtils {
 
     public static void saveTorrent(Torrent t) throws IOException {
         FileOutputStream fos;
-        fos = new FileOutputStream(System.getProperty( "user.home" ) + "/.fps/" + t.getHexInfoHash());
+        fos = new FileOutputStream(System.getProperty( "user.home" ) + "/.fps-server/" + t.getHexInfoHash());
         t.save(fos);
         IOUtils.closeQuietly(fos);
     }
 
     public static void deleteFiles(Torrent t) throws IOException {
-        File torrent = new File(System.getProperty( "user.home" ) + "/.fps/" + t.getHexInfoHash());
-        File fileDownloaded = new File(System.getProperty( "user.home" ) + "/.fps/files/" + t.getFilenames().get(0));
+        File torrent = new File(System.getProperty( "user.home" ) + "/.fps-server/" + t.getHexInfoHash());
+        File fileDownloaded = new File(System.getProperty( "user.home" ) + "/.fps-server/files2/" + t.getFilenames().get(0));
         Files.deleteIfExists(torrent.toPath());
         Files.deleteIfExists(fileDownloaded.toPath());
     }
