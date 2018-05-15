@@ -25,7 +25,7 @@ public class Listener extends Thread {
         peers = new ConcurrentHashMap<>();
 
         for(LocalAddresses addr : ips){
-            User p = new User(username, addr.getIpv6(), addr.getIpv4(), new Timestamp(System.currentTimeMillis())); // put null ??
+            User p = new User(username, addr.getIpv6(), addr.getIpv4(), new Timestamp(System.currentTimeMillis()));
             peers.put(addr.getIpv6(),p);
         }
 
@@ -40,11 +40,10 @@ public class Listener extends Thread {
     @Override
     public void run(){
         checkUsers();
-        //DatagramSocket socket = null;
         String ipv6, ipv4;
         int port;
 
-        try { // passar o try para dentro do while
+        try {
             byte[] buff = new byte[1024];
             DatagramPacket dgram = new DatagramPacket(buff, buff.length);
             MulticastSocket socket = new MulticastSocket(receivePort); // must bind receive side
@@ -73,7 +72,7 @@ public class Listener extends Thread {
                     e.printStackTrace(); // podem vir cenas pela porta 5557 que nao sao protobuffs
                 }
 
-                dgram.setLength(buff.length); // must reset length field!
+                dgram.setLength(buff.length);
             }
 
         } catch (IOException e) {
@@ -82,39 +81,27 @@ public class Listener extends Thread {
     }
 
     private void checkUsers() {
+
         // -------------- Para verificar se o timestamp ja antigo ou nao ------------------
         ScheduledExecutorService executor = Executors.newScheduledThreadPool ( 1 );
 
         Runnable r = () -> {
-            try {  // Always wrap your Runnable with a try-catch as any uncaught Exception causes the ScheduledExecutorService to silently terminate.
-                //System.out.println ( "Now: " + Instant.now () );  // Our task at hand in this example: Capturing the current moment in UTC.
+            try {
 
                 for (Map.Entry<String, User> entry : peers.entrySet()) {
 
-//                        System.out.println("current time: " + System.currentTimeMillis());
-//                        System.out.println("timestamp: " + entry.getValue().getLast().getTime());
-
-
                     if( (System.currentTimeMillis() - entry.getValue().getLast().getTime() ) > 5000 ){
 
-                        System.out.println("remover");
+                        System.out.println("remover: " + entry.getKey());
                         peers.remove(entry.getKey());
                     }
-
                 }
+
             } catch ( Exception e ) {
-                System.out.println ( "Oops, uncaught Exception surfaced at Runnable in ScheduledExecutorService." );
+                e.printStackTrace();
             }
         };
 
         executor.scheduleAtFixedRate ( r , 4000 , 4000 , TimeUnit.MILLISECONDS ); // ( runnable , initialDelay , period , TimeUnit )
-
     }
-
-//    public long getDateDiff(long timeUpdate, long timeNow, TimeUnit timeUnit)
-//    {
-//        long diffInMillies = Math.abs(timeNow- timeUpdate);
-//        return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS);
-//    }
-
 }

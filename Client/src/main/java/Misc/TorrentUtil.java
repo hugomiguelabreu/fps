@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -116,16 +117,18 @@ public class TorrentUtil {
             try{
 
                 TrackedPeer p = (TrackedPeer) arg;
-                //System.out.println("tr id:" + tr.getName());
 
                 if(p.getLeft() == 0 && p.getState() != TrackedPeer.PeerState.UNKNOWN && p.getState() != TrackedPeer.PeerState.STOPPED){
 
-                    byte[] b = new byte[p.getPeerId().capacity()];
-                    p.getPeerId().get(b, 0,p.getPeerId().capacity());
+
+
+                    byte[] b = p.getPeerId().array();
                     String tmp = new String(b);
                     String id = tmp.replaceAll("-TO0042-", "");
 
-
+//                    p.getPeerId().get(b, 0,p.getPeerId().capacity());
+//                    String tmp = new String(b);
+//                    String id = tmp.replaceAll("-TO0042-", "");
 
                     //System.out.println("id: " + id);
                     //System.out.println("size = " + torrentPeers.get(tr.getHexInfoHash()).size() );
@@ -142,9 +145,10 @@ public class TorrentUtil {
                         c.stop();
 
                         if(tck.getTrackedTorrents().isEmpty()){
+
                             tck.stop();
                             System.out.println("stop tracker");
-                        }
+                                                    }
 
                         //System.out.println("name = " + t.getName());
                     }
@@ -176,7 +180,7 @@ public class TorrentUtil {
 
                 System.out.println("Sending to: " + entry.getKey());
                 Socket s = new Socket(entry.getValue().getIpv4(), 5558);
-                wrapper.writeDelimitedTo(s.getOutputStream()); //TODO mudar o o wrapper no socket que recebe
+                wrapper.writeDelimitedTo(s.getOutputStream());
             }
         }
 
@@ -239,15 +243,9 @@ public class TorrentUtil {
 
             //Download and seed
             c.addObserver((o, arg) -> {
+
                 System.out.println(st.getCompletion());
                 System.out.println(arg);
-
-                for(SharingPeer s : c.getPeers()){
-
-                    byte[] b = new byte[s.getPeerId().limit()];
-                    s.getPeerId().get(b, 0,s.getPeerId().limit());
-                    System.out.println(new String(b));
-                }
             });
 
             c.share(-1);
