@@ -230,7 +230,7 @@ public class Main {
 //        Socket socket = new Socket("localhost", 2000);
 //        boolean ret;
 //
-//        ClientWrapper.Login request = ClientWrapper.Login.newBuilder()
+//        ClientWrapper.MainUI request = ClientWrapper.MainUI.newBuilder()
 //                .setUsername(username)
 //                .setPassword(password).build();
 //

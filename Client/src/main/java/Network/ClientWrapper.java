@@ -15,7 +15,7 @@ public final class ClientWrapper {
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   public interface LoginOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:Network.Login)
+      // @@protoc_insertion_point(interface_extends:Network.MainUI)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -39,14 +39,14 @@ public final class ClientWrapper {
         getPasswordBytes();
   }
   /**
-   * Protobuf type {@code Network.Login}
+   * Protobuf type {@code Network.MainUI}
    */
   public  static final class Login extends
       com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:Network.Login)
+      // @@protoc_insertion_point(message_implements:Network.MainUI)
       LoginOrBuilder {
   private static final long serialVersionUID = 0L;
-    // Use Login.newBuilder() to construct.
+    // Use MainUI.newBuilder() to construct.
     private Login(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
@@ -351,11 +351,11 @@ public final class ClientWrapper {
       return builder;
     }
     /**
-     * Protobuf type {@code Network.Login}
+     * Protobuf type {@code Network.MainUI}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:Network.Login)
+        // @@protoc_insertion_point(builder_implements:Network.MainUI)
         Network.ClientWrapper.LoginOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
@@ -369,7 +369,7 @@ public final class ClientWrapper {
                 Network.ClientWrapper.Login.class, Network.ClientWrapper.Login.Builder.class);
       }
 
-      // Construct using Network.ClientWrapper.Login.newBuilder()
+      // Construct using Network.ClientWrapper.MainUI.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -638,10 +638,10 @@ public final class ClientWrapper {
       }
 
 
-      // @@protoc_insertion_point(builder_scope:Network.Login)
+      // @@protoc_insertion_point(builder_scope:Network.MainUI)
     }
 
-    // @@protoc_insertion_point(class_scope:Network.Login)
+    // @@protoc_insertion_point(class_scope:Network.MainUI)
     private static final Network.ClientWrapper.Login DEFAULT_INSTANCE;
     static {
       DEFAULT_INSTANCE = new Network.ClientWrapper.Login();
@@ -3573,15 +3573,15 @@ public final class ClientWrapper {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>.Network.Login login = 1;</code>
+     * <code>.Network.MainUI login = 1;</code>
      */
     boolean hasLogin();
     /**
-     * <code>.Network.Login login = 1;</code>
+     * <code>.Network.MainUI login = 1;</code>
      */
     Network.ClientWrapper.Login getLogin();
     /**
-     * <code>.Network.Login login = 1;</code>
+     * <code>.Network.MainUI login = 1;</code>
      */
     Network.ClientWrapper.LoginOrBuilder getLoginOrBuilder();
 
@@ -3854,13 +3854,13 @@ public final class ClientWrapper {
 
     public static final int LOGIN_FIELD_NUMBER = 1;
     /**
-     * <code>.Network.Login login = 1;</code>
+     * <code>.Network.MainUI login = 1;</code>
      */
     public boolean hasLogin() {
       return msgCase_ == 1;
     }
     /**
-     * <code>.Network.Login login = 1;</code>
+     * <code>.Network.MainUI login = 1;</code>
      */
     public Network.ClientWrapper.Login getLogin() {
       if (msgCase_ == 1) {
@@ -3869,7 +3869,7 @@ public final class ClientWrapper {
       return Network.ClientWrapper.Login.getDefaultInstance();
     }
     /**
-     * <code>.Network.Login login = 1;</code>
+     * <code>.Network.MainUI login = 1;</code>
      */
     public Network.ClientWrapper.LoginOrBuilder getLoginOrBuilder() {
       if (msgCase_ == 1) {
@@ -4467,13 +4467,13 @@ public final class ClientWrapper {
       private com.google.protobuf.SingleFieldBuilderV3<
           Network.ClientWrapper.Login, Network.ClientWrapper.Login.Builder, Network.ClientWrapper.LoginOrBuilder> loginBuilder_;
       /**
-       * <code>.Network.Login login = 1;</code>
+       * <code>.Network.MainUI login = 1;</code>
        */
       public boolean hasLogin() {
         return msgCase_ == 1;
       }
       /**
-       * <code>.Network.Login login = 1;</code>
+       * <code>.Network.MainUI login = 1;</code>
        */
       public Network.ClientWrapper.Login getLogin() {
         if (loginBuilder_ == null) {
@@ -4489,7 +4489,7 @@ public final class ClientWrapper {
         }
       }
       /**
-       * <code>.Network.Login login = 1;</code>
+       * <code>.Network.MainUI login = 1;</code>
        */
       public Builder setLogin(Network.ClientWrapper.Login value) {
         if (loginBuilder_ == null) {
@@ -4505,7 +4505,7 @@ public final class ClientWrapper {
         return this;
       }
       /**
-       * <code>.Network.Login login = 1;</code>
+       * <code>.Network.MainUI login = 1;</code>
        */
       public Builder setLogin(
           Network.ClientWrapper.Login.Builder builderForValue) {
@@ -4519,7 +4519,7 @@ public final class ClientWrapper {
         return this;
       }
       /**
-       * <code>.Network.Login login = 1;</code>
+       * <code>.Network.MainUI login = 1;</code>
        */
       public Builder mergeLogin(Network.ClientWrapper.Login value) {
         if (loginBuilder_ == null) {
@@ -4541,7 +4541,7 @@ public final class ClientWrapper {
         return this;
       }
       /**
-       * <code>.Network.Login login = 1;</code>
+       * <code>.Network.MainUI login = 1;</code>
        */
       public Builder clearLogin() {
         if (loginBuilder_ == null) {
@@ -4560,13 +4560,13 @@ public final class ClientWrapper {
         return this;
       }
       /**
-       * <code>.Network.Login login = 1;</code>
+       * <code>.Network.MainUI login = 1;</code>
        */
       public Network.ClientWrapper.Login.Builder getLoginBuilder() {
         return getLoginFieldBuilder().getBuilder();
       }
       /**
-       * <code>.Network.Login login = 1;</code>
+       * <code>.Network.MainUI login = 1;</code>
        */
       public Network.ClientWrapper.LoginOrBuilder getLoginOrBuilder() {
         if ((msgCase_ == 1) && (loginBuilder_ != null)) {
@@ -4579,7 +4579,7 @@ public final class ClientWrapper {
         }
       }
       /**
-       * <code>.Network.Login login = 1;</code>
+       * <code>.Network.MainUI login = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           Network.ClientWrapper.Login, Network.ClientWrapper.Login.Builder, Network.ClientWrapper.LoginOrBuilder> 
@@ -5379,7 +5379,7 @@ public final class ClientWrapper {
       "\001(\010\"\034\n\013CreateGroup\022\r\n\005group\030\001 \001(\t\"\032\n\tJoi" +
       "nGroup\022\r\n\005group\030\001 \001(\t\"0\n\016TorrentWrapper\022" +
       "\r\n\005group\030\001 \001(\t\022\017\n\007content\030\002 \001(\014\"\216\002\n\rClie" +
-      "ntMessage\022\037\n\005login\030\001 \001(\0132\016.Network.Login" +
+      "ntMessage\022\037\n\005login\030\001 \001(\0132\016.Network.MainUI" +
       "H\000\022%\n\010register\030\002 \001(\0132\021.Network.RegisterH" +
       "\000\022%\n\010response\030\003 \001(\0132\021.Network.ResponseH\000" +
       "\022+\n\013createGroup\030\004 \001(\0132\024.Network.CreateGr" +
@@ -5440,7 +5440,7 @@ public final class ClientWrapper {
     internal_static_Network_ClientMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Network_ClientMessage_descriptor,
-        new java.lang.String[] { "Login", "Register", "Response", "CreateGroup", "JoinGroup", "TorrentWrapper", "Msg", });
+        new java.lang.String[] { "MainUI", "Register", "Response", "CreateGroup", "JoinGroup", "TorrentWrapper", "Msg", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
