@@ -33,13 +33,17 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
         String torrentId = message.getTorrentHexId().toStringUtf8();
         String peerId = message.getPeerId().toStringUtf8();
 
-        if(openClients.containsKey(torrentId)){
-            //We're handling that torrent.
-            Peer localCli = openClients.get(torrentId).getPeerSpec();
-            TrackedTorrent tt =  tck.getTrackedTorrents().stream().peek(x -> x.getHexInfoHash().equals(torrentId)).findFirst().get();
-            //PEERS SUPER NODOS
-            //TODO: tratar do id dos peers
-            tt.injectPeer(new TrackedPeer(tt, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING))));
+        if(type){
+            if(openClients.containsKey(torrentId)){
+                //We're handling that torrent.
+                Peer localCli = openClients.get(torrentId).getPeerSpec();
+                TrackedTorrent tt =  tck.getTrackedTorrents().stream().peek(x -> x.getHexInfoHash().equals(torrentId)).findFirst().get();
+                //PEERS SUPER NODOS
+                tt.injectPeer(new TrackedPeer(tt, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING))));
+            }
+        }else{
+            //Um servidor eliminou o ficheiro.
+            //TODO: DELETE
         }
     }
 
