@@ -6,4 +6,5 @@ message InterServerMessage {
     bool type_op = 2;
     bytes server_ip = 3;
     int32 server_cli_port = 4;
+    bytes peerId = 5;
 }
