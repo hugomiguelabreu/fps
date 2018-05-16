@@ -111,7 +111,7 @@ public class Main {
                     //TODO: This IP must be dynamic
 
                     trc.add("http://localhost:6969/announce");
-                    trc.add("http://192.168.43.288:6969/announce");
+                    trc.add("http://localhost:7070/announce");
 
                     t = TorrentUtil.createTorrent(path, username, trc);
 
@@ -195,8 +195,8 @@ public class Main {
     private static Channel startClient(ArrayList<Torrent> available) {
 
         HashMap<String,Integer> ips = new HashMap<>();// frontServer ips
-        ips.put("localhost", 5000);
-        ips.put("8.8.8.8", 6969);
+        ips.put("localhost", 2000);
+        ips.put("localhost", 2001);
 
         if(group == null)
             group = new NioEventLoopGroup();
