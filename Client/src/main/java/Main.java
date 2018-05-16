@@ -1,4 +1,3 @@
-import Handlers.AutenticationInitializer;
 import Handlers.TorrentListenerInitializer;
 import Misc.FileUtils;
 import Misc.TorrentUtil;
@@ -210,6 +209,7 @@ public class Main {
                 b.group(group)
                         .channel(NioSocketChannel.class)
                         .handler(new TorrentListenerInitializer(available));
+
                 // Make a new connection.
                 ch = b.connect(entry.getKey(), entry.getValue()).sync().channel();
 

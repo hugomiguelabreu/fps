@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.text.*?>
-<?import javafx.scene.shape.*?>
+<?import javafx.scene.media.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
 
 <Pane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.AppController">
    <children>
@@ -12,9 +14,12 @@
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <Label fx:id="initial_label" layoutX="35.0" layoutY="14.0" text="Grupo do migos" />
+                  <ListView fx:id="list_groups" prefHeight="398.0" prefWidth="174.0" />
                </children></AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" onDragEntered="#handleDragEntered" prefHeight="160.0" prefWidth="100.0" />
+          <AnchorPane minHeight="0.0" minWidth="0.0" onDragEntered="#handleDragEntered" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <VBox fx:id="list_groups_files" alignment="BOTTOM_RIGHT" prefHeight="398.0" prefWidth="416.0" />
+               </children></AnchorPane>
         </items>
       </SplitPane>
    </children>
