@@ -1,3 +1,4 @@
+import Core.Connector;
 import Handlers.TorrentListenerInitializer;
 import Misc.FileUtils;
 import Misc.TorrentUtil;
@@ -21,6 +22,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -30,33 +32,36 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Object.class);
     private static ArrayList<Client> activeClients;
     private static EventLoopGroup group = null;
+    private static ArrayList<String> servers = new ArrayList<>();
+    private static Connector channel;
 
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException, URISyntaxException {
 
         Scanner sc = new Scanner(System.in);
         String input;
 
-        String username = "default";
-        String password, name;
-
-        Torrent t = null;
+        String username, password, name;
+        FileUtils.initDir();
+        Torrent t;
         ArrayList<Torrent> available = new ArrayList<>();
         Channel ch = null;
         Tracker offlineTck = null;
-        FileUtils.initDir();
         activeClients = new ArrayList<>();
 
         System.out.println("Started client");
+        servers.add("localhost:2000");
 
         //TODO connect to frontEnd
+        channel = new Connector(servers);
+        if(channel.isConnected()){
+            channel.start();
+        }
 
         while (true){
-
             System.out.println("[l]login");
             System.out.println("[r]register");
 
             input = sc.nextLine();
-
             if(input.equals("l")){
                 System.out.println("username:");
                 username = sc.nextLine();
@@ -80,9 +85,7 @@ public class Main {
                     break;
                 }
             }
-
             System.out.println("---------------------------------");
-
         }
 
         System.out.println("Online or Offline?");
@@ -91,16 +94,15 @@ public class Main {
         if(!type) {
             Offline.startProbes(username, available);
         }else {
-            ch = startClient(available);
-            if (ch == null) {
+            if (!channel.isConnected()) {
                 // System.exit(2);
                 System.out.println("Falling back to Offline");
                 Offline.startProbes(username, available);
+                type = false;
             }
         }
 
         while (!(input = sc.nextLine()).equals("quit")) {
-
             if (type) {
                 System.out.println("Working online");
                 if (input.equals("upload")) {
@@ -246,23 +248,24 @@ public class Main {
 
     }
 
-    private static boolean register(String username, String password, String name) throws IOException {
+    private static boolean register(String username, String password, String name) throws IOException, URISyntaxException {
 
-        Socket socket = new Socket("localhost", 2000);
-        boolean ret;
+        //Socket socket = new Socket("localhost", 2000);
+        boolean ret = true;
 
         ClientWrapper.Register request = ClientWrapper.Register.newBuilder()
                 .setUsername(username)
                 .setPassword(password)
                 .setName(name).build();
-
         ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
                 .setRegister(request).build();
+        if(!channel.send(wrapper)){
+            return false;
+        }
+//        socket.getOutputStream().write(wrapper.getSerializedSize());
+//        wrapper.writeTo(socket.getOutputStream());
 
-        socket.getOutputStream().write(wrapper.getSerializedSize());
-        wrapper.writeTo(socket.getOutputStream());
-
-        ret = ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep();
+//        ret = ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep();
 
         return ret;
     }
