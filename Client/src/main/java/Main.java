@@ -193,38 +193,6 @@ public class Main {
         //TODO:Terminar todos os clientes/tarckers abertos
     }
 
-    private static Channel startClient(ArrayList<Torrent> available) {
-
-        HashMap<String,Integer> ips = new HashMap<>();// frontServer ips
-        ips.put("localhost", 2000);
-        ips.put("localhost", 2001);
-
-        if(group == null)
-            group = new NioEventLoopGroup();
-
-        Channel ch = null;
-
-        for (Map.Entry<String, Integer> entry : ips.entrySet()) {
-
-            try {
-                Bootstrap b = new Bootstrap();
-                b.group(group)
-                        .channel(NioSocketChannel.class)
-                        .handler(new TorrentListenerInitializer(available));
-
-                // Make a new connection.
-                ch = b.connect(entry.getKey(), entry.getValue()).sync().channel();
-
-            } catch (Exception e) {
-
-                System.out.println("\u001B[31mError opening socket\u001B[0m");
-                //e.printStackTrace();
-            }
-        }
-
-        return ch;
-    }
-
     private static boolean login(String username, String password) throws IOException {
 
         return true;
@@ -259,6 +227,7 @@ public class Main {
                 .setName(name).build();
         ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
                 .setRegister(request).build();
+
         if(!channel.send(wrapper)){
             return false;
         }
@@ -271,9 +240,7 @@ public class Main {
     }
 
     private static boolean createGroup(String groupName) throws IOException {
-
-        Socket socket = new Socket("localhost", 2000);
-        boolean ret;
+        boolean ret = true;
 
         ClientWrapper.CreateGroup request = ClientWrapper.CreateGroup.newBuilder()
                 .setGroup(groupName).build();
@@ -281,18 +248,21 @@ public class Main {
         ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
                 .setCreateGroup(request).build();
 
-        socket.getOutputStream().write(wrapper.getSerializedSize());
-        wrapper.writeTo(socket.getOutputStream());
+        //socket.getOutputStream().write(wrapper.getSerializedSize());
+        //wrapper.writeTo(socket.getOutputStream());
 
-        ret = ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep();
+        //ret = ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep();
+
+        if(!channel.send(wrapper)){
+            return false;
+        }
 
         return ret;
     }
 
     private static boolean joinGroup(String groupName) throws IOException {
 
-        Socket socket = new Socket("localhost", 2000);
-        boolean ret;
+        boolean ret = true;
 
         ClientWrapper.JoinGroup request = ClientWrapper.JoinGroup.newBuilder()
                 .setGroup(groupName).build();
@@ -300,10 +270,13 @@ public class Main {
         ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
                 .setJoinGroup(request).build();
 
-        socket.getOutputStream().write(wrapper.getSerializedSize());
-        wrapper.writeTo(socket.getOutputStream());
+        //socket.getOutputStream().write(wrapper.getSerializedSize());
+        //wrapper.writeTo(socket.getOutputStream());
 
-        ret = ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep();
+        //ret = ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep();
+        if(!channel.send(wrapper)){
+            return false;
+        }
 
         return ret;
     }
