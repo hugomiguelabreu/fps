@@ -1,5 +1,6 @@
-package Misc;
+package Util;
 
+import Core.Connector;
 import Network.ClientWrapper;
 import Offline.Offline;
 import Offline.Utils.LocalAddresses;
@@ -7,13 +8,11 @@ import Offline.Utils.User;
 import com.google.protobuf.ByteString;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.client.SharedTorrent;
-import com.turn.ttorrent.client.peer.SharingPeer;
 import com.turn.ttorrent.common.Torrent;
 //import javafx.util.converter.ByteStringConverter;
 import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
-import io.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -24,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -187,10 +185,8 @@ public class TorrentUtil {
         return c;
     }
 
-    public static Client upload(Torrent t, String path, Channel ch, String username) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
-
+    public static Client upload(Torrent t, String path, Connector channel, String username) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
         File dest = new File(path);
-        //Seeding starts.
         URL whatismyip = new URL("http://checkip.amazonaws.com");
         BufferedReader in = new BufferedReader(new InputStreamReader(
                 whatismyip.openStream()));
@@ -206,7 +202,9 @@ public class TorrentUtil {
                 .setTorrentWrapper(sw).build();
 
         //Escreve e espera pela escrita no socket
-        ch.writeAndFlush(wrapper).sync();
+        if(!channel.send(wrapper)){
+            //Nao conseguiu enviar //TODO
+        }
         //Após iniciada a intenção, iniciamos o cliente.
 
         SharedTorrent st = new SharedTorrent(t, dest.getParentFile());

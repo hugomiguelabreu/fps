@@ -1,10 +1,9 @@
-package Misc;
+package Util;
 
 import com.turn.ttorrent.common.Torrent;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
