@@ -1,26 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<Pane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.MainController">
+<Pane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.MainController">
    <children>
-      <TextField fx:id="login_username" layoutX="14.0" layoutY="164.0" promptText="Username" />
-      <PasswordField fx:id="login_password" layoutX="14.0" layoutY="210.0" promptText="Password" />
-      <Button fx:id="loginButton" layoutX="209.0" layoutY="210.0" mnemonicParsing="false" onAction="#loginHandle" text="Login" />
-      <Separator layoutX="297.0" layoutY="100.0" orientation="VERTICAL" prefHeight="200.0" />
-      <PasswordField fx:id="register_password" layoutX="415.0" layoutY="210.0" promptText="Password" />
-      <TextField fx:id="register_username" layoutX="415.0" layoutY="164.0" promptText="Username" />
-      <Button fx:id="registerButton" layoutX="324.0" layoutY="210.0" mnemonicParsing="false" onAction="#registerHandle" text="Sign up" />
-      <Label layoutX="14.0" layoutY="80.0" text="Login">
+      <TextField fx:id="login_username" layoutX="138.0" layoutY="290.0" promptText="Username" />
+      <PasswordField fx:id="login_password" layoutX="138.0" layoutY="336.0" promptText="Password" />
+      <Button fx:id="loginButton" layoutX="333.0" layoutY="336.0" mnemonicParsing="false" onAction="#loginHandle" text="Login" />
+      <Separator layoutX="421.0" layoutY="226.0" orientation="VERTICAL" prefHeight="200.0" />
+      <PasswordField fx:id="register_password" layoutX="539.0" layoutY="336.0" promptText="Password" />
+      <TextField fx:id="register_username" layoutX="539.0" layoutY="290.0" promptText="Username" />
+      <Button fx:id="registerButton" layoutX="448.0" layoutY="336.0" mnemonicParsing="false" onAction="#registerHandle" text="Sign up" />
+      <Label layoutX="138.0" layoutY="206.0" text="Login">
          <font>
             <Font size="32.0" />
          </font>
       </Label>
-      <Label layoutX="462.0" layoutY="80.0" text="Sign Up">
+      <Label layoutX="586.0" layoutY="206.0" text="Sign Up">
          <font>
             <Font size="32.0" />
+         </font>
+      </Label>
+      <Label fx:id="error_login" layoutX="14.0" layoutY="251.0" text="Wrong username or password" visible="false">
+         <font>
+            <Font name="System Bold" size="14.0" />
          </font>
       </Label>
    </children>

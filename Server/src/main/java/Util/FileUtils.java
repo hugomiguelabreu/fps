@@ -16,11 +16,11 @@ import java.util.Map;
 
 public class FileUtils {
 
-    public static String fileDir = System.getProperty( "user.home" ) + "/.fps-server/files2/";
+    public static String fileDir = System.getProperty( "user.home" ) + "/.fps-server/files/";
 
     public static void initDir(){
         new File(System.getProperty( "user.home" ) + "/.fps-server").mkdirs();
-        new File(System.getProperty( "user.home" ) + "/.fps-server/files2").mkdirs();
+        new File(System.getProperty( "user.home" ) + "/.fps-server/files").mkdirs();
     }
 
     public static boolean loadTorrents(Tracker tck, Map<String, Client> clients) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
@@ -48,7 +48,7 @@ public class FileUtils {
 
     public static void deleteFiles(Torrent t) throws IOException {
         File torrent = new File(System.getProperty( "user.home" ) + "/.fps-server/" + t.getHexInfoHash());
-        File fileDownloaded = new File(System.getProperty( "user.home" ) + "/.fps-server/files2/" + t.getFilenames().get(0));
+        File fileDownloaded = new File(System.getProperty( "user.home" ) + "/.fps-server/files/" + t.getFilenames().get(0));
         Files.deleteIfExists(torrent.toPath());
         Files.deleteIfExists(fileDownloaded.toPath());
     }

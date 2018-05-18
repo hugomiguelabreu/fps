@@ -39,12 +39,12 @@ public class Connector extends Thread{
     public void run() {
         while (!stop){
             try {
-                ClientWrapper.ClientMessage cm =
-                        ClientWrapper.ClientMessage.parseDelimitedFrom(in);
-
+                boolean cm =
+                        ClientWrapper.ClientMessage.parseDelimitedFrom(in).getResponse().getRep();
                 //TODO: verificar o que recebo e chamar cenas;
-                System.out.println("RECEBI CENAS");
-            } catch (IOException e) {
+                System.out.println("RECEBI CENAS " + cm);
+                //TODO: check if not null
+            } catch (Exception e) {
                 this.close();
                 //e.printStackTrace();
             }
@@ -57,7 +57,6 @@ public class Connector extends Thread{
 
         try {
             out.write(msg.getSerializedSize());
-            out.flush();
             msg.writeTo(out);
         } catch (IOException e) {
             return false;

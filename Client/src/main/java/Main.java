@@ -1,18 +1,14 @@
 import Core.Connector;
-import Handlers.TorrentListenerInitializer;
-import Misc.FileUtils;
-import Misc.TorrentUtil;
+import Util.FileUtils;
+import Util.ServerOperations;
+import Util.TorrentUtil;
 import Network.ClientWrapper;
 import Offline.Offline;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.Tracker;
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +18,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -44,7 +39,6 @@ public class Main {
         FileUtils.initDir();
         Torrent t;
         ArrayList<Torrent> available = new ArrayList<>();
-        Channel ch = null;
         Tracker offlineTck = null;
         activeClients = new ArrayList<>();
 
@@ -55,6 +49,7 @@ public class Main {
         channel = new Connector(servers);
         if(channel.isConnected()){
             channel.start();
+            ServerOperations.setChannel(channel);
         }
 
         while (true){
@@ -67,7 +62,7 @@ public class Main {
                 username = sc.nextLine();
                 System.out.println("password:");
                 password = sc.nextLine();
-                if(login(username, password)){
+                if(ServerOperations.login(username, password)){
                     System.out.println("logged in");
                     break;
                 }
@@ -80,7 +75,7 @@ public class Main {
                 password = sc.nextLine();
                 System.out.println("name:");
                 name = sc.nextLine();
-                if(register(username, password, name)){
+                if(ServerOperations.register(username, password, name)){
                     System.out.println("registed");
                     break;
                 }
@@ -117,7 +112,7 @@ public class Main {
                     t = TorrentUtil.createTorrent(path, username, trc);
 
                     try {
-                        activeClients.add(TorrentUtil.upload(t, path, ch, username));
+                        activeClients.add(TorrentUtil.upload(t, path, channel, username));
                     } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
                         System.out.println("Couldn't bind, fallback to local");
                         e.printStackTrace();
@@ -159,25 +154,11 @@ public class Main {
                 //TODO: Keep track of shared torrent to know when they end;
                 TorrentUtil.download(st, type, username);
             }
-
-            if (input.equals("info")) {
-                int n = 0;
-                for(Torrent tA : available) {
-                    System.out.println("Torrent info " + n++ + ":");
-                    System.out.println(tA.getName());
-                    System.out.println(tA.getSize());
-                    System.out.println(tA.getAnnounceList());
-                    System.out.println(tA.getCreatedBy());
-                    System.out.println("-----------------------------------");
-                }
-            }
         }
 
         //input == quit
-
         System.out.println("Shuting down...");
         for(Client c : activeClients){
-
             c.stop();
         }
 
@@ -193,91 +174,4 @@ public class Main {
         //TODO:Terminar todos os clientes/tarckers abertos
     }
 
-    private static boolean login(String username, String password) throws IOException {
-
-        return true;
-
-//        Socket socket = new Socket("localhost", 2000);
-//        boolean ret;
-//
-//        ClientWrapper.MainUI request = ClientWrapper.MainUI.newBuilder()
-//                .setUsername(username)
-//                .setPassword(password).build();
-//
-//        ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
-//                .setLogin(request).build();
-//
-//        socket.getOutputStream().write(wrapper.getSerializedSize());
-//        wrapper.writeTo(socket.getOutputStream());
-//
-//        ret = ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep();
-//
-//        return ret;
-
-    }
-
-    private static boolean register(String username, String password, String name) throws IOException, URISyntaxException {
-
-        //Socket socket = new Socket("localhost", 2000);
-        boolean ret = true;
-
-        ClientWrapper.Register request = ClientWrapper.Register.newBuilder()
-                .setUsername(username)
-                .setPassword(password)
-                .setName(name).build();
-        ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
-                .setRegister(request).build();
-
-        if(!channel.send(wrapper)){
-            return false;
-        }
-//        socket.getOutputStream().write(wrapper.getSerializedSize());
-//        wrapper.writeTo(socket.getOutputStream());
-
-//        ret = ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep();
-
-        return ret;
-    }
-
-    private static boolean createGroup(String groupName) throws IOException {
-        boolean ret = true;
-
-        ClientWrapper.CreateGroup request = ClientWrapper.CreateGroup.newBuilder()
-                .setGroup(groupName).build();
-
-        ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
-                .setCreateGroup(request).build();
-
-        //socket.getOutputStream().write(wrapper.getSerializedSize());
-        //wrapper.writeTo(socket.getOutputStream());
-
-        //ret = ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep();
-
-        if(!channel.send(wrapper)){
-            return false;
-        }
-
-        return ret;
-    }
-
-    private static boolean joinGroup(String groupName) throws IOException {
-
-        boolean ret = true;
-
-        ClientWrapper.JoinGroup request = ClientWrapper.JoinGroup.newBuilder()
-                .setGroup(groupName).build();
-
-        ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
-                .setJoinGroup(request).build();
-
-        //socket.getOutputStream().write(wrapper.getSerializedSize());
-        //wrapper.writeTo(socket.getOutputStream());
-
-        //ret = ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep();
-        if(!channel.send(wrapper)){
-            return false;
-        }
-
-        return ret;
-    }
 }

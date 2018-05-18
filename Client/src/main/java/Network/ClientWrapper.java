@@ -15,7 +15,7 @@ public final class ClientWrapper {
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   public interface LoginOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:Network.MainUI)
+      // @@protoc_insertion_point(interface_extends:Network.Login)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -39,14 +39,13 @@ public final class ClientWrapper {
         getPasswordBytes();
   }
   /**
-   * Protobuf type {@code Network.MainUI}
+   * Protobuf type {@code Network.Login}
    */
   public  static final class Login extends
       com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:Network.MainUI)
+      // @@protoc_insertion_point(message_implements:Network.Login)
       LoginOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use MainUI.newBuilder() to construct.
+    // Use Login.newBuilder() to construct.
     private Login(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
@@ -58,19 +57,14 @@ public final class ClientWrapper {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return this.unknownFields;
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
     private Login(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
       int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -80,8 +74,7 @@ public final class ClientWrapper {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
+              if (!input.skipField(tag)) {
                 done = true;
               }
               break;
@@ -106,7 +99,6 @@ public final class ClientWrapper {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -208,7 +200,6 @@ public final class ClientWrapper {
       if (!getPasswordBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, password_);
       }
-      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -222,11 +213,11 @@ public final class ClientWrapper {
       if (!getPasswordBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, password_);
       }
-      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -242,7 +233,6 @@ public final class ClientWrapper {
           .equals(other.getUsername());
       result = result && getPassword()
           .equals(other.getPassword());
-      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -262,17 +252,6 @@ public final class ClientWrapper {
       return hash;
     }
 
-    public static Network.ClientWrapper.Login parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static Network.ClientWrapper.Login parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
     public static Network.ClientWrapper.Login parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -351,11 +330,11 @@ public final class ClientWrapper {
       return builder;
     }
     /**
-     * Protobuf type {@code Network.MainUI}
+     * Protobuf type {@code Network.Login}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:Network.MainUI)
+        // @@protoc_insertion_point(builder_implements:Network.Login)
         Network.ClientWrapper.LoginOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
@@ -369,7 +348,7 @@ public final class ClientWrapper {
                 Network.ClientWrapper.Login.class, Network.ClientWrapper.Login.Builder.class);
       }
 
-      // Construct using Network.ClientWrapper.MainUI.newBuilder()
+      // Construct using Network.ClientWrapper.Login.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -423,7 +402,7 @@ public final class ClientWrapper {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -436,12 +415,12 @@ public final class ClientWrapper {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
+          int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -463,7 +442,6 @@ public final class ClientWrapper {
           password_ = other.password_;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -629,19 +607,19 @@ public final class ClientWrapper {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return this;
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
+        return this;
       }
 
 
-      // @@protoc_insertion_point(builder_scope:Network.MainUI)
+      // @@protoc_insertion_point(builder_scope:Network.Login)
     }
 
-    // @@protoc_insertion_point(class_scope:Network.MainUI)
+    // @@protoc_insertion_point(class_scope:Network.Login)
     private static final Network.ClientWrapper.Login DEFAULT_INSTANCE;
     static {
       DEFAULT_INSTANCE = new Network.ClientWrapper.Login();
@@ -657,7 +635,7 @@ public final class ClientWrapper {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Login(input, extensionRegistry);
+          return new Login(input, extensionRegistry);
       }
     };
 
@@ -717,7 +695,6 @@ public final class ClientWrapper {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:Network.Register)
       RegisterOrBuilder {
-  private static final long serialVersionUID = 0L;
     // Use Register.newBuilder() to construct.
     private Register(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -731,19 +708,14 @@ public final class ClientWrapper {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return this.unknownFields;
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
     private Register(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
       int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -753,8 +725,7 @@ public final class ClientWrapper {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
+              if (!input.skipField(tag)) {
                 done = true;
               }
               break;
@@ -785,7 +756,6 @@ public final class ClientWrapper {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -924,7 +894,6 @@ public final class ClientWrapper {
       if (!getNameBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, name_);
       }
-      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -941,11 +910,11 @@ public final class ClientWrapper {
       if (!getNameBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, name_);
       }
-      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -963,7 +932,6 @@ public final class ClientWrapper {
           .equals(other.getPassword());
       result = result && getName()
           .equals(other.getName());
-      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -985,17 +953,6 @@ public final class ClientWrapper {
       return hash;
     }
 
-    public static Network.ClientWrapper.Register parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static Network.ClientWrapper.Register parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
     public static Network.ClientWrapper.Register parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1149,7 +1106,7 @@ public final class ClientWrapper {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -1162,12 +1119,12 @@ public final class ClientWrapper {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
+          int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -1193,7 +1150,6 @@ public final class ClientWrapper {
           name_ = other.name_;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -1428,12 +1384,12 @@ public final class ClientWrapper {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return this;
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
+        return this;
       }
 
 
@@ -1456,7 +1412,7 @@ public final class ClientWrapper {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Register(input, extensionRegistry);
+          return new Register(input, extensionRegistry);
       }
     };
 
@@ -1491,7 +1447,6 @@ public final class ClientWrapper {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:Network.Response)
       ResponseOrBuilder {
-  private static final long serialVersionUID = 0L;
     // Use Response.newBuilder() to construct.
     private Response(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -1503,19 +1458,14 @@ public final class ClientWrapper {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return this.unknownFields;
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
     private Response(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
       int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -1525,8 +1475,7 @@ public final class ClientWrapper {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
+              if (!input.skipField(tag)) {
                 done = true;
               }
               break;
@@ -1544,7 +1493,6 @@ public final class ClientWrapper {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -1584,7 +1532,6 @@ public final class ClientWrapper {
       if (rep_ != false) {
         output.writeBool(1, rep_);
       }
-      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -1596,11 +1543,11 @@ public final class ClientWrapper {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(1, rep_);
       }
-      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -1614,7 +1561,6 @@ public final class ClientWrapper {
       boolean result = true;
       result = result && (getRep()
           == other.getRep());
-      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -1633,17 +1579,6 @@ public final class ClientWrapper {
       return hash;
     }
 
-    public static Network.ClientWrapper.Response parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static Network.ClientWrapper.Response parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
     public static Network.ClientWrapper.Response parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1791,7 +1726,7 @@ public final class ClientWrapper {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -1804,12 +1739,12 @@ public final class ClientWrapper {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
+          int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -1826,7 +1761,6 @@ public final class ClientWrapper {
         if (other.getRep() != false) {
           setRep(other.getRep());
         }
-        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -1880,12 +1814,12 @@ public final class ClientWrapper {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return this;
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
+        return this;
       }
 
 
@@ -1908,7 +1842,7 @@ public final class ClientWrapper {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Response(input, extensionRegistry);
+          return new Response(input, extensionRegistry);
       }
     };
 
@@ -1948,7 +1882,6 @@ public final class ClientWrapper {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:Network.CreateGroup)
       CreateGroupOrBuilder {
-  private static final long serialVersionUID = 0L;
     // Use CreateGroup.newBuilder() to construct.
     private CreateGroup(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -1960,19 +1893,14 @@ public final class ClientWrapper {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return this.unknownFields;
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
     private CreateGroup(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
       int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -1982,8 +1910,7 @@ public final class ClientWrapper {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
+              if (!input.skipField(tag)) {
                 done = true;
               }
               break;
@@ -2002,7 +1929,6 @@ public final class ClientWrapper {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -2067,7 +1993,6 @@ public final class ClientWrapper {
       if (!getGroupBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, group_);
       }
-      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -2078,11 +2003,11 @@ public final class ClientWrapper {
       if (!getGroupBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, group_);
       }
-      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -2096,7 +2021,6 @@ public final class ClientWrapper {
       boolean result = true;
       result = result && getGroup()
           .equals(other.getGroup());
-      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -2114,17 +2038,6 @@ public final class ClientWrapper {
       return hash;
     }
 
-    public static Network.ClientWrapper.CreateGroup parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static Network.ClientWrapper.CreateGroup parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
     public static Network.ClientWrapper.CreateGroup parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -2272,7 +2185,7 @@ public final class ClientWrapper {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -2285,12 +2198,12 @@ public final class ClientWrapper {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
+          int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -2308,7 +2221,6 @@ public final class ClientWrapper {
           group_ = other.group_;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -2405,12 +2317,12 @@ public final class ClientWrapper {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return this;
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
+        return this;
       }
 
 
@@ -2433,7 +2345,7 @@ public final class ClientWrapper {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new CreateGroup(input, extensionRegistry);
+          return new CreateGroup(input, extensionRegistry);
       }
     };
 
@@ -2473,7 +2385,6 @@ public final class ClientWrapper {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:Network.JoinGroup)
       JoinGroupOrBuilder {
-  private static final long serialVersionUID = 0L;
     // Use JoinGroup.newBuilder() to construct.
     private JoinGroup(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -2485,19 +2396,14 @@ public final class ClientWrapper {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return this.unknownFields;
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
     private JoinGroup(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
       int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -2507,8 +2413,7 @@ public final class ClientWrapper {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
+              if (!input.skipField(tag)) {
                 done = true;
               }
               break;
@@ -2527,7 +2432,6 @@ public final class ClientWrapper {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -2592,7 +2496,6 @@ public final class ClientWrapper {
       if (!getGroupBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, group_);
       }
-      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -2603,11 +2506,11 @@ public final class ClientWrapper {
       if (!getGroupBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, group_);
       }
-      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -2621,7 +2524,6 @@ public final class ClientWrapper {
       boolean result = true;
       result = result && getGroup()
           .equals(other.getGroup());
-      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -2639,17 +2541,6 @@ public final class ClientWrapper {
       return hash;
     }
 
-    public static Network.ClientWrapper.JoinGroup parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static Network.ClientWrapper.JoinGroup parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
     public static Network.ClientWrapper.JoinGroup parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -2797,7 +2688,7 @@ public final class ClientWrapper {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -2810,12 +2701,12 @@ public final class ClientWrapper {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
+          int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -2833,7 +2724,6 @@ public final class ClientWrapper {
           group_ = other.group_;
           onChanged();
         }
-        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -2930,12 +2820,12 @@ public final class ClientWrapper {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return this;
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
+        return this;
       }
 
 
@@ -2958,7 +2848,7 @@ public final class ClientWrapper {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new JoinGroup(input, extensionRegistry);
+          return new JoinGroup(input, extensionRegistry);
       }
     };
 
@@ -3003,7 +2893,6 @@ public final class ClientWrapper {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:Network.TorrentWrapper)
       TorrentWrapperOrBuilder {
-  private static final long serialVersionUID = 0L;
     // Use TorrentWrapper.newBuilder() to construct.
     private TorrentWrapper(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -3016,19 +2905,14 @@ public final class ClientWrapper {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return this.unknownFields;
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
     private TorrentWrapper(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
       int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -3038,8 +2922,7 @@ public final class ClientWrapper {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
+              if (!input.skipField(tag)) {
                 done = true;
               }
               break;
@@ -3063,7 +2946,6 @@ public final class ClientWrapper {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -3140,7 +3022,6 @@ public final class ClientWrapper {
       if (!content_.isEmpty()) {
         output.writeBytes(2, content_);
       }
-      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -3155,11 +3036,11 @@ public final class ClientWrapper {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(2, content_);
       }
-      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -3175,7 +3056,6 @@ public final class ClientWrapper {
           .equals(other.getGroup());
       result = result && getContent()
           .equals(other.getContent());
-      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -3195,17 +3075,6 @@ public final class ClientWrapper {
       return hash;
     }
 
-    public static Network.ClientWrapper.TorrentWrapper parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static Network.ClientWrapper.TorrentWrapper parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
     public static Network.ClientWrapper.TorrentWrapper parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -3356,7 +3225,7 @@ public final class ClientWrapper {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -3369,12 +3238,12 @@ public final class ClientWrapper {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
+          int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -3395,7 +3264,6 @@ public final class ClientWrapper {
         if (other.getContent() != com.google.protobuf.ByteString.EMPTY) {
           setContent(other.getContent());
         }
-        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -3521,12 +3389,12 @@ public final class ClientWrapper {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return this;
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
+        return this;
       }
 
 
@@ -3549,7 +3417,7 @@ public final class ClientWrapper {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new TorrentWrapper(input, extensionRegistry);
+          return new TorrentWrapper(input, extensionRegistry);
       }
     };
 
@@ -3573,22 +3441,14 @@ public final class ClientWrapper {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>.Network.MainUI login = 1;</code>
-     */
-    boolean hasLogin();
-    /**
-     * <code>.Network.MainUI login = 1;</code>
+     * <code>.Network.Login login = 1;</code>
      */
     Network.ClientWrapper.Login getLogin();
     /**
-     * <code>.Network.MainUI login = 1;</code>
+     * <code>.Network.Login login = 1;</code>
      */
     Network.ClientWrapper.LoginOrBuilder getLoginOrBuilder();
 
-    /**
-     * <code>.Network.Register register = 2;</code>
-     */
-    boolean hasRegister();
     /**
      * <code>.Network.Register register = 2;</code>
      */
@@ -3601,20 +3461,12 @@ public final class ClientWrapper {
     /**
      * <code>.Network.Response response = 3;</code>
      */
-    boolean hasResponse();
-    /**
-     * <code>.Network.Response response = 3;</code>
-     */
     Network.ClientWrapper.Response getResponse();
     /**
      * <code>.Network.Response response = 3;</code>
      */
     Network.ClientWrapper.ResponseOrBuilder getResponseOrBuilder();
 
-    /**
-     * <code>.Network.CreateGroup createGroup = 4;</code>
-     */
-    boolean hasCreateGroup();
     /**
      * <code>.Network.CreateGroup createGroup = 4;</code>
      */
@@ -3627,20 +3479,12 @@ public final class ClientWrapper {
     /**
      * <code>.Network.JoinGroup joinGroup = 5;</code>
      */
-    boolean hasJoinGroup();
-    /**
-     * <code>.Network.JoinGroup joinGroup = 5;</code>
-     */
     Network.ClientWrapper.JoinGroup getJoinGroup();
     /**
      * <code>.Network.JoinGroup joinGroup = 5;</code>
      */
     Network.ClientWrapper.JoinGroupOrBuilder getJoinGroupOrBuilder();
 
-    /**
-     * <code>.Network.TorrentWrapper torrentWrapper = 6;</code>
-     */
-    boolean hasTorrentWrapper();
     /**
      * <code>.Network.TorrentWrapper torrentWrapper = 6;</code>
      */
@@ -3659,7 +3503,6 @@ public final class ClientWrapper {
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:Network.ClientMessage)
       ClientMessageOrBuilder {
-  private static final long serialVersionUID = 0L;
     // Use ClientMessage.newBuilder() to construct.
     private ClientMessage(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
@@ -3670,19 +3513,14 @@ public final class ClientWrapper {
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
     getUnknownFields() {
-      return this.unknownFields;
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
     }
     private ClientMessage(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
       int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -3692,8 +3530,7 @@ public final class ClientWrapper {
               done = true;
               break;
             default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
+              if (!input.skipField(tag)) {
                 done = true;
               }
               break;
@@ -3790,7 +3627,6 @@ public final class ClientWrapper {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
@@ -3854,13 +3690,7 @@ public final class ClientWrapper {
 
     public static final int LOGIN_FIELD_NUMBER = 1;
     /**
-     * <code>.Network.MainUI login = 1;</code>
-     */
-    public boolean hasLogin() {
-      return msgCase_ == 1;
-    }
-    /**
-     * <code>.Network.MainUI login = 1;</code>
+     * <code>.Network.Login login = 1;</code>
      */
     public Network.ClientWrapper.Login getLogin() {
       if (msgCase_ == 1) {
@@ -3869,7 +3699,7 @@ public final class ClientWrapper {
       return Network.ClientWrapper.Login.getDefaultInstance();
     }
     /**
-     * <code>.Network.MainUI login = 1;</code>
+     * <code>.Network.Login login = 1;</code>
      */
     public Network.ClientWrapper.LoginOrBuilder getLoginOrBuilder() {
       if (msgCase_ == 1) {
@@ -3879,12 +3709,6 @@ public final class ClientWrapper {
     }
 
     public static final int REGISTER_FIELD_NUMBER = 2;
-    /**
-     * <code>.Network.Register register = 2;</code>
-     */
-    public boolean hasRegister() {
-      return msgCase_ == 2;
-    }
     /**
      * <code>.Network.Register register = 2;</code>
      */
@@ -3908,12 +3732,6 @@ public final class ClientWrapper {
     /**
      * <code>.Network.Response response = 3;</code>
      */
-    public boolean hasResponse() {
-      return msgCase_ == 3;
-    }
-    /**
-     * <code>.Network.Response response = 3;</code>
-     */
     public Network.ClientWrapper.Response getResponse() {
       if (msgCase_ == 3) {
          return (Network.ClientWrapper.Response) msg_;
@@ -3931,12 +3749,6 @@ public final class ClientWrapper {
     }
 
     public static final int CREATEGROUP_FIELD_NUMBER = 4;
-    /**
-     * <code>.Network.CreateGroup createGroup = 4;</code>
-     */
-    public boolean hasCreateGroup() {
-      return msgCase_ == 4;
-    }
     /**
      * <code>.Network.CreateGroup createGroup = 4;</code>
      */
@@ -3960,12 +3772,6 @@ public final class ClientWrapper {
     /**
      * <code>.Network.JoinGroup joinGroup = 5;</code>
      */
-    public boolean hasJoinGroup() {
-      return msgCase_ == 5;
-    }
-    /**
-     * <code>.Network.JoinGroup joinGroup = 5;</code>
-     */
     public Network.ClientWrapper.JoinGroup getJoinGroup() {
       if (msgCase_ == 5) {
          return (Network.ClientWrapper.JoinGroup) msg_;
@@ -3983,12 +3789,6 @@ public final class ClientWrapper {
     }
 
     public static final int TORRENTWRAPPER_FIELD_NUMBER = 6;
-    /**
-     * <code>.Network.TorrentWrapper torrentWrapper = 6;</code>
-     */
-    public boolean hasTorrentWrapper() {
-      return msgCase_ == 6;
-    }
     /**
      * <code>.Network.TorrentWrapper torrentWrapper = 6;</code>
      */
@@ -4038,7 +3838,6 @@ public final class ClientWrapper {
       if (msgCase_ == 6) {
         output.writeMessage(6, (Network.ClientWrapper.TorrentWrapper) msg_);
       }
-      unknownFields.writeTo(output);
     }
 
     public int getSerializedSize() {
@@ -4070,11 +3869,11 @@ public final class ClientWrapper {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(6, (Network.ClientWrapper.TorrentWrapper) msg_);
       }
-      size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
+    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -4117,7 +3916,6 @@ public final class ClientWrapper {
         case 0:
         default:
       }
-      result = result && unknownFields.equals(other.unknownFields);
       return result;
     }
 
@@ -4161,17 +3959,6 @@ public final class ClientWrapper {
       return hash;
     }
 
-    public static Network.ClientWrapper.ClientMessage parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static Network.ClientWrapper.ClientMessage parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
     public static Network.ClientWrapper.ClientMessage parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -4361,7 +4148,7 @@ public final class ClientWrapper {
       }
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
@@ -4374,12 +4161,12 @@ public final class ClientWrapper {
       }
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
+          int index, Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
+          Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
       public Builder mergeFrom(com.google.protobuf.Message other) {
@@ -4422,7 +4209,6 @@ public final class ClientWrapper {
             break;
           }
         }
-        this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
       }
@@ -4467,13 +4253,7 @@ public final class ClientWrapper {
       private com.google.protobuf.SingleFieldBuilderV3<
           Network.ClientWrapper.Login, Network.ClientWrapper.Login.Builder, Network.ClientWrapper.LoginOrBuilder> loginBuilder_;
       /**
-       * <code>.Network.MainUI login = 1;</code>
-       */
-      public boolean hasLogin() {
-        return msgCase_ == 1;
-      }
-      /**
-       * <code>.Network.MainUI login = 1;</code>
+       * <code>.Network.Login login = 1;</code>
        */
       public Network.ClientWrapper.Login getLogin() {
         if (loginBuilder_ == null) {
@@ -4489,7 +4269,7 @@ public final class ClientWrapper {
         }
       }
       /**
-       * <code>.Network.MainUI login = 1;</code>
+       * <code>.Network.Login login = 1;</code>
        */
       public Builder setLogin(Network.ClientWrapper.Login value) {
         if (loginBuilder_ == null) {
@@ -4505,7 +4285,7 @@ public final class ClientWrapper {
         return this;
       }
       /**
-       * <code>.Network.MainUI login = 1;</code>
+       * <code>.Network.Login login = 1;</code>
        */
       public Builder setLogin(
           Network.ClientWrapper.Login.Builder builderForValue) {
@@ -4519,7 +4299,7 @@ public final class ClientWrapper {
         return this;
       }
       /**
-       * <code>.Network.MainUI login = 1;</code>
+       * <code>.Network.Login login = 1;</code>
        */
       public Builder mergeLogin(Network.ClientWrapper.Login value) {
         if (loginBuilder_ == null) {
@@ -4541,7 +4321,7 @@ public final class ClientWrapper {
         return this;
       }
       /**
-       * <code>.Network.MainUI login = 1;</code>
+       * <code>.Network.Login login = 1;</code>
        */
       public Builder clearLogin() {
         if (loginBuilder_ == null) {
@@ -4560,13 +4340,13 @@ public final class ClientWrapper {
         return this;
       }
       /**
-       * <code>.Network.MainUI login = 1;</code>
+       * <code>.Network.Login login = 1;</code>
        */
       public Network.ClientWrapper.Login.Builder getLoginBuilder() {
         return getLoginFieldBuilder().getBuilder();
       }
       /**
-       * <code>.Network.MainUI login = 1;</code>
+       * <code>.Network.Login login = 1;</code>
        */
       public Network.ClientWrapper.LoginOrBuilder getLoginOrBuilder() {
         if ((msgCase_ == 1) && (loginBuilder_ != null)) {
@@ -4579,7 +4359,7 @@ public final class ClientWrapper {
         }
       }
       /**
-       * <code>.Network.MainUI login = 1;</code>
+       * <code>.Network.Login login = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           Network.ClientWrapper.Login, Network.ClientWrapper.Login.Builder, Network.ClientWrapper.LoginOrBuilder> 
@@ -4602,12 +4382,6 @@ public final class ClientWrapper {
 
       private com.google.protobuf.SingleFieldBuilderV3<
           Network.ClientWrapper.Register, Network.ClientWrapper.Register.Builder, Network.ClientWrapper.RegisterOrBuilder> registerBuilder_;
-      /**
-       * <code>.Network.Register register = 2;</code>
-       */
-      public boolean hasRegister() {
-        return msgCase_ == 2;
-      }
       /**
        * <code>.Network.Register register = 2;</code>
        */
@@ -4741,12 +4515,6 @@ public final class ClientWrapper {
       /**
        * <code>.Network.Response response = 3;</code>
        */
-      public boolean hasResponse() {
-        return msgCase_ == 3;
-      }
-      /**
-       * <code>.Network.Response response = 3;</code>
-       */
       public Network.ClientWrapper.Response getResponse() {
         if (responseBuilder_ == null) {
           if (msgCase_ == 3) {
@@ -4874,12 +4642,6 @@ public final class ClientWrapper {
 
       private com.google.protobuf.SingleFieldBuilderV3<
           Network.ClientWrapper.CreateGroup, Network.ClientWrapper.CreateGroup.Builder, Network.ClientWrapper.CreateGroupOrBuilder> createGroupBuilder_;
-      /**
-       * <code>.Network.CreateGroup createGroup = 4;</code>
-       */
-      public boolean hasCreateGroup() {
-        return msgCase_ == 4;
-      }
       /**
        * <code>.Network.CreateGroup createGroup = 4;</code>
        */
@@ -5013,12 +4775,6 @@ public final class ClientWrapper {
       /**
        * <code>.Network.JoinGroup joinGroup = 5;</code>
        */
-      public boolean hasJoinGroup() {
-        return msgCase_ == 5;
-      }
-      /**
-       * <code>.Network.JoinGroup joinGroup = 5;</code>
-       */
       public Network.ClientWrapper.JoinGroup getJoinGroup() {
         if (joinGroupBuilder_ == null) {
           if (msgCase_ == 5) {
@@ -5149,12 +4905,6 @@ public final class ClientWrapper {
       /**
        * <code>.Network.TorrentWrapper torrentWrapper = 6;</code>
        */
-      public boolean hasTorrentWrapper() {
-        return msgCase_ == 6;
-      }
-      /**
-       * <code>.Network.TorrentWrapper torrentWrapper = 6;</code>
-       */
       public Network.ClientWrapper.TorrentWrapper getTorrentWrapper() {
         if (torrentWrapperBuilder_ == null) {
           if (msgCase_ == 6) {
@@ -5281,12 +5031,12 @@ public final class ClientWrapper {
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFieldsProto3(unknownFields);
+        return this;
       }
 
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
+        return this;
       }
 
 
@@ -5309,7 +5059,7 @@ public final class ClientWrapper {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ClientMessage(input, extensionRegistry);
+          return new ClientMessage(input, extensionRegistry);
       }
     };
 
@@ -5379,9 +5129,9 @@ public final class ClientWrapper {
       "\001(\010\"\034\n\013CreateGroup\022\r\n\005group\030\001 \001(\t\"\032\n\tJoi" +
       "nGroup\022\r\n\005group\030\001 \001(\t\"0\n\016TorrentWrapper\022" +
       "\r\n\005group\030\001 \001(\t\022\017\n\007content\030\002 \001(\014\"\216\002\n\rClie" +
-      "ntMessage\022\037\n\005login\030\001 \001(\0132\016.Network.MainUI" +
+      "ntMessage\022\037\n\005login\030\001 \001(\0132\016.Network.Login" +
       "H\000\022%\n\010register\030\002 \001(\0132\021.Network.RegisterH" +
-      "\000\022%\n\010response\030\003 \001(\0132\021.Network.ResponseH\000" +
+      "\000\022%\n\010response\030\003 \001(\0132\021.Network.ResponseH\000",
       "\022+\n\013createGroup\030\004 \001(\0132\024.Network.CreateGr" +
       "oupH\000\022\'\n\tjoinGroup\030\005 \001(\0132\022.Network.JoinG" +
       "roupH\000\0221\n\016torrentWrapper\030\006 \001(\0132\027.Network" +
@@ -5440,7 +5190,7 @@ public final class ClientWrapper {
     internal_static_Network_ClientMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Network_ClientMessage_descriptor,
-        new java.lang.String[] { "MainUI", "Register", "Response", "CreateGroup", "JoinGroup", "TorrentWrapper", "Msg", });
+        new java.lang.String[] { "Login", "Register", "Response", "CreateGroup", "JoinGroup", "TorrentWrapper", "Msg", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

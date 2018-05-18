@@ -1,3 +1,8 @@
+import Core.Connector;
+import Util.FileUtils;
+import Util.ServerOperations;
+import com.turn.ttorrent.common.Torrent;
+import com.turn.ttorrent.tracker.Tracker;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -10,10 +15,14 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import javafx.scene.control.TextField;
+import sun.util.locale.StringTokenIterator;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 public class MainUI extends Application {
     public static void main(String[] args) {
@@ -21,7 +30,27 @@ public class MainUI extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws IOException {
+    public void start(Stage primaryStage) throws IOException, URISyntaxException {
+        Connector channel;
+        ArrayList<String> activeClients;
+        ArrayList<String> servers = new ArrayList<>();
+        String username, password, name;
+        FileUtils.initDir();
+        Torrent t;
+        ArrayList<Torrent> available = new ArrayList<>();
+        Tracker offlineTck = null;
+        activeClients = new ArrayList<>();
+
+        System.out.println("Started client");
+        servers.add("localhost:2000");
+
+        //TODO connect to frontEnd
+        channel = new Connector(servers);
+        if(channel.isConnected()){
+            channel.start();
+            ServerOperations.setChannel(channel);
+        }
+
         FXMLLoader loader = new FXMLLoader();
         // Path to the FXML File
         String fxmlDocPath = "src/main/java/UI/main.fxml";
@@ -34,8 +63,14 @@ public class MainUI extends Application {
         scene.getStylesheets().clear();
         scene.getStylesheets().add("file:///" + f.getAbsolutePath());
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
         primaryStage.setTitle("Serviço Distribuído de Publicação e Subscrição de Ficheiros");
         primaryStage.show();
     }
 
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        System.exit(0);
+    }
 }
