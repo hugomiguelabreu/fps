@@ -165,10 +165,9 @@ redirect(ProtoTorrent, ID, CurrentUser) ->
 	{ok, X} = data:incrementAndGet(),
 	TID = ID ++ "_" ++ integer_to_list(X),
 	zk:newTorrent(TID, CurrentUser, binary_to_list(ProtoTorrent#'TorrentWrapper'.group)),
-
 	%sendTracker(ID,ProtoTorrent#'TorrentWrapper'.content),
 	file:write_file("./torrents/" ++ TID, ProtoTorrent),
-
+	
 	case zk:getGroupUsers(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
 		{ok, UsersMap} ->
 			lists:foreach(fun(ServerID) ->

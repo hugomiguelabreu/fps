@@ -16,6 +16,7 @@ start() ->
 	mnesia:start(),
 	mnesia:create_table(connections, [{attributes, record_info(fields, connections)}]),	
 	mnesia:wait_for_tables([connections,counter], 5000),
+	startCounter(),
 	io:format("> db started\n").
 
 init() ->
@@ -64,7 +65,7 @@ get_pid(Username) ->
 startCounter() ->
  	F = fun() ->
 		mnesia:write(#counter {id = counter,
-				   			   current = 0}),
+				   			   current = 26}),
 		ok
 	end,
 	mnesia:activity(transaction, F).
