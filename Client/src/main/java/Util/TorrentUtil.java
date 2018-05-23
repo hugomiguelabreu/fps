@@ -185,7 +185,7 @@ public class TorrentUtil {
         return c;
     }
 
-    public static Client upload(Torrent t, String path, Connector channel, String username) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
+    public static Client upload(Torrent t, String path, Connector channel, String username, String group) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
         File dest = new File(path);
         URL whatismyip = new URL("http://checkip.amazonaws.com");
         BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -196,6 +196,7 @@ public class TorrentUtil {
 
         ClientWrapper.TorrentWrapper sw = ClientWrapper.TorrentWrapper.newBuilder()
                 .setContent(ByteString.copyFrom(t.getEncoded()))
+                .setGroup(group)
                 .build();
 
         ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
@@ -203,12 +204,11 @@ public class TorrentUtil {
 
         //Escreve e espera pela escrita no socket
         if(!channel.send(wrapper)){
-            //Nao conseguiu enviar //TODO
+            //Nao conseguiu enviar //TODO:cenas
         }
         //Após iniciada a intenção, iniciamos o cliente.
 
         SharedTorrent st = new SharedTorrent(t, dest.getParentFile());
-        //TODO: return client
         Client c = new Client(
                 InetAddress.getByName(ip),
                 st,

@@ -39,14 +39,24 @@ public class Connector extends Thread{
     public void run() {
         while (!stop){
             try {
-                boolean cm =
-                        ClientWrapper.ClientMessage.parseDelimitedFrom(in).getResponse().getRep();
-                //TODO: verificar o que recebo e chamar cenas;
-                System.out.println("RECEBI CENAS " + cm);
+                ClientWrapper.ClientMessage cm = ClientWrapper.ClientMessage.parseDelimitedFrom(in);
+                boolean torrent =
+                        cm.getMsgCase().equals(ClientWrapper.ClientMessage.MsgCase.TORRENTWRAPPER);
+
+                if(torrent){
+                    byte[] byteTorrent = cm.getTorrentWrapper().getContent().toByteArray();
+                    String group = cm.getTorrentWrapper().getGroup();
+                    System.out.println(group);
+                }else{
+                    boolean response = cm.getResponse().getRep();
+                    System.out.println(response);
+                }
+
+                System.out.println("RECEBI CENAS ");
                 //TODO: check if not null
             } catch (Exception e) {
+                e.printStackTrace();
                 this.close();
-                //e.printStackTrace();
             }
         }
     }
@@ -59,8 +69,8 @@ public class Connector extends Thread{
             out.write(msg.getSerializedSize());
             msg.writeTo(out);
         } catch (IOException e) {
+            e.printStackTrace();
             return false;
-            //e.printStackTrace();
         }
         return true;
     }
@@ -81,8 +91,8 @@ public class Connector extends Thread{
             in.close();
             socket.close();
         } catch (IOException e) {
+            e.printStackTrace();
             return false;
-            //e.printStackTrace();
         }
         this.interrupt();
         return true;

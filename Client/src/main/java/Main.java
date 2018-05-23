@@ -110,9 +110,10 @@ public class Main {
                     trc.add("http://localhost:7070/announce");
 
                     t = TorrentUtil.createTorrent(path, username, trc);
-
+                    //TODO: GROUP DINAMICO
+                    String group = "leddit";
                     try {
-                        activeClients.add(TorrentUtil.upload(t, path, channel, username));
+                        activeClients.add(TorrentUtil.upload(t, path, channel, username, group));
                     } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
                         System.out.println("Couldn't bind, fallback to local");
                         e.printStackTrace();
