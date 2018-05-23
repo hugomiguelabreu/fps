@@ -105,7 +105,7 @@ login(PID,Username,Password) ->
 				 {error, _} ->
 				 	error;
 				 {ok,{RP,_}} ->
-				 	string:equal(RP,Password)
+				 	string:equal(binary_to_list(RP),Password)
 			end
 	end.
 
