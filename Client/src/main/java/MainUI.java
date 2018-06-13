@@ -53,7 +53,7 @@ public class MainUI extends Application {
 
         FXMLLoader loader = new FXMLLoader();
         // Path to the FXML File
-        String fxmlDocPath = "src/main/java/UI/Offline.fxml";
+        String fxmlDocPath = "src/main/java/UI/type.fxml";
         FileInputStream fxmlStream = new FileInputStream(fxmlDocPath);
         File f = new File("src/main/java/UI/material.css");
 

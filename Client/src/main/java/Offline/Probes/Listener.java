@@ -1,8 +1,11 @@
 package Offline.Probes;
 
+import Event.ConcurrentHashMapEvent;
 import Network.AddrBroadcastOuterClass;
 import Offline.Utils.LocalAddresses;
 import Offline.Utils.User;
+import UI.OfflineUI;
+import javafx.collections.ObservableMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -16,13 +19,15 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Listener extends Thread {
-    private ConcurrentHashMap<String, User> peers;
+
+    private ConcurrentHashMapEvent<String, User> peers;
     private final int sendPort = 5556; // porta de onde saem os multicasts
     private final int receivePort = 5557; // porta de destino dos multicasts
 
-    public Listener(String username, ArrayList<LocalAddresses> ips){
+    public Listener(String username, ArrayList<LocalAddresses> ips, OfflineUI ui){
 
-        peers = new ConcurrentHashMap<>();
+        peers = new ConcurrentHashMapEvent<>();
+        peers.registerCallback(ui);
 
         for(LocalAddresses addr : ips){
             User p = new User(username, addr.getIpv6(), addr.getIpv4(), new Timestamp(System.currentTimeMillis()));

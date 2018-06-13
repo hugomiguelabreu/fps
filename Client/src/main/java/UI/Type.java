@@ -1,15 +1,9 @@
 package UI;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.fxml.JavaFXBuilderFactory;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.effect.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -19,7 +13,6 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -129,13 +122,17 @@ public class Type implements Initializable {
         System.out.println("Offline clicked");
 
         FXMLLoader loader = new FXMLLoader();
-        String fxmlDocPath = "src/main/java/UI/app.fxml";
+        String fxmlDocPath = "src/main/java/UI/Offline.fxml";
         FileInputStream fxmlStream = new FileInputStream(fxmlDocPath);
         File f = new File("src/main/java/UI/material.css");
 
         Pane root = (Pane) loader.load(fxmlStream);
+        Scene scene = new Scene(root);
+        scene.getStylesheets().clear();
+        scene.getStylesheets().add("file:///" + f.getAbsolutePath());
         Stage stage = (Stage) onlineCircle.getScene().getWindow();
-        stage.setScene(new Scene(root));
+        stage.setScene(scene);
+        
     }
 
     @FXML

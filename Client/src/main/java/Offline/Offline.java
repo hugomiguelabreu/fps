@@ -4,6 +4,7 @@ import Offline.LocalTorrent.TorrentListener;
 import Offline.Utils.LocalAddresses;
 import Offline.Probes.Broadcast;
 import Offline.Probes.Listener;
+import UI.OfflineUI;
 import com.turn.ttorrent.common.Torrent;
 
 import java.net.*;
@@ -26,7 +27,28 @@ public class Offline {
         ArrayList<LocalAddresses> ownAddresses =  findLocalAddresses();
 
         //Starts listening for .torrents in the network
-        listener = new Listener(username, ownAddresses);
+        listener = new Listener(username, ownAddresses, null);
+        listener.start();
+        //Start broadcasting address and info
+        broadcast = new Broadcast(username, ownAddresses);
+        broadcast.start();
+
+        for (LocalAddresses addr : ownAddresses){
+            // inica o listener de torrents na porta 5558
+            new TorrentListener(addr.getIpv4(), 5558, availableParam).start();
+        }
+    }
+
+    /**
+     * Inicia os Probes e o Torrentlistner para a UI
+     * @param username nome do dude loged
+     */
+    public static void startProbes(String username, ArrayList<Torrent> availableParam, OfflineUI ui){
+
+        ArrayList<LocalAddresses> ownAddresses =  findLocalAddresses();
+
+        //Starts listening for .torrents in the network
+        listener = new Listener(username, ownAddresses, ui);
         listener.start();
         //Start broadcasting address and info
         broadcast = new Broadcast(username, ownAddresses);
