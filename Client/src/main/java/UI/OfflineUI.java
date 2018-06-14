@@ -8,6 +8,7 @@ import Offline.Offline;
 import Offline.OfflineUploadThread;
 import Offline.Utils.User;
 import com.turn.ttorrent.common.Torrent;
+import com.turn.ttorrent.tracker.Tracker;
 import javafx.animation.TranslateTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -20,8 +21,13 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.*;
 
 public class OfflineUI implements MapEvent, ArrayEvent {
@@ -35,61 +41,94 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     public Button slider_button;
 
     private HashMap<String, User> usersOn;
-    private OfflineUploadThread uploadThread;
     private ArrayListEvent<Torrent> available;
-    private String username = "FALTA RECEBER O USERNAME";
+    private Tracker offlineTck;
+    private String username;
 
     @FXML
     void initialize(){
 
-        uploadThread = new OfflineUploadThread();
         usersOn = new HashMap<>();
         available = new ArrayListEvent<>();
         available.registerCallback(this);
 
-        Offline.startProbes(username, available, this);
-
-        ConcurrentHashMapEvent<String , User> map = new ConcurrentHashMapEvent<>();
-        map.registerCallback(this);
-
-        paneDrop.setOnDragEntered(new EventHandler<DragEvent>() {
-
-            @Override
-            public void handle(DragEvent event) {
-                Dragboard db = event.getDragboard();
-                String path;
-
-                boolean success = false;
-                if (db.hasString()) {
-                    label_file.setText("File = " + db.getFiles().get(0).getName() );
-                    path = db.getFiles().get(0).getAbsolutePath();
-                    label_send.setText("Select user to send");
-
-                    // handler para recolher o mano que esta selecionado na lista
-                    list_users.getSelectionModel().selectedItemProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
-                        // Your action here
-                        System.out.println("Selected item: " + newValue);
-                        label_send.setText("send to " + newValue);
-
-                        label_send.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                            @Override
-                            public void handle(MouseEvent mouseEvent) {
-
-                                System.out.println("clicked on user, init local send process");
-                                sendLocal(path, username);
-                            }
-                        });
-
-                    });
-
-                    success = true;
-                }
-
-                event.consume();
-            }
-        });
+//        paneDrop.setOnDragEntered(new EventHandler<DragEvent>() {
+//
+//            @Override
+//            public void handle(DragEvent event) {
+//                Dragboard db = event.getDragboard();
+//                String path;
+//
+//                boolean success = false;
+//                if (db.hasString()) {
+//                    label_file.setText("File = " + db.getFiles().get(0).getName() );
+//                    path = db.getFiles().get(0).getAbsolutePath();
+//                    label_send.setText("Select user to send");
+//
+//                    // handler para recolher o mano que esta selecionado na lista
+//                    list_users.getSelectionModel().selectedItemProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+//                        // Your action here
+//                        System.out.println("Selected item: " + newValue);
+//                        label_send.setText("send to " + newValue);
+//
+//                        label_send.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//                            @Override
+//                            public void handle(MouseEvent mouseEvent) {
+//
+//                                System.out.println("clicked on user, init local send process");
+//                                sendLocal(path, username);
+//                            }
+//                        });
+//
+//                    });
+//
+//                    success = true;
+//                }
+//
+//                event.consume();
+//            }
+//        });
 
         addReturnIndex(0); //TODO tirar isto daqui
+    }
+
+    @FXML
+    void handleDragOver(DragEvent event) {
+        event.acceptTransferModes(TransferMode.ANY);
+        event.consume();
+    }
+
+    @FXML
+    void handleDragDropped(DragEvent event) {
+
+        Dragboard db = event.getDragboard();
+        String path;
+
+        if (db.hasString()) {
+            label_file.setText("File = " + db.getFiles().get(0).getName() );
+            path = db.getFiles().get(0).getAbsolutePath();
+            label_send.setText("Select user to send");
+
+            // handler para recolher o mano que esta selecionado na lista
+            list_users.getSelectionModel().selectedItemProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+                // Your action here
+                System.out.println("Selected item: " + newValue);
+                label_send.setText("send to " + newValue);
+
+                label_send.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent mouseEvent) {
+
+                        System.out.println("clicked on user, init local send process");
+                        sendLocal(path, username);
+                    }
+                });
+
+            });
+        }
+
+        event.setDropCompleted(true);
+        event.consume();
     }
 
     @Override
@@ -136,7 +175,8 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
     private void sendLocal(String path, String username){
 
-        uploadThread.newUpload(path,username);
+        OfflineUploadThread uploadThread = new OfflineUploadThread();
+        uploadThread.newUpload(path,username, offlineTck);
         uploadThread.start();
     }
 
@@ -199,5 +239,27 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
             }
         });
+    }
+
+    public void initLocal(String username){
+
+        this.username = username;
+
+        System.out.println("username " + username);
+
+        try {
+
+            String httpAddress = Offline.findLocalAddresses().get(0).getIpv4();
+            offlineTck = new Tracker(new InetSocketAddress(InetAddress.getByName(httpAddress), 6969));
+            offlineTck.start();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Offline.startProbes(username, available, this);
+
+        ConcurrentHashMapEvent<String , User> map = new ConcurrentHashMapEvent<>();
+        map.registerCallback(this);
     }
 }

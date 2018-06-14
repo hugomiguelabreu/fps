@@ -31,29 +31,17 @@ public class MainUI extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException, URISyntaxException {
-        Connector channel;
-        ArrayList<String> activeClients;
+
         ArrayList<String> servers = new ArrayList<>();
-        String username, password, name;
         FileUtils.initDir();
-        Torrent t;
-        ArrayList<Torrent> available = new ArrayList<>();
-        Tracker offlineTck = null;
-        activeClients = new ArrayList<>();
+
 
         System.out.println("Started client");
         servers.add("localhost:2000");
 
-        //TODO connect to frontEnd
-        channel = new Connector(servers);
-        if(channel.isConnected()){
-            channel.start();
-            ServerOperations.setChannel(channel);
-        }
-
         FXMLLoader loader = new FXMLLoader();
         // Path to the FXML File
-        String fxmlDocPath = "src/main/java/UI/type.fxml";
+        String fxmlDocPath = "src/main/java/UI/main.fxml";
         FileInputStream fxmlStream = new FileInputStream(fxmlDocPath);
         File f = new File("src/main/java/UI/material.css");
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -21,7 +22,7 @@
                     <children>
                         <SplitPane prefHeight="598.0" prefWidth="556.0">
                             <items>
-                                <AnchorPane fx:id="paneDrop" prefHeight="200.0" prefWidth="200.0">
+                                <AnchorPane fx:id="paneDrop" onDragDropped="#handleDragDropped" onDragOver="#handleDragOver" prefHeight="200.0" prefWidth="200.0">
                                     <Label fx:id="label_file" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="272.0" prefHeight="52.0" prefWidth="475.0" text="Drop Files Here" />
                                     <Label fx:id="label_send" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="346.0" prefHeight="52.0" prefWidth="475.0" />
                                 </AnchorPane>
@@ -31,11 +32,14 @@
                 </AnchorPane>
             </items>
         </SplitPane>
-      <AnchorPane fx:id="slider" layoutX="246.0" layoutY="-56.0" prefHeight="56.0" prefWidth="554.0">
+      <AnchorPane fx:id="slider" layoutX="244.0" layoutY="-56.0" prefHeight="56.0" prefWidth="556.0" style="-fx-background-color: lightgrey;">
          <children>
             <Label fx:id="slider_label" layoutX="14.0" layoutY="20.0" prefHeight="16.0" prefWidth="349.0" text="" />
-            <Button fx:id="slider_button" layoutX="444.0" layoutY="15.0" mnemonicParsing="false" text="Accept" />
+            <Button fx:id="slider_button" alignment="CENTER" layoutX="444.0" layoutY="15.0" mnemonicParsing="false" style="-fx-background-color: lightgreen;" text="Accept" />
          </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
       </AnchorPane>
         
     </children>

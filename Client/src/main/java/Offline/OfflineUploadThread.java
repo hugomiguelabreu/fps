@@ -25,10 +25,11 @@ public class OfflineUploadThread extends Thread {
 
     }
 
-    public void newUpload(String path, String username){
+    public void newUpload(String path, String username, Tracker offlineTck){
 
         this.path = path;
         this.username = username;
+        this.offlineTck = offlineTck;
     }
 
     public void run(){
