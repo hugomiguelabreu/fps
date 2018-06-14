@@ -1,4 +1,5 @@
 import Core.Connector;
+import Event.ArrayListEvent;
 import Util.FileUtils;
 import Util.ServerOperations;
 import Util.TorrentUtil;
@@ -38,7 +39,7 @@ public class Main {
         String username, password, name;
         FileUtils.initDir();
         Torrent t;
-        ArrayList<Torrent> available = new ArrayList<>();
+        ArrayListEvent<Torrent> available = new ArrayListEvent<>();
         Tracker offlineTck = null;
         activeClients = new ArrayList<>();
 

@@ -1,5 +1,6 @@
 package Handlers;
 
+import Event.ArrayListEvent;
 import Network.ClientWrapper;
 import com.turn.ttorrent.common.Torrent;
 import io.netty.channel.ChannelInitializer;
@@ -15,9 +16,9 @@ import java.util.ArrayList;
 
 public class TorrentListenerInitializer extends ChannelInitializer<SocketChannel> {
 
-    private ArrayList<Torrent> available;
+    private ArrayListEvent<Torrent> available;
 
-    public TorrentListenerInitializer(ArrayList<Torrent> availableParam){
+    public TorrentListenerInitializer(ArrayListEvent<Torrent> availableParam){
         this.available = availableParam;
     }
 

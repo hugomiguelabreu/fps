@@ -132,7 +132,7 @@ public class Type implements Initializable {
         scene.getStylesheets().add("file:///" + f.getAbsolutePath());
         Stage stage = (Stage) onlineCircle.getScene().getWindow();
         stage.setScene(scene);
-        
+
     }
 
     @FXML

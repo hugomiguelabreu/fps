@@ -31,10 +31,10 @@
                 </AnchorPane>
             </items>
         </SplitPane>
-      <AnchorPane fx:id="slider" layoutX="246.0" layoutY="-86.0" prefHeight="86.0" prefWidth="556.0">
+      <AnchorPane fx:id="slider" layoutX="246.0" layoutY="-56.0" prefHeight="56.0" prefWidth="554.0">
          <children>
-            <Label fx:id="userUpload" layoutX="14.0" layoutY="35.0" text="Label" />
-            <Button layoutX="480.0" layoutY="30.0" mnemonicParsing="false" text="Accept" />
+            <Label fx:id="slider_label" layoutX="14.0" layoutY="20.0" prefHeight="16.0" prefWidth="349.0" text="" />
+            <Button fx:id="slider_button" layoutX="444.0" layoutY="15.0" mnemonicParsing="false" text="Accept" />
          </children>
       </AnchorPane>
         

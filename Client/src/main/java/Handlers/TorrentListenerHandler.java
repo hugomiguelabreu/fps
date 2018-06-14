@@ -1,6 +1,7 @@
 package Handlers;
 
 
+import Event.ArrayListEvent;
 import Util.FileUtils;
 import Network.ClientWrapper;
 import com.turn.ttorrent.common.Torrent;
@@ -11,9 +12,9 @@ import java.util.ArrayList;
 
 public class TorrentListenerHandler extends SimpleChannelInboundHandler<ClientWrapper.ClientMessage> {
 
-    private ArrayList<Torrent> available;
+    private ArrayListEvent<Torrent> available;
 
-    public TorrentListenerHandler(ArrayList<Torrent> availableParam) {
+    public TorrentListenerHandler(ArrayListEvent<Torrent> availableParam) {
         super(false);
         this.available = availableParam;
     }
@@ -25,7 +26,7 @@ public class TorrentListenerHandler extends SimpleChannelInboundHandler<ClientWr
         Torrent t = new Torrent(
                 torrentWrapper.getTorrentWrapper().getContent().toByteArray(),
                 true);
-        available.add(t);
+        available.addReturnIndex(t);
         FileUtils.addTorrent(t);
     }
 

@@ -1,5 +1,6 @@
 package Offline;
 
+import Event.ArrayListEvent;
 import Offline.LocalTorrent.TorrentListener;
 import Offline.Utils.LocalAddresses;
 import Offline.Probes.Broadcast;
@@ -21,7 +22,7 @@ public class Offline {
      * Inicia os Probes e o Torrentlistner
      * @param username nome do dude loged
      */
-    public static void startProbes(String username, ArrayList<Torrent> availableParam){
+    public static void startProbes(String username, ArrayListEvent<Torrent> availableParam){
         Scanner sc = new Scanner(System.in);
         // start Probes
         ArrayList<LocalAddresses> ownAddresses =  findLocalAddresses();
@@ -43,7 +44,7 @@ public class Offline {
      * Inicia os Probes e o Torrentlistner para a UI
      * @param username nome do dude loged
      */
-    public static void startProbes(String username, ArrayList<Torrent> availableParam, OfflineUI ui){
+    public static void startProbes(String username, ArrayListEvent<Torrent> availableParam, OfflineUI ui){
 
         ArrayList<LocalAddresses> ownAddresses =  findLocalAddresses();
 

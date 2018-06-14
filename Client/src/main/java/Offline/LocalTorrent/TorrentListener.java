@@ -1,5 +1,6 @@
 package Offline.LocalTorrent;
 
+import Event.ArrayListEvent;
 import Handlers.TorrentListenerInitializer;
 import com.turn.ttorrent.common.Torrent;
 import io.netty.bootstrap.ServerBootstrap;
@@ -17,9 +18,9 @@ public class TorrentListener extends Thread{
     private EventLoopGroup workerGroup;
     private EventLoopGroup bossGroup;
     private String ipv4;
-    private ArrayList<Torrent> available;
+    private ArrayListEvent<Torrent> available;
 
-    public TorrentListener(String ipv4, int port, ArrayList<Torrent> availableParam){
+    public TorrentListener(String ipv4, int port, ArrayListEvent<Torrent> availableParam){
         this.available = availableParam;
         this.workerGroup = new NioEventLoopGroup();
         this.bossGroup = new NioEventLoopGroup();
