@@ -7,14 +7,17 @@ import Event.MapEvent;
 import Offline.Offline;
 import Offline.OfflineUploadThread;
 import Offline.Utils.User;
+import Util.TorrentUtil;
+import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.Tracker;
-import javafx.animation.TranslateTransition;
+import javafx.animation.*;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -22,12 +25,15 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class OfflineUI implements MapEvent, ArrayEvent {
@@ -39,6 +45,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     public AnchorPane slider;
     public Label slider_label;
     public Button slider_button;
+    public Button button_send;
 
     private HashMap<String, User> usersOn;
     private ArrayListEvent<Torrent> available;
@@ -51,51 +58,17 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         usersOn = new HashMap<>();
         available = new ArrayListEvent<>();
         available.registerCallback(this);
-
-//        paneDrop.setOnDragEntered(new EventHandler<DragEvent>() {
-//
-//            @Override
-//            public void handle(DragEvent event) {
-//                Dragboard db = event.getDragboard();
-//                String path;
-//
-//                boolean success = false;
-//                if (db.hasString()) {
-//                    label_file.setText("File = " + db.getFiles().get(0).getName() );
-//                    path = db.getFiles().get(0).getAbsolutePath();
-//                    label_send.setText("Select user to send");
-//
-//                    // handler para recolher o mano que esta selecionado na lista
-//                    list_users.getSelectionModel().selectedItemProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
-//                        // Your action here
-//                        System.out.println("Selected item: " + newValue);
-//                        label_send.setText("send to " + newValue);
-//
-//                        label_send.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//                            @Override
-//                            public void handle(MouseEvent mouseEvent) {
-//
-//                                System.out.println("clicked on user, init local send process");
-//                                sendLocal(path, username);
-//                            }
-//                        });
-//
-//                    });
-//
-//                    success = true;
-//                }
-//
-//                event.consume();
-//            }
-//        });
-
-        addReturnIndex(0); //TODO tirar isto daqui
     }
 
     @FXML
     void handleDragOver(DragEvent event) {
+
         event.acceptTransferModes(TransferMode.ANY);
         event.consume();
+
+        //TODO fade para cinzento
+        paneDrop.setBackground(new Background(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+
     }
 
     @FXML
@@ -113,16 +86,33 @@ public class OfflineUI implements MapEvent, ArrayEvent {
             list_users.getSelectionModel().selectedItemProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
                 // Your action here
                 System.out.println("Selected item: " + newValue);
-                label_send.setText("send to " + newValue);
 
-                label_send.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                label_send.setVisible(false);
+
+                button_send.setText("send to " + newValue);
+                button_send.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
+
+                        paneDrop.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
 
                         System.out.println("clicked on user, init local send process");
                         sendLocal(path, username);
                     }
                 });
+
+
+
+//                label_send.setText("send to " + newValue);
+//
+//                label_send.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//                    @Override
+//                    public void handle(MouseEvent mouseEvent) {
+//
+//                        System.out.println("clicked on user, init local send process");
+//                        sendLocal(path, username);
+//                    }
+//                });
 
             });
         }
@@ -143,7 +133,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
             for(Map.Entry<String, User> entry : Offline.listener.getUsers().entrySet()){
 
                 usersOn.put(entry.getKey(), entry.getValue());
-                users.add(entry.getValue().getIpv6());
+                users.add(entry.getValue().getUsername());
             }
 
             ObservableList<String> items = FXCollections.observableArrayList(users);
@@ -190,17 +180,17 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
         System.out.println("slide");
 
-//        Torrent t = available.get(i);
-//
-//        StringBuilder sb = new StringBuilder()
-//                .append(t.getCreatedBy() + " wants to share ");
-//
-//        if(t.getFilenames().size() > 1)
-//            sb.append(t.getFilenames().size() + "files with you");
-//        else
-//            sb.append(t.getFilenames().get(0) + "with you");
-//
-//        slider_label.setText(sb.toString());
+        Torrent t = available.get(i);
+
+        StringBuilder sb = new StringBuilder()
+                .append(t.getCreatedBy() + " wants to share ");
+
+        if(t.getFilenames().size() > 1)
+            sb.append(t.getFilenames().size() + "files with you");
+        else
+            sb.append(t.getFilenames().get(0) + "with you");
+
+        slider_label.setText(sb.toString());
 
         TranslateTransition down = new TranslateTransition();
         down.setToY(56);
@@ -224,18 +214,19 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
                 up.play();
 
-//                File dest = new File("/tmp/");
-//                try {
-//
-//                    SharedTorrent st = new SharedTorrent(available.get(i), dest);
-//
-//                    TorrentUtil.download(st, false, username);
-//
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                } catch (NoSuchAlgorithmException e) {
-//                    e.printStackTrace();
-//                }
+                File dest = new File("/tmp/");
+
+                try {
+
+                    SharedTorrent st = new SharedTorrent(available.get(i), dest);
+
+                    TorrentUtil.download(st, false, username);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
 
             }
         });
@@ -261,5 +252,19 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
         ConcurrentHashMapEvent<String , User> map = new ConcurrentHashMapEvent<>();
         map.registerCallback(this);
+
+        //UI
+        paneDrop.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+
+        slider.setBorder(new Border(new BorderStroke(Color.BLACK,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+
+
+    }
+
+    public void handleDragExited(DragEvent dragEvent) {
+
+        paneDrop.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+
     }
 }

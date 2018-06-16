@@ -22,9 +22,10 @@
                     <children>
                         <SplitPane prefHeight="598.0" prefWidth="556.0">
                             <items>
-                                <AnchorPane fx:id="paneDrop" onDragDropped="#handleDragDropped" onDragOver="#handleDragOver" prefHeight="200.0" prefWidth="200.0">
+                                <AnchorPane fx:id="paneDrop" onDragDropped="#handleDragDropped" onDragExited="#handleDragExited" onDragOver="#handleDragOver" prefHeight="200.0" prefWidth="200.0">
                                     <Label fx:id="label_file" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="272.0" prefHeight="52.0" prefWidth="475.0" text="Drop Files Here" />
                                     <Label fx:id="label_send" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="346.0" prefHeight="52.0" prefWidth="475.0" />
+                                    <Button fx:id="button_send" contentDisplay="CENTER" layoutX="40.0" layoutY="346.0" mnemonicParsing="false" prefHeight="52.0" prefWidth="475.0" visible="false" />
                                 </AnchorPane>
                             </items>
                         </SplitPane>
