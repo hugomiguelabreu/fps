@@ -80,6 +80,8 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         if (db.hasString()) {
             label_file.setText("File = " + db.getFiles().get(0).getName() );
             path = db.getFiles().get(0).getAbsolutePath();
+
+            label_send.setVisible(true);
             label_send.setText("Select user to send");
 
             // handler para recolher o mano que esta selecionado na lista
@@ -90,6 +92,8 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                 label_send.setVisible(false);
 
                 button_send.setText("send to " + newValue);
+                button_send.setVisible(true);
+
                 button_send.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
