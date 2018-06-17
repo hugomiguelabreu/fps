@@ -1,6 +1,8 @@
 package Util;
 
 import Core.Connector;
+import Event.FloatEvent;
+import Event.StringEvent;
 import Network.ClientWrapper;
 import Offline.Offline;
 import Offline.Utils.LocalAddresses;
@@ -13,6 +15,8 @@ import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
+import javafx.application.Platform;
+import javafx.scene.control.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -241,6 +245,53 @@ public class TorrentUtil {
 
             //Download and seed
             c.addObserver((o, arg) -> {
+
+                System.out.println(st.getCompletion());
+                System.out.println(arg);
+            });
+
+            c.share(-1);
+
+            if (com.turn.ttorrent.client.Client.ClientState.ERROR.equals(c.getState())) {
+                System.exit(1);
+            }
+        } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void download(SharedTorrent st, boolean online, String username, Label l)
+    {
+        String ip;
+        try {
+            if(online){
+                //Seeding starts.
+                URL whatismyip = new URL("http://checkip.amazonaws.com");
+                BufferedReader in = new BufferedReader(new InputStreamReader(
+                        whatismyip.openStream()));
+                ip = in.readLine(); //you get the IP as a String
+            }else{
+                ip = Offline.findLocalAddresses().get(0).getIpv4();
+            }
+
+            Client c = new Client(
+                    InetAddress.getByName(ip),
+                    st);
+            c.setMaxDownloadRate(0.0);
+            c.setMaxUploadRate(0.0);
+
+            //Download and seed
+            c.addObserver((o, arg) -> {
+
+            // update UI thread
+            Platform.runLater(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    l.setText(arg + " -> " +  st.getCompletion());
+                }
+            });
 
                 System.out.println(st.getCompletion());
                 System.out.println(arg);
