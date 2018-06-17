@@ -75,7 +75,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     }
 
     @FXML
-    void handleDragDropped(DragEvent event) {
+    void handleDragDropped(DragEvent event) { // TODO meter botao broadcast
 
         Dragboard db = event.getDragboard();
         String path;
@@ -87,14 +87,13 @@ public class OfflineUI implements MapEvent, ArrayEvent {
             label_send.setVisible(true);
             label_send.setText("Select user to send");
 
-            // handler para recolher o mano que esta selecionado na lista
-            list_users.getSelectionModel().selectedItemProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
-                // Your action here
-                System.out.println("Selected item: " + newValue);
+            if (list_users.getSelectionModel().getSelectedItem() != null){
+
+                String value = (String) list_users.getSelectionModel().getSelectedItem();
 
                 label_send.setVisible(false);
 
-                button_send.setText("send to " + newValue);
+                button_send.setText("send to " + value);
                 button_send.setVisible(true);
 
                 button_send.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -107,24 +106,37 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                         button_send.setVisible(false);
 
                         System.out.println("clicked on user, init local send process");
-                        sendLocal(path, username);
+                        sendLocal(path, username, value);
                     }
                 });
 
+            }
+            else{
 
+                list_users.getSelectionModel().selectedItemProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+                    // Your action here
+                    System.out.println("Selected item: " + newValue);
 
-//                label_send.setText("send to " + newValue);
-//
-//                label_send.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//                    @Override
-//                    public void handle(MouseEvent mouseEvent) {
-//
-//                        System.out.println("clicked on user, init local send process");
-//                        sendLocal(path, username);
-//                    }
-//                });
+                    label_send.setVisible(false);
 
-            });
+                    button_send.setText("send to " + newValue);
+                    button_send.setVisible(true);
+
+                    button_send.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent mouseEvent) {
+
+                            db.clear();
+
+                            paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+                            button_send.setVisible(false);
+
+                            System.out.println("clicked on user, init local send process");
+                            sendLocal(path, username, newValue);
+                        }
+                    });
+                });
+            }
         }
 
         event.setDropCompleted(true);
@@ -193,16 +205,14 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         });
     }
 
-    private void sendLocal(String path, String username){
+    private void sendLocal(String path, String username, String userToSend){
 
-        OfflineUploadThread uploadThread = new OfflineUploadThread();
-        uploadThread.newUpload(path,username, offlineTck);
-        uploadThread.start();
-    }
+        if(!username.equals(userToSend)){
 
-    @Override
-    public void addEvent() {
-
+            OfflineUploadThread uploadThread = new OfflineUploadThread();
+            uploadThread.newUpload(path,username, offlineTck, userToSend);
+            uploadThread.start();
+        }
     }
 
     @Override

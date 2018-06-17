@@ -138,7 +138,7 @@ public class Main {
 
                     t = TorrentUtil.createTorrent(path, username, trc);
                     try {
-                        TorrentUtil.upload(t, path, offlineTck, username);
+                        TorrentUtil.upload(t, path, offlineTck, username, null);
                     } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
                         System.out.println("Couldn't bind, ERROR.");
                         e.printStackTrace();

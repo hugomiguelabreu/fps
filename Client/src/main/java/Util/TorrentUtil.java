@@ -1,8 +1,6 @@
 package Util;
 
 import Core.Connector;
-import Event.FloatEvent;
-import Event.StringEvent;
 import Network.ClientWrapper;
 import Offline.Offline;
 import Offline.Utils.LocalAddresses;
@@ -11,7 +9,6 @@ import com.google.protobuf.ByteString;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
-//import javafx.util.converter.ByteStringConverter;
 import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
@@ -91,14 +88,14 @@ public class TorrentUtil {
     }
 
     /**
-     * Inicia o processo de upload de um ficheiro
+     * Inicia o processo de upload de um ficheiro Offline
      * Inicia o traker nele proprio
      * @param t Torrent a fazer upload
      * @throws IOException
      * @throws NoSuchAlgorithmException
      */
 
-    public static Client upload(Torrent t, String path, Tracker tck, String username) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
+    public static Client upload(Torrent t, String path, Tracker tck, String username, String userToSend) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
         ArrayList<LocalAddresses> ownAddresses = Offline.findLocalAddresses();
         File dest = new File(path);
 
@@ -175,16 +172,38 @@ public class TorrentUtil {
 
         torrentPeers.put(t.getHexInfoHash(),new ArrayList<String>());
 
-        for (Map.Entry<String, User> entry : foundUsers.entrySet()) {
-            if(!entry.getValue().getUsername().equals(t.getCreatedBy())){
+        if(userToSend == null){
 
-                torrentPeers.get(tr.getHexInfoHash()).add(entry.getValue().getUsername());
+            //Broadcast
+            for (Map.Entry<String, User> entry : foundUsers.entrySet()) {
 
-                System.out.println("Sending to: " + entry.getKey());
-                Socket s = new Socket(entry.getValue().getIpv4(), 5558);
-                wrapper.writeDelimitedTo(s.getOutputStream());
+                if(!entry.getValue().getUsername().equals(t.getCreatedBy())){
+
+                    torrentPeers.get(tr.getHexInfoHash()).add(entry.getValue().getUsername());
+
+                    System.out.println("Sending to: " + entry.getKey());
+                    Socket s = new Socket(entry.getValue().getIpv4(), 5558);
+                    wrapper.writeDelimitedTo(s.getOutputStream());
+                }
             }
         }
+        else {
+
+            //Manda so para um men
+            for (Map.Entry<String, User> entry : foundUsers.entrySet()) {
+
+                if(entry.getValue().getUsername().equals(userToSend)){
+
+                    torrentPeers.get(tr.getHexInfoHash()).add(entry.getValue().getUsername());
+
+                    System.out.println("Sending to: " + entry.getKey());
+                    Socket s = new Socket(entry.getValue().getIpv4(), 5558);
+                    wrapper.writeDelimitedTo(s.getOutputStream());
+                }
+            }
+        }
+
+
 
         return c;
     }

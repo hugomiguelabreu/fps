@@ -13,12 +13,12 @@ public class ArrayListEvent<E> extends ArrayList<E>{
         this.arrayEvent = arrayEvent;
     }
 
-    @Override
-    public boolean add(E e){
-        boolean b = super.add(e);
-        arrayEvent.addEvent();
-        return b;
-    }
+//    @Override
+//    public boolean add(E e){
+//        boolean b = super.add(e);
+//        arrayEvent.addEvent();
+//        return b;
+//    }
 
     public boolean addTorrent(E e){
         boolean b = super.add(e);

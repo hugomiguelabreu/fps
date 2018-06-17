@@ -20,16 +20,18 @@ public class OfflineUploadThread extends Thread {
     private String path;
     private String username;
     private Torrent t;
+    private String userToSend;
 
     public OfflineUploadThread(){
 
     }
 
-    public void newUpload(String path, String username, Tracker offlineTck){
+    public void newUpload(String path, String username, Tracker offlineTck, String userToSend){
 
         this.path = path;
         this.username = username;
         this.offlineTck = offlineTck;
+        this.userToSend = userToSend;
     }
 
     public void run(){
@@ -47,7 +49,7 @@ public class OfflineUploadThread extends Thread {
             }
 
             t = TorrentUtil.createTorrent(path, username, trc);
-            TorrentUtil.upload(t, path, offlineTck, username);
+            TorrentUtil.upload(t, path, offlineTck, username, userToSend);
 
             System.out.println("Upload intention initiated");
 
