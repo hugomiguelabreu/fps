@@ -6,8 +6,9 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.OfflineUI">
+<AnchorPane fx:id="mainPane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.OfflineUI">
 
     <children>
         <SplitPane dividerPositions="0.298" prefHeight="600.0" prefWidth="800.0">
@@ -26,6 +27,7 @@
                                     <Label fx:id="label_file" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="272.0" prefHeight="52.0" prefWidth="475.0" text="Drop Files Here" />
                                     <Label fx:id="label_send" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="346.0" prefHeight="52.0" prefWidth="475.0" />
                                     <Button fx:id="button_send" contentDisplay="CENTER" layoutX="40.0" layoutY="346.0" mnemonicParsing="false" prefHeight="52.0" prefWidth="475.0" visible="false" />
+                           <VBox fx:id="notifications" prefHeight="270.0" prefWidth="554.0" />
                                 </AnchorPane>
                             </items>
                         </SplitPane>
@@ -33,15 +35,14 @@
                 </AnchorPane>
             </items>
         </SplitPane>
-      <AnchorPane fx:id="slider" layoutX="244.0" layoutY="-56.0" prefHeight="56.0" prefWidth="556.0" style="-fx-background-color: lightgrey;">
-         <children>
-            <Label fx:id="slider_label" layoutX="14.0" layoutY="20.0" prefHeight="16.0" prefWidth="349.0" text="" />
-            <Button fx:id="slider_button" alignment="CENTER" layoutX="444.0" layoutY="15.0" mnemonicParsing="false" style="-fx-background-color: lightgreen;" text="Accept" />
-         </children>
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-      </AnchorPane>
-        
+        <AnchorPane fx:id="slider" layoutX="244.0" layoutY="-56.0" prefHeight="56.0" prefWidth="556.0" style="-fx-background-color: lightgrey;">
+            <children>
+                <Label fx:id="slider_label" layoutX="14.0" layoutY="20.0" prefHeight="16.0" prefWidth="349.0" text="" />
+                <Button fx:id="slider_button" alignment="CENTER" layoutX="444.0" layoutY="15.0" mnemonicParsing="false" style="-fx-background-color: lightgreen;" text="Accept" />
+            </children>
+            <opaqueInsets>
+                <Insets />
+            </opaqueInsets>
+        </AnchorPane>
     </children>
 </AnchorPane>

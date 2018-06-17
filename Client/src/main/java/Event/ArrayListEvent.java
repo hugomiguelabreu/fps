@@ -22,15 +22,17 @@ public class ArrayListEvent<E> extends ArrayList<E>{
 
     public boolean addTorrent(E e){
         boolean b = super.add(e);
-        //arrayEvent.addEventTorrent((Torrent) e);
+        arrayEvent.addEventTorrent((Torrent) e);
         return b;
     }
 
-    public boolean addReturnIndex(E e){
-        boolean b = super.add(e);
-        arrayEvent.addReturnIndex(super.size()); // so e coerente se for single thread
-        return b;
-    }
+
+//    // TODO vai dar bosta eventualmente
+//    public boolean addReturnIndex(E e){
+//        boolean b = super.add(e);
+//        arrayEvent.addReturnIndex(super.size()); // so e coerente se for single thread
+//        return b;
+//    }
 
 
 }

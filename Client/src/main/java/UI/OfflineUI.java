@@ -12,12 +12,14 @@ import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.Tracker;
 import javafx.animation.*;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -38,6 +40,7 @@ import java.util.*;
 
 public class OfflineUI implements MapEvent, ArrayEvent {
 
+    public AnchorPane mainPane;
     public ListView list_users;
     public Label label_file;
     public AnchorPane paneDrop;
@@ -51,9 +54,12 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     private ArrayListEvent<Torrent> available;
     private Tracker offlineTck;
     private String username;
+    private int nNotifications;
 
     @FXML
     void initialize(){
+
+        nNotifications = 0;
 
         usersOn = new HashMap<>();
         available = new ArrayListEvent<>();
@@ -98,7 +104,10 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
 
-                        paneDrop.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+                        db.clear();
+
+                        paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+                        button_send.setVisible(false);
 
                         System.out.println("clicked on user, init local send process");
                         sendLocal(path, username);
@@ -136,12 +145,22 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
             for(Map.Entry<String, User> entry : Offline.listener.getUsers().entrySet()){
 
-                usersOn.put(entry.getKey(), entry.getValue());
-                users.add(entry.getValue().getUsername());
+                if(!entry.getValue().equals(username)){
+
+                    usersOn.put(entry.getKey(), entry.getValue());
+                    users.add(entry.getValue().getUsername());
+                }
             }
 
             ObservableList<String> items = FXCollections.observableArrayList(users);
-            list_users.setItems(items);
+
+            // update UI thread
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    list_users.setItems(items);
+                }
+            });
         }
 
         catch (NullPointerException e){
@@ -159,12 +178,22 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
         for(Map.Entry<String, User> entry : Offline.listener.getUsers().entrySet()){
 
-            usersOn.remove(entry.getKey());
-            users.add(entry.getValue().getIpv6());
+            if(!entry.getValue().equals(username)){
+
+                usersOn.put(entry.getKey(), entry.getValue());
+                users.add(entry.getValue().getUsername());
+            }
         }
 
         ObservableList<String> items = FXCollections.observableArrayList(users);
-        list_users.setItems(items);
+
+        // update UI thread
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                list_users.setItems(items);
+            }
+        });
     }
 
     private void sendLocal(String path, String username){
@@ -180,31 +209,62 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     }
 
     @Override
-    public void addReturnIndex(int i) {
+    public void addEventTorrent(Torrent t) {
 
-        System.out.println("slide");
-
-        Torrent t = available.get(i);
+        Label l = new Label();
+        Button b = new Button();
+        AnchorPane pane = new AnchorPane();
 
         StringBuilder sb = new StringBuilder()
                 .append(t.getCreatedBy() + " wants to share ");
 
         if(t.getFilenames().size() > 1)
-            sb.append(t.getFilenames().size() + "files with you");
+            sb.append(t.getFilenames().size() + " files with you");
         else
-            sb.append(t.getFilenames().get(0) + "with you");
+            sb.append(t.getFilenames().get(0) + " with you");
 
-        slider_label.setText(sb.toString());
 
-        TranslateTransition down = new TranslateTransition();
-        down.setToY(56);
+        // update UI thread
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
 
-        down.setDuration(Duration.seconds(1));
-        down.setNode(this.slider);
+                nNotifications++;
 
-        down.play();
+                pane.getChildren().add(l);
+                pane.getChildren().add(b);
+                mainPane.getChildren().add(pane);
 
-        slider_button.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                pane.setLayoutX(244.0);
+                pane.setLayoutY(-56.0);
+                pane.setPrefHeight(56.0);
+                pane.setPrefWidth(556.0);
+                pane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+
+                l.setText(sb.toString());
+                l.setLayoutX(14.0);
+                l.setLayoutY(20.0);
+                l.setPrefHeight(16.0);
+                l.setPrefWidth(349.0);
+
+                b.setAlignment(Pos.CENTER);
+                b.setLayoutX(444.0);
+                b.setLayoutY(15.0);
+                b.setBackground(new Background(new BackgroundFill(Color.LIGHTGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+                b.setText("Accept");
+
+                TranslateTransition down = new TranslateTransition();
+                down.setFromY(56 * (nNotifications - 1));
+                down.setToY(56 * nNotifications);
+
+                down.setDuration(Duration.seconds(1));
+                down.setNode(pane);
+
+                down.play();
+            }
+        });
+
+        b.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
 
@@ -214,15 +274,16 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                 up.setToY(-56);
 
                 up.setDuration(Duration.seconds(1));
-                up.setNode(slider);
+                up.setNode(pane);
 
                 up.play();
 
+                //TODO mudar para a diretoria certa
                 File dest = new File("/tmp/");
 
                 try {
 
-                    SharedTorrent st = new SharedTorrent(available.get(i), dest);
+                    SharedTorrent st = new SharedTorrent(t, dest);
 
                     TorrentUtil.download(st, false, username);
 
@@ -234,6 +295,63 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
             }
         });
+
+//        StringBuilder sb = new StringBuilder()
+//                .append(t.getCreatedBy() + " wants to share ");
+//
+//        if(t.getFilenames().size() > 1)
+//            sb.append(t.getFilenames().size() + " files with you");
+//        else
+//            sb.append(t.getFilenames().get(0) + " with you");
+//
+//        // update UI thread
+//        Platform.runLater(new Runnable() {
+//            @Override
+//            public void run() {
+//                slider_label.setText(sb.toString());
+//            }
+//        });
+//
+//        TranslateTransition down = new TranslateTransition();
+//        down.setToY(56);
+//
+//        down.setDuration(Duration.seconds(1));
+//        down.setNode(this.slider);
+//
+//        down.play();
+//
+//        slider_button.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//            @Override
+//            public void handle(MouseEvent mouseEvent) {
+//
+//                //System.out.println("accept torrent " + t.toString());
+//
+//                TranslateTransition up = new TranslateTransition();
+//                up.setToY(-56);
+//
+//                up.setDuration(Duration.seconds(1));
+//                up.setNode(slider);
+//
+//                up.play();
+//
+//                //TODO mudar para a diretoria certa
+//                File dest = new File("/tmp/");
+//
+//                try {
+//
+//                    SharedTorrent st = new SharedTorrent(t, dest);
+//
+//                    TorrentUtil.download(st, false, username);
+//
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } catch (NoSuchAlgorithmException e) {
+//                    e.printStackTrace();
+//                }
+//
+//            }
+//        });
+
     }
 
     public void initLocal(String username){
@@ -258,17 +376,86 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         map.registerCallback(this);
 
         //UI
-        paneDrop.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
-
-        slider.setBorder(new Border(new BorderStroke(Color.BLACK,
-                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-
+        paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 
     }
 
     public void handleDragExited(DragEvent dragEvent) {
 
-        paneDrop.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+        paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 
+    }
+
+    private AnchorPane creatNotification(Torrent t){
+
+        AnchorPane pane = new AnchorPane();
+        pane.setPrefHeight(56.0);
+        pane.setPrefWidth(556.0);
+        pane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+
+        Label l = new Label();
+
+        StringBuilder sb = new StringBuilder()
+                .append(t.getCreatedBy() + " wants to share ");
+
+        if(t.getFilenames().size() > 1)
+            sb.append(t.getFilenames().size() + " files with you");
+        else
+            sb.append(t.getFilenames().get(0) + " with you");
+
+        // update UI thread
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                slider_label.setText(sb.toString());
+            }
+        });
+
+        l.setLayoutX(14.0);
+        l.setLayoutY(20.0);
+        l.setPrefHeight(16.0);
+        l.setPrefWidth(349.0);
+
+        Button b = new Button();
+
+        b.setAlignment(Pos.CENTER);
+        b.setLayoutX(444.0);
+        b.setLayoutY(15.0);
+        b.setBackground(new Background(new BackgroundFill(Color.LIGHTGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+        b.setText("Accept");
+
+        b.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+
+                //System.out.println("accept torrent " + t.toString());
+
+                TranslateTransition up = new TranslateTransition();
+                up.setToY(-56);
+
+                up.setDuration(Duration.seconds(1));
+                up.setNode(slider);
+
+                up.play();
+
+                //TODO mudar para a diretoria certa
+                File dest = new File("/tmp/");
+
+                try {
+
+                    SharedTorrent st = new SharedTorrent(t, dest);
+
+                    TorrentUtil.download(st, false, username);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        return null;
     }
 }
