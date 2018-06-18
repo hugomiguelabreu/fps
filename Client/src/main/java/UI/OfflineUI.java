@@ -46,6 +46,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     public Label slider_label;
     public Button slider_button;
     public Button button_send;
+    public Button button_broadcast;
 
     private HashMap<String, User> usersOn;
     private ArrayListEvent<Torrent> available;
@@ -71,7 +72,6 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
         //TODO fade para cinzento
         paneDrop.setBackground(new Background(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, Insets.EMPTY)));
-
     }
 
     @FXML
@@ -86,6 +86,9 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
             label_send.setVisible(true);
             label_send.setText("Select user to send");
+
+            button_broadcast.setUserData(path);
+            button_broadcast.setVisible(true);
 
             if (list_users.getSelectionModel().getSelectedItem() != null){
 
@@ -104,6 +107,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
                         paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
                         button_send.setVisible(false);
+                        button_broadcast.setVisible(false);
 
                         System.out.println("clicked on user, init local send process");
                         sendLocal(path, username, value);
@@ -130,6 +134,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
                             paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
                             button_send.setVisible(false);
+                            button_broadcast.setVisible(false);
 
                             System.out.println("clicked on user, init local send process");
                             sendLocal(path, username, newValue);
@@ -206,6 +211,8 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     }
 
     private void sendLocal(String path, String username, String userToSend){
+
+        label_file.setText("Drop Files Here");
 
         if(!username.equals(userToSend)){
 
@@ -424,6 +431,16 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     public void handleDragExited(DragEvent dragEvent) {
 
         paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+
+    }
+
+    public void handleBroadcastClicked(MouseEvent mouseEvent) {
+
+        String path = (String) button_broadcast.getUserData();
+        sendLocal(path, username, null);
+        button_send.setVisible(false);
+        button_broadcast.setVisible(false);
+        label_send.setVisible(false);
 
     }
 }
