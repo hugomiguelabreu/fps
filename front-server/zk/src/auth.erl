@@ -76,7 +76,7 @@ login(Username, Password, ID, Socket) ->
 			MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {response,#'Response'{rep=true}}}),
 			gen_tcp:send(Socket, MsgContainer),
 			io:format("> Client " ++ Username ++ " logged in.\n"),
-			checkNewContent(Username),
+			%checkNewContent(Username),
 			loggedLoop(Socket, Username, ID);
 		false ->
 			MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {response,#'Response'{rep=false}}}),
@@ -162,11 +162,10 @@ msgDecriptor(Data, User, Socket, ID) ->
 redirect(ProtoTorrent, ID, CurrentUser) ->
 	io:format("> starting to redirect to group " ++ binary_to_list(ProtoTorrent#'TorrentWrapper'.group) ++ "\n"),
 	
-	{ok, X} = data:incrementAndGet(),
-	TID = ID ++ "_" ++ integer_to_list(X),
-	zk:newTorrent(TID, CurrentUser, binary_to_list(ProtoTorrent#'TorrentWrapper'.group)),
+	{'TorrentWrapper', _, _, TID} = ProtoTorrent,
+	zk:newTorrent(binary_to_list(TID), CurrentUser, binary_to_list(ProtoTorrent#'TorrentWrapper'.group)),
 	%sendTracker(ID,ProtoTorrent#'TorrentWrapper'.content),
-	file:write_file("./torrents/" ++ TID, ProtoTorrent),
+	%file:write_file("./torrents/" ++ TID, ProtoTorrent),
 	
 	case zk:getGroupUsers(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
 		{ok, UsersMap} ->
@@ -187,7 +186,7 @@ redirect(ProtoTorrent, ID, CurrentUser) ->
 										end
 									 end, maps:get(ID, UsersMap));
 								_ ->
-									{'TorrentWrapper', _, Content} = ProtoTorrent,
+									{'TorrentWrapper', _, Content, _} = ProtoTorrent,
 									UsersSv = lists:concat(lists:join(";",maps:get(ServerID,UsersMap))),
 									server_comm:sendFrontServer(ServerID, UsersSv, binary_to_list(ProtoTorrent#'TorrentWrapper'.group), TID, Content)
 							end

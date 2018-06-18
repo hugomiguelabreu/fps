@@ -1,4 +1,3 @@
-import client_network.Wrapper;
 import server_network.ServerWrapper;
 
 import java.io.IOException;

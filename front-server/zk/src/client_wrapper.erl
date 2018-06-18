@@ -30,20 +30,20 @@
 -export_type([]).
 
 %% message types
--type 'Login'() :: #'Login'{}.
--type 'CreateGroup'() :: #'CreateGroup'{}.
--type 'TorrentWrapper'() :: #'TorrentWrapper'{}.
 -type 'JoinGroup'() :: #'JoinGroup'{}.
--type 'Response'() :: #'Response'{}.
 -type 'Register'() :: #'Register'{}.
+-type 'Login'() :: #'Login'{}.
+-type 'TorrentWrapper'() :: #'TorrentWrapper'{}.
+-type 'CreateGroup'() :: #'CreateGroup'{}.
+-type 'Response'() :: #'Response'{}.
 -type 'ClientMessage'() :: #'ClientMessage'{}.
--export_type(['Login'/0, 'CreateGroup'/0, 'TorrentWrapper'/0, 'JoinGroup'/0, 'Response'/0, 'Register'/0, 'ClientMessage'/0]).
+-export_type(['JoinGroup'/0, 'Register'/0, 'Login'/0, 'TorrentWrapper'/0, 'CreateGroup'/0, 'Response'/0, 'ClientMessage'/0]).
 
--spec encode_msg(#'Login'{} | #'CreateGroup'{} | #'TorrentWrapper'{} | #'JoinGroup'{} | #'Response'{} | #'Register'{} | #'ClientMessage'{}) -> binary().
+-spec encode_msg(#'JoinGroup'{} | #'Register'{} | #'Login'{} | #'TorrentWrapper'{} | #'CreateGroup'{} | #'Response'{} | #'ClientMessage'{}) -> binary().
 encode_msg(Msg) -> encode_msg(Msg, []).
 
 
--spec encode_msg(#'Login'{} | #'CreateGroup'{} | #'TorrentWrapper'{} | #'JoinGroup'{} | #'Response'{} | #'Register'{} | #'ClientMessage'{}, list()) -> binary().
+-spec encode_msg(#'JoinGroup'{} | #'Register'{} | #'Login'{} | #'TorrentWrapper'{} | #'CreateGroup'{} | #'Response'{} | #'ClientMessage'{}, list()) -> binary().
 encode_msg(Msg, Opts) ->
     case proplists:get_bool(verify, Opts) of
       true -> verify_msg(Msg, Opts);
@@ -51,90 +51,18 @@ encode_msg(Msg, Opts) ->
     end,
     TrUserData = proplists:get_value(user_data, Opts),
     case Msg of
+      #'JoinGroup'{} -> e_msg_JoinGroup(Msg, TrUserData);
+      #'Register'{} -> e_msg_Register(Msg, TrUserData);
       #'Login'{} -> e_msg_Login(Msg, TrUserData);
-      #'CreateGroup'{} -> e_msg_CreateGroup(Msg, TrUserData);
       #'TorrentWrapper'{} ->
 	  e_msg_TorrentWrapper(Msg, TrUserData);
-      #'JoinGroup'{} -> e_msg_JoinGroup(Msg, TrUserData);
+      #'CreateGroup'{} -> e_msg_CreateGroup(Msg, TrUserData);
       #'Response'{} -> e_msg_Response(Msg, TrUserData);
-      #'Register'{} -> e_msg_Register(Msg, TrUserData);
       #'ClientMessage'{} ->
 	  e_msg_ClientMessage(Msg, TrUserData)
     end.
 
 
-
-e_msg_Login(Msg, TrUserData) ->
-    e_msg_Login(Msg, <<>>, TrUserData).
-
-
-e_msg_Login(#'Login'{username = F1, password = F2}, Bin,
-	    TrUserData) ->
-    B1 = if F1 == undefined -> Bin;
-	    true ->
-		begin
-		  TrF1 = id(F1, TrUserData),
-		  case is_empty_string(TrF1) of
-		    true -> Bin;
-		    false -> e_type_string(TrF1, <<Bin/binary, 10>>)
-		  end
-		end
-	 end,
-    if F2 == undefined -> B1;
-       true ->
-	   begin
-	     TrF2 = id(F2, TrUserData),
-	     case is_empty_string(TrF2) of
-	       true -> B1;
-	       false -> e_type_string(TrF2, <<B1/binary, 18>>)
-	     end
-	   end
-    end.
-
-e_msg_CreateGroup(Msg, TrUserData) ->
-    e_msg_CreateGroup(Msg, <<>>, TrUserData).
-
-
-e_msg_CreateGroup(#'CreateGroup'{group = F1}, Bin,
-		  TrUserData) ->
-    if F1 == undefined -> Bin;
-       true ->
-	   begin
-	     TrF1 = id(F1, TrUserData),
-	     case is_empty_string(TrF1) of
-	       true -> Bin;
-	       false -> e_type_string(TrF1, <<Bin/binary, 10>>)
-	     end
-	   end
-    end.
-
-e_msg_TorrentWrapper(Msg, TrUserData) ->
-    e_msg_TorrentWrapper(Msg, <<>>, TrUserData).
-
-
-e_msg_TorrentWrapper(#'TorrentWrapper'{group = F1,
-				       content = F2},
-		     Bin, TrUserData) ->
-    B1 = if F1 == undefined -> Bin;
-	    true ->
-		begin
-		  TrF1 = id(F1, TrUserData),
-		  case is_empty_string(TrF1) of
-		    true -> Bin;
-		    false -> e_type_string(TrF1, <<Bin/binary, 10>>)
-		  end
-		end
-	 end,
-    if F2 == undefined -> B1;
-       true ->
-	   begin
-	     TrF2 = id(F2, TrUserData),
-	     case iolist_size(TrF2) of
-	       0 -> B1;
-	       _ -> e_type_bytes(TrF2, <<B1/binary, 18>>)
-	     end
-	   end
-    end.
 
 e_msg_JoinGroup(Msg, TrUserData) ->
     e_msg_JoinGroup(Msg, <<>>, TrUserData).
@@ -149,22 +77,6 @@ e_msg_JoinGroup(#'JoinGroup'{group = F1}, Bin,
 	     case is_empty_string(TrF1) of
 	       true -> Bin;
 	       false -> e_type_string(TrF1, <<Bin/binary, 10>>)
-	     end
-	   end
-    end.
-
-e_msg_Response(Msg, TrUserData) ->
-    e_msg_Response(Msg, <<>>, TrUserData).
-
-
-e_msg_Response(#'Response'{rep = F1}, Bin,
-	       TrUserData) ->
-    if F1 == undefined -> Bin;
-       true ->
-	   begin
-	     TrF1 = id(F1, TrUserData),
-	     if TrF1 =:= false -> Bin;
-		true -> e_type_bool(TrF1, <<Bin/binary, 8>>)
 	     end
 	   end
     end.
@@ -203,6 +115,104 @@ e_msg_Register(#'Register'{username = F1, password = F2,
 	     case is_empty_string(TrF3) of
 	       true -> B2;
 	       false -> e_type_string(TrF3, <<B2/binary, 26>>)
+	     end
+	   end
+    end.
+
+e_msg_Login(Msg, TrUserData) ->
+    e_msg_Login(Msg, <<>>, TrUserData).
+
+
+e_msg_Login(#'Login'{username = F1, password = F2}, Bin,
+	    TrUserData) ->
+    B1 = if F1 == undefined -> Bin;
+	    true ->
+		begin
+		  TrF1 = id(F1, TrUserData),
+		  case is_empty_string(TrF1) of
+		    true -> Bin;
+		    false -> e_type_string(TrF1, <<Bin/binary, 10>>)
+		  end
+		end
+	 end,
+    if F2 == undefined -> B1;
+       true ->
+	   begin
+	     TrF2 = id(F2, TrUserData),
+	     case is_empty_string(TrF2) of
+	       true -> B1;
+	       false -> e_type_string(TrF2, <<B1/binary, 18>>)
+	     end
+	   end
+    end.
+
+e_msg_TorrentWrapper(Msg, TrUserData) ->
+    e_msg_TorrentWrapper(Msg, <<>>, TrUserData).
+
+
+e_msg_TorrentWrapper(#'TorrentWrapper'{group = F1,
+				       content = F2, id = F3},
+		     Bin, TrUserData) ->
+    B1 = if F1 == undefined -> Bin;
+	    true ->
+		begin
+		  TrF1 = id(F1, TrUserData),
+		  case is_empty_string(TrF1) of
+		    true -> Bin;
+		    false -> e_type_string(TrF1, <<Bin/binary, 10>>)
+		  end
+		end
+	 end,
+    B2 = if F2 == undefined -> B1;
+	    true ->
+		begin
+		  TrF2 = id(F2, TrUserData),
+		  case iolist_size(TrF2) of
+		    0 -> B1;
+		    _ -> e_type_bytes(TrF2, <<B1/binary, 18>>)
+		  end
+		end
+	 end,
+    if F3 == undefined -> B2;
+       true ->
+	   begin
+	     TrF3 = id(F3, TrUserData),
+	     case is_empty_string(TrF3) of
+	       true -> B2;
+	       false -> e_type_string(TrF3, <<B2/binary, 26>>)
+	     end
+	   end
+    end.
+
+e_msg_CreateGroup(Msg, TrUserData) ->
+    e_msg_CreateGroup(Msg, <<>>, TrUserData).
+
+
+e_msg_CreateGroup(#'CreateGroup'{group = F1}, Bin,
+		  TrUserData) ->
+    if F1 == undefined -> Bin;
+       true ->
+	   begin
+	     TrF1 = id(F1, TrUserData),
+	     case is_empty_string(TrF1) of
+	       true -> Bin;
+	       false -> e_type_string(TrF1, <<Bin/binary, 10>>)
+	     end
+	   end
+    end.
+
+e_msg_Response(Msg, TrUserData) ->
+    e_msg_Response(Msg, <<>>, TrUserData).
+
+
+e_msg_Response(#'Response'{rep = F1}, Bin,
+	       TrUserData) ->
+    if F1 == undefined -> Bin;
+       true ->
+	   begin
+	     TrF1 = id(F1, TrUserData),
+	     if TrF1 =:= false -> Bin;
+		true -> e_type_bool(TrF1, <<Bin/binary, 8>>)
 	     end
 	   end
     end.
@@ -336,6 +346,22 @@ decode_msg(Bin, MsgName) when is_binary(Bin) ->
 decode_msg(Bin, MsgName, Opts) when is_binary(Bin) ->
     TrUserData = proplists:get_value(user_data, Opts),
     case MsgName of
+      'JoinGroup' ->
+	  try d_msg_JoinGroup(Bin, TrUserData) catch
+	    Class:Reason ->
+		StackTrace = erlang:get_stacktrace(),
+		error({gpb_error,
+		       {decoding_failure,
+			{Bin, 'JoinGroup', {Class, Reason, StackTrace}}}})
+	  end;
+      'Register' ->
+	  try d_msg_Register(Bin, TrUserData) catch
+	    Class:Reason ->
+		StackTrace = erlang:get_stacktrace(),
+		error({gpb_error,
+		       {decoding_failure,
+			{Bin, 'Register', {Class, Reason, StackTrace}}}})
+	  end;
       'Login' ->
 	  try d_msg_Login(Bin, TrUserData) catch
 	    Class:Reason ->
@@ -343,14 +369,6 @@ decode_msg(Bin, MsgName, Opts) when is_binary(Bin) ->
 		error({gpb_error,
 		       {decoding_failure,
 			{Bin, 'Login', {Class, Reason, StackTrace}}}})
-	  end;
-      'CreateGroup' ->
-	  try d_msg_CreateGroup(Bin, TrUserData) catch
-	    Class:Reason ->
-		StackTrace = erlang:get_stacktrace(),
-		error({gpb_error,
-		       {decoding_failure,
-			{Bin, 'CreateGroup', {Class, Reason, StackTrace}}}})
 	  end;
       'TorrentWrapper' ->
 	  try d_msg_TorrentWrapper(Bin, TrUserData) catch
@@ -360,13 +378,13 @@ decode_msg(Bin, MsgName, Opts) when is_binary(Bin) ->
 		       {decoding_failure,
 			{Bin, 'TorrentWrapper', {Class, Reason, StackTrace}}}})
 	  end;
-      'JoinGroup' ->
-	  try d_msg_JoinGroup(Bin, TrUserData) catch
+      'CreateGroup' ->
+	  try d_msg_CreateGroup(Bin, TrUserData) catch
 	    Class:Reason ->
 		StackTrace = erlang:get_stacktrace(),
 		error({gpb_error,
 		       {decoding_failure,
-			{Bin, 'JoinGroup', {Class, Reason, StackTrace}}}})
+			{Bin, 'CreateGroup', {Class, Reason, StackTrace}}}})
 	  end;
       'Response' ->
 	  try d_msg_Response(Bin, TrUserData) catch
@@ -375,14 +393,6 @@ decode_msg(Bin, MsgName, Opts) when is_binary(Bin) ->
 		error({gpb_error,
 		       {decoding_failure,
 			{Bin, 'Response', {Class, Reason, StackTrace}}}})
-	  end;
-      'Register' ->
-	  try d_msg_Register(Bin, TrUserData) catch
-	    Class:Reason ->
-		StackTrace = erlang:get_stacktrace(),
-		error({gpb_error,
-		       {decoding_failure,
-			{Bin, 'Register', {Class, Reason, StackTrace}}}})
 	  end;
       'ClientMessage' ->
 	  try d_msg_ClientMessage(Bin, TrUserData) catch
@@ -395,352 +405,6 @@ decode_msg(Bin, MsgName, Opts) when is_binary(Bin) ->
     end.
 
 
-
-d_msg_Login(Bin, TrUserData) ->
-    dfp_read_field_def_Login(Bin, 0, 0,
-			     id(<<>>, TrUserData), id(<<>>, TrUserData),
-			     TrUserData).
-
-dfp_read_field_def_Login(<<10, Rest/binary>>, Z1, Z2,
-			 F@_1, F@_2, TrUserData) ->
-    d_field_Login_username(Rest, Z1, Z2, F@_1, F@_2,
-			   TrUserData);
-dfp_read_field_def_Login(<<18, Rest/binary>>, Z1, Z2,
-			 F@_1, F@_2, TrUserData) ->
-    d_field_Login_password(Rest, Z1, Z2, F@_1, F@_2,
-			   TrUserData);
-dfp_read_field_def_Login(<<>>, 0, 0, F@_1, F@_2, _) ->
-    #'Login'{username = F@_1, password = F@_2};
-dfp_read_field_def_Login(Other, Z1, Z2, F@_1, F@_2,
-			 TrUserData) ->
-    dg_read_field_def_Login(Other, Z1, Z2, F@_1, F@_2,
-			    TrUserData).
-
-dg_read_field_def_Login(<<1:1, X:7, Rest/binary>>, N,
-			Acc, F@_1, F@_2, TrUserData)
-    when N < 32 - 7 ->
-    dg_read_field_def_Login(Rest, N + 7, X bsl N + Acc,
-			    F@_1, F@_2, TrUserData);
-dg_read_field_def_Login(<<0:1, X:7, Rest/binary>>, N,
-			Acc, F@_1, F@_2, TrUserData) ->
-    Key = X bsl N + Acc,
-    case Key of
-      10 ->
-	  d_field_Login_username(Rest, 0, 0, F@_1, F@_2,
-				 TrUserData);
-      18 ->
-	  d_field_Login_password(Rest, 0, 0, F@_1, F@_2,
-				 TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_Login(Rest, 0, 0, F@_1, F@_2, TrUserData);
-	    1 -> skip_64_Login(Rest, 0, 0, F@_1, F@_2, TrUserData);
-	    2 ->
-		skip_length_delimited_Login(Rest, 0, 0, F@_1, F@_2,
-					    TrUserData);
-	    3 ->
-		skip_group_Login(Rest, Key bsr 3, 0, F@_1, F@_2,
-				 TrUserData);
-	    5 -> skip_32_Login(Rest, 0, 0, F@_1, F@_2, TrUserData)
-	  end
-    end;
-dg_read_field_def_Login(<<>>, 0, 0, F@_1, F@_2, _) ->
-    #'Login'{username = F@_1, password = F@_2}.
-
-d_field_Login_username(<<1:1, X:7, Rest/binary>>, N,
-		       Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
-    d_field_Login_username(Rest, N + 7, X bsl N + Acc, F@_1,
-			   F@_2, TrUserData);
-d_field_Login_username(<<0:1, X:7, Rest/binary>>, N,
-		       Acc, _, F@_2, TrUserData) ->
-    {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
-			   {binary:copy(Bytes), Rest2}
-			 end,
-    dfp_read_field_def_Login(RestF, 0, 0, NewFValue, F@_2,
-			     TrUserData).
-
-d_field_Login_password(<<1:1, X:7, Rest/binary>>, N,
-		       Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
-    d_field_Login_password(Rest, N + 7, X bsl N + Acc, F@_1,
-			   F@_2, TrUserData);
-d_field_Login_password(<<0:1, X:7, Rest/binary>>, N,
-		       Acc, F@_1, _, TrUserData) ->
-    {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
-			   {binary:copy(Bytes), Rest2}
-			 end,
-    dfp_read_field_def_Login(RestF, 0, 0, F@_1, NewFValue,
-			     TrUserData).
-
-skip_varint_Login(<<1:1, _:7, Rest/binary>>, Z1, Z2,
-		  F@_1, F@_2, TrUserData) ->
-    skip_varint_Login(Rest, Z1, Z2, F@_1, F@_2, TrUserData);
-skip_varint_Login(<<0:1, _:7, Rest/binary>>, Z1, Z2,
-		  F@_1, F@_2, TrUserData) ->
-    dfp_read_field_def_Login(Rest, Z1, Z2, F@_1, F@_2,
-			     TrUserData).
-
-skip_length_delimited_Login(<<1:1, X:7, Rest/binary>>,
-			    N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
-    skip_length_delimited_Login(Rest, N + 7, X bsl N + Acc,
-				F@_1, F@_2, TrUserData);
-skip_length_delimited_Login(<<0:1, X:7, Rest/binary>>,
-			    N, Acc, F@_1, F@_2, TrUserData) ->
-    Length = X bsl N + Acc,
-    <<_:Length/binary, Rest2/binary>> = Rest,
-    dfp_read_field_def_Login(Rest2, 0, 0, F@_1, F@_2,
-			     TrUserData).
-
-skip_group_Login(Bin, FNum, Z2, F@_1, F@_2,
-		 TrUserData) ->
-    {_, Rest} = read_group(Bin, FNum),
-    dfp_read_field_def_Login(Rest, 0, Z2, F@_1, F@_2,
-			     TrUserData).
-
-skip_32_Login(<<_:32, Rest/binary>>, Z1, Z2, F@_1, F@_2,
-	      TrUserData) ->
-    dfp_read_field_def_Login(Rest, Z1, Z2, F@_1, F@_2,
-			     TrUserData).
-
-skip_64_Login(<<_:64, Rest/binary>>, Z1, Z2, F@_1, F@_2,
-	      TrUserData) ->
-    dfp_read_field_def_Login(Rest, Z1, Z2, F@_1, F@_2,
-			     TrUserData).
-
-d_msg_CreateGroup(Bin, TrUserData) ->
-    dfp_read_field_def_CreateGroup(Bin, 0, 0,
-				   id(<<>>, TrUserData), TrUserData).
-
-dfp_read_field_def_CreateGroup(<<10, Rest/binary>>, Z1,
-			       Z2, F@_1, TrUserData) ->
-    d_field_CreateGroup_group(Rest, Z1, Z2, F@_1,
-			      TrUserData);
-dfp_read_field_def_CreateGroup(<<>>, 0, 0, F@_1, _) ->
-    #'CreateGroup'{group = F@_1};
-dfp_read_field_def_CreateGroup(Other, Z1, Z2, F@_1,
-			       TrUserData) ->
-    dg_read_field_def_CreateGroup(Other, Z1, Z2, F@_1,
-				  TrUserData).
-
-dg_read_field_def_CreateGroup(<<1:1, X:7, Rest/binary>>,
-			      N, Acc, F@_1, TrUserData)
-    when N < 32 - 7 ->
-    dg_read_field_def_CreateGroup(Rest, N + 7,
-				  X bsl N + Acc, F@_1, TrUserData);
-dg_read_field_def_CreateGroup(<<0:1, X:7, Rest/binary>>,
-			      N, Acc, F@_1, TrUserData) ->
-    Key = X bsl N + Acc,
-    case Key of
-      10 ->
-	  d_field_CreateGroup_group(Rest, 0, 0, F@_1, TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_CreateGroup(Rest, 0, 0, F@_1, TrUserData);
-	    1 -> skip_64_CreateGroup(Rest, 0, 0, F@_1, TrUserData);
-	    2 ->
-		skip_length_delimited_CreateGroup(Rest, 0, 0, F@_1,
-						  TrUserData);
-	    3 ->
-		skip_group_CreateGroup(Rest, Key bsr 3, 0, F@_1,
-				       TrUserData);
-	    5 -> skip_32_CreateGroup(Rest, 0, 0, F@_1, TrUserData)
-	  end
-    end;
-dg_read_field_def_CreateGroup(<<>>, 0, 0, F@_1, _) ->
-    #'CreateGroup'{group = F@_1}.
-
-d_field_CreateGroup_group(<<1:1, X:7, Rest/binary>>, N,
-			  Acc, F@_1, TrUserData)
-    when N < 57 ->
-    d_field_CreateGroup_group(Rest, N + 7, X bsl N + Acc,
-			      F@_1, TrUserData);
-d_field_CreateGroup_group(<<0:1, X:7, Rest/binary>>, N,
-			  Acc, _, TrUserData) ->
-    {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
-			   {binary:copy(Bytes), Rest2}
-			 end,
-    dfp_read_field_def_CreateGroup(RestF, 0, 0, NewFValue,
-				   TrUserData).
-
-skip_varint_CreateGroup(<<1:1, _:7, Rest/binary>>, Z1,
-			Z2, F@_1, TrUserData) ->
-    skip_varint_CreateGroup(Rest, Z1, Z2, F@_1, TrUserData);
-skip_varint_CreateGroup(<<0:1, _:7, Rest/binary>>, Z1,
-			Z2, F@_1, TrUserData) ->
-    dfp_read_field_def_CreateGroup(Rest, Z1, Z2, F@_1,
-				   TrUserData).
-
-skip_length_delimited_CreateGroup(<<1:1, X:7,
-				    Rest/binary>>,
-				  N, Acc, F@_1, TrUserData)
-    when N < 57 ->
-    skip_length_delimited_CreateGroup(Rest, N + 7,
-				      X bsl N + Acc, F@_1, TrUserData);
-skip_length_delimited_CreateGroup(<<0:1, X:7,
-				    Rest/binary>>,
-				  N, Acc, F@_1, TrUserData) ->
-    Length = X bsl N + Acc,
-    <<_:Length/binary, Rest2/binary>> = Rest,
-    dfp_read_field_def_CreateGroup(Rest2, 0, 0, F@_1,
-				   TrUserData).
-
-skip_group_CreateGroup(Bin, FNum, Z2, F@_1,
-		       TrUserData) ->
-    {_, Rest} = read_group(Bin, FNum),
-    dfp_read_field_def_CreateGroup(Rest, 0, Z2, F@_1,
-				   TrUserData).
-
-skip_32_CreateGroup(<<_:32, Rest/binary>>, Z1, Z2, F@_1,
-		    TrUserData) ->
-    dfp_read_field_def_CreateGroup(Rest, Z1, Z2, F@_1,
-				   TrUserData).
-
-skip_64_CreateGroup(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
-		    TrUserData) ->
-    dfp_read_field_def_CreateGroup(Rest, Z1, Z2, F@_1,
-				   TrUserData).
-
-d_msg_TorrentWrapper(Bin, TrUserData) ->
-    dfp_read_field_def_TorrentWrapper(Bin, 0, 0,
-				      id(<<>>, TrUserData),
-				      id(<<>>, TrUserData), TrUserData).
-
-dfp_read_field_def_TorrentWrapper(<<10, Rest/binary>>,
-				  Z1, Z2, F@_1, F@_2, TrUserData) ->
-    d_field_TorrentWrapper_group(Rest, Z1, Z2, F@_1, F@_2,
-				 TrUserData);
-dfp_read_field_def_TorrentWrapper(<<18, Rest/binary>>,
-				  Z1, Z2, F@_1, F@_2, TrUserData) ->
-    d_field_TorrentWrapper_content(Rest, Z1, Z2, F@_1, F@_2,
-				   TrUserData);
-dfp_read_field_def_TorrentWrapper(<<>>, 0, 0, F@_1,
-				  F@_2, _) ->
-    #'TorrentWrapper'{group = F@_1, content = F@_2};
-dfp_read_field_def_TorrentWrapper(Other, Z1, Z2, F@_1,
-				  F@_2, TrUserData) ->
-    dg_read_field_def_TorrentWrapper(Other, Z1, Z2, F@_1,
-				     F@_2, TrUserData).
-
-dg_read_field_def_TorrentWrapper(<<1:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, F@_1, F@_2, TrUserData)
-    when N < 32 - 7 ->
-    dg_read_field_def_TorrentWrapper(Rest, N + 7,
-				     X bsl N + Acc, F@_1, F@_2, TrUserData);
-dg_read_field_def_TorrentWrapper(<<0:1, X:7,
-				   Rest/binary>>,
-				 N, Acc, F@_1, F@_2, TrUserData) ->
-    Key = X bsl N + Acc,
-    case Key of
-      10 ->
-	  d_field_TorrentWrapper_group(Rest, 0, 0, F@_1, F@_2,
-				       TrUserData);
-      18 ->
-	  d_field_TorrentWrapper_content(Rest, 0, 0, F@_1, F@_2,
-					 TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_TorrentWrapper(Rest, 0, 0, F@_1, F@_2,
-					   TrUserData);
-	    1 ->
-		skip_64_TorrentWrapper(Rest, 0, 0, F@_1, F@_2,
-				       TrUserData);
-	    2 ->
-		skip_length_delimited_TorrentWrapper(Rest, 0, 0, F@_1,
-						     F@_2, TrUserData);
-	    3 ->
-		skip_group_TorrentWrapper(Rest, Key bsr 3, 0, F@_1,
-					  F@_2, TrUserData);
-	    5 ->
-		skip_32_TorrentWrapper(Rest, 0, 0, F@_1, F@_2,
-				       TrUserData)
-	  end
-    end;
-dg_read_field_def_TorrentWrapper(<<>>, 0, 0, F@_1, F@_2,
-				 _) ->
-    #'TorrentWrapper'{group = F@_1, content = F@_2}.
-
-d_field_TorrentWrapper_group(<<1:1, X:7, Rest/binary>>,
-			     N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
-    d_field_TorrentWrapper_group(Rest, N + 7, X bsl N + Acc,
-				 F@_1, F@_2, TrUserData);
-d_field_TorrentWrapper_group(<<0:1, X:7, Rest/binary>>,
-			     N, Acc, _, F@_2, TrUserData) ->
-    {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
-			   {binary:copy(Bytes), Rest2}
-			 end,
-    dfp_read_field_def_TorrentWrapper(RestF, 0, 0,
-				      NewFValue, F@_2, TrUserData).
-
-d_field_TorrentWrapper_content(<<1:1, X:7,
-				 Rest/binary>>,
-			       N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
-    d_field_TorrentWrapper_content(Rest, N + 7,
-				   X bsl N + Acc, F@_1, F@_2, TrUserData);
-d_field_TorrentWrapper_content(<<0:1, X:7,
-				 Rest/binary>>,
-			       N, Acc, F@_1, _, TrUserData) ->
-    {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
-			   {binary:copy(Bytes), Rest2}
-			 end,
-    dfp_read_field_def_TorrentWrapper(RestF, 0, 0, F@_1,
-				      NewFValue, TrUserData).
-
-skip_varint_TorrentWrapper(<<1:1, _:7, Rest/binary>>,
-			   Z1, Z2, F@_1, F@_2, TrUserData) ->
-    skip_varint_TorrentWrapper(Rest, Z1, Z2, F@_1, F@_2,
-			       TrUserData);
-skip_varint_TorrentWrapper(<<0:1, _:7, Rest/binary>>,
-			   Z1, Z2, F@_1, F@_2, TrUserData) ->
-    dfp_read_field_def_TorrentWrapper(Rest, Z1, Z2, F@_1,
-				      F@_2, TrUserData).
-
-skip_length_delimited_TorrentWrapper(<<1:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, F@_1, F@_2, TrUserData)
-    when N < 57 ->
-    skip_length_delimited_TorrentWrapper(Rest, N + 7,
-					 X bsl N + Acc, F@_1, F@_2, TrUserData);
-skip_length_delimited_TorrentWrapper(<<0:1, X:7,
-				       Rest/binary>>,
-				     N, Acc, F@_1, F@_2, TrUserData) ->
-    Length = X bsl N + Acc,
-    <<_:Length/binary, Rest2/binary>> = Rest,
-    dfp_read_field_def_TorrentWrapper(Rest2, 0, 0, F@_1,
-				      F@_2, TrUserData).
-
-skip_group_TorrentWrapper(Bin, FNum, Z2, F@_1, F@_2,
-			  TrUserData) ->
-    {_, Rest} = read_group(Bin, FNum),
-    dfp_read_field_def_TorrentWrapper(Rest, 0, Z2, F@_1,
-				      F@_2, TrUserData).
-
-skip_32_TorrentWrapper(<<_:32, Rest/binary>>, Z1, Z2,
-		       F@_1, F@_2, TrUserData) ->
-    dfp_read_field_def_TorrentWrapper(Rest, Z1, Z2, F@_1,
-				      F@_2, TrUserData).
-
-skip_64_TorrentWrapper(<<_:64, Rest/binary>>, Z1, Z2,
-		       F@_1, F@_2, TrUserData) ->
-    dfp_read_field_def_TorrentWrapper(Rest, Z1, Z2, F@_1,
-				      F@_2, TrUserData).
 
 d_msg_JoinGroup(Bin, TrUserData) ->
     dfp_read_field_def_JoinGroup(Bin, 0, 0,
@@ -835,94 +499,6 @@ skip_64_JoinGroup(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
 		  TrUserData) ->
     dfp_read_field_def_JoinGroup(Rest, Z1, Z2, F@_1,
 				 TrUserData).
-
-d_msg_Response(Bin, TrUserData) ->
-    dfp_read_field_def_Response(Bin, 0, 0,
-				id(false, TrUserData), TrUserData).
-
-dfp_read_field_def_Response(<<8, Rest/binary>>, Z1, Z2,
-			    F@_1, TrUserData) ->
-    d_field_Response_rep(Rest, Z1, Z2, F@_1, TrUserData);
-dfp_read_field_def_Response(<<>>, 0, 0, F@_1, _) ->
-    #'Response'{rep = F@_1};
-dfp_read_field_def_Response(Other, Z1, Z2, F@_1,
-			    TrUserData) ->
-    dg_read_field_def_Response(Other, Z1, Z2, F@_1,
-			       TrUserData).
-
-dg_read_field_def_Response(<<1:1, X:7, Rest/binary>>, N,
-			   Acc, F@_1, TrUserData)
-    when N < 32 - 7 ->
-    dg_read_field_def_Response(Rest, N + 7, X bsl N + Acc,
-			       F@_1, TrUserData);
-dg_read_field_def_Response(<<0:1, X:7, Rest/binary>>, N,
-			   Acc, F@_1, TrUserData) ->
-    Key = X bsl N + Acc,
-    case Key of
-      8 -> d_field_Response_rep(Rest, 0, 0, F@_1, TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 -> skip_varint_Response(Rest, 0, 0, F@_1, TrUserData);
-	    1 -> skip_64_Response(Rest, 0, 0, F@_1, TrUserData);
-	    2 ->
-		skip_length_delimited_Response(Rest, 0, 0, F@_1,
-					       TrUserData);
-	    3 ->
-		skip_group_Response(Rest, Key bsr 3, 0, F@_1,
-				    TrUserData);
-	    5 -> skip_32_Response(Rest, 0, 0, F@_1, TrUserData)
-	  end
-    end;
-dg_read_field_def_Response(<<>>, 0, 0, F@_1, _) ->
-    #'Response'{rep = F@_1}.
-
-d_field_Response_rep(<<1:1, X:7, Rest/binary>>, N, Acc,
-		     F@_1, TrUserData)
-    when N < 57 ->
-    d_field_Response_rep(Rest, N + 7, X bsl N + Acc, F@_1,
-			 TrUserData);
-d_field_Response_rep(<<0:1, X:7, Rest/binary>>, N, Acc,
-		     _, TrUserData) ->
-    {NewFValue, RestF} = {X bsl N + Acc =/= 0, Rest},
-    dfp_read_field_def_Response(RestF, 0, 0, NewFValue,
-				TrUserData).
-
-skip_varint_Response(<<1:1, _:7, Rest/binary>>, Z1, Z2,
-		     F@_1, TrUserData) ->
-    skip_varint_Response(Rest, Z1, Z2, F@_1, TrUserData);
-skip_varint_Response(<<0:1, _:7, Rest/binary>>, Z1, Z2,
-		     F@_1, TrUserData) ->
-    dfp_read_field_def_Response(Rest, Z1, Z2, F@_1,
-				TrUserData).
-
-skip_length_delimited_Response(<<1:1, X:7,
-				 Rest/binary>>,
-			       N, Acc, F@_1, TrUserData)
-    when N < 57 ->
-    skip_length_delimited_Response(Rest, N + 7,
-				   X bsl N + Acc, F@_1, TrUserData);
-skip_length_delimited_Response(<<0:1, X:7,
-				 Rest/binary>>,
-			       N, Acc, F@_1, TrUserData) ->
-    Length = X bsl N + Acc,
-    <<_:Length/binary, Rest2/binary>> = Rest,
-    dfp_read_field_def_Response(Rest2, 0, 0, F@_1,
-				TrUserData).
-
-skip_group_Response(Bin, FNum, Z2, F@_1, TrUserData) ->
-    {_, Rest} = read_group(Bin, FNum),
-    dfp_read_field_def_Response(Rest, 0, Z2, F@_1,
-				TrUserData).
-
-skip_32_Response(<<_:32, Rest/binary>>, Z1, Z2, F@_1,
-		 TrUserData) ->
-    dfp_read_field_def_Response(Rest, Z1, Z2, F@_1,
-				TrUserData).
-
-skip_64_Response(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
-		 TrUserData) ->
-    dfp_read_field_def_Response(Rest, Z1, Z2, F@_1,
-				TrUserData).
 
 d_msg_Register(Bin, TrUserData) ->
     dfp_read_field_def_Register(Bin, 0, 0,
@@ -1075,6 +651,467 @@ skip_64_Register(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
 		 F@_2, F@_3, TrUserData) ->
     dfp_read_field_def_Register(Rest, Z1, Z2, F@_1, F@_2,
 				F@_3, TrUserData).
+
+d_msg_Login(Bin, TrUserData) ->
+    dfp_read_field_def_Login(Bin, 0, 0,
+			     id(<<>>, TrUserData), id(<<>>, TrUserData),
+			     TrUserData).
+
+dfp_read_field_def_Login(<<10, Rest/binary>>, Z1, Z2,
+			 F@_1, F@_2, TrUserData) ->
+    d_field_Login_username(Rest, Z1, Z2, F@_1, F@_2,
+			   TrUserData);
+dfp_read_field_def_Login(<<18, Rest/binary>>, Z1, Z2,
+			 F@_1, F@_2, TrUserData) ->
+    d_field_Login_password(Rest, Z1, Z2, F@_1, F@_2,
+			   TrUserData);
+dfp_read_field_def_Login(<<>>, 0, 0, F@_1, F@_2, _) ->
+    #'Login'{username = F@_1, password = F@_2};
+dfp_read_field_def_Login(Other, Z1, Z2, F@_1, F@_2,
+			 TrUserData) ->
+    dg_read_field_def_Login(Other, Z1, Z2, F@_1, F@_2,
+			    TrUserData).
+
+dg_read_field_def_Login(<<1:1, X:7, Rest/binary>>, N,
+			Acc, F@_1, F@_2, TrUserData)
+    when N < 32 - 7 ->
+    dg_read_field_def_Login(Rest, N + 7, X bsl N + Acc,
+			    F@_1, F@_2, TrUserData);
+dg_read_field_def_Login(<<0:1, X:7, Rest/binary>>, N,
+			Acc, F@_1, F@_2, TrUserData) ->
+    Key = X bsl N + Acc,
+    case Key of
+      10 ->
+	  d_field_Login_username(Rest, 0, 0, F@_1, F@_2,
+				 TrUserData);
+      18 ->
+	  d_field_Login_password(Rest, 0, 0, F@_1, F@_2,
+				 TrUserData);
+      _ ->
+	  case Key band 7 of
+	    0 ->
+		skip_varint_Login(Rest, 0, 0, F@_1, F@_2, TrUserData);
+	    1 -> skip_64_Login(Rest, 0, 0, F@_1, F@_2, TrUserData);
+	    2 ->
+		skip_length_delimited_Login(Rest, 0, 0, F@_1, F@_2,
+					    TrUserData);
+	    3 ->
+		skip_group_Login(Rest, Key bsr 3, 0, F@_1, F@_2,
+				 TrUserData);
+	    5 -> skip_32_Login(Rest, 0, 0, F@_1, F@_2, TrUserData)
+	  end
+    end;
+dg_read_field_def_Login(<<>>, 0, 0, F@_1, F@_2, _) ->
+    #'Login'{username = F@_1, password = F@_2}.
+
+d_field_Login_username(<<1:1, X:7, Rest/binary>>, N,
+		       Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    d_field_Login_username(Rest, N + 7, X bsl N + Acc, F@_1,
+			   F@_2, TrUserData);
+d_field_Login_username(<<0:1, X:7, Rest/binary>>, N,
+		       Acc, _, F@_2, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
+			   {binary:copy(Bytes), Rest2}
+			 end,
+    dfp_read_field_def_Login(RestF, 0, 0, NewFValue, F@_2,
+			     TrUserData).
+
+d_field_Login_password(<<1:1, X:7, Rest/binary>>, N,
+		       Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    d_field_Login_password(Rest, N + 7, X bsl N + Acc, F@_1,
+			   F@_2, TrUserData);
+d_field_Login_password(<<0:1, X:7, Rest/binary>>, N,
+		       Acc, F@_1, _, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
+			   {binary:copy(Bytes), Rest2}
+			 end,
+    dfp_read_field_def_Login(RestF, 0, 0, F@_1, NewFValue,
+			     TrUserData).
+
+skip_varint_Login(<<1:1, _:7, Rest/binary>>, Z1, Z2,
+		  F@_1, F@_2, TrUserData) ->
+    skip_varint_Login(Rest, Z1, Z2, F@_1, F@_2, TrUserData);
+skip_varint_Login(<<0:1, _:7, Rest/binary>>, Z1, Z2,
+		  F@_1, F@_2, TrUserData) ->
+    dfp_read_field_def_Login(Rest, Z1, Z2, F@_1, F@_2,
+			     TrUserData).
+
+skip_length_delimited_Login(<<1:1, X:7, Rest/binary>>,
+			    N, Acc, F@_1, F@_2, TrUserData)
+    when N < 57 ->
+    skip_length_delimited_Login(Rest, N + 7, X bsl N + Acc,
+				F@_1, F@_2, TrUserData);
+skip_length_delimited_Login(<<0:1, X:7, Rest/binary>>,
+			    N, Acc, F@_1, F@_2, TrUserData) ->
+    Length = X bsl N + Acc,
+    <<_:Length/binary, Rest2/binary>> = Rest,
+    dfp_read_field_def_Login(Rest2, 0, 0, F@_1, F@_2,
+			     TrUserData).
+
+skip_group_Login(Bin, FNum, Z2, F@_1, F@_2,
+		 TrUserData) ->
+    {_, Rest} = read_group(Bin, FNum),
+    dfp_read_field_def_Login(Rest, 0, Z2, F@_1, F@_2,
+			     TrUserData).
+
+skip_32_Login(<<_:32, Rest/binary>>, Z1, Z2, F@_1, F@_2,
+	      TrUserData) ->
+    dfp_read_field_def_Login(Rest, Z1, Z2, F@_1, F@_2,
+			     TrUserData).
+
+skip_64_Login(<<_:64, Rest/binary>>, Z1, Z2, F@_1, F@_2,
+	      TrUserData) ->
+    dfp_read_field_def_Login(Rest, Z1, Z2, F@_1, F@_2,
+			     TrUserData).
+
+d_msg_TorrentWrapper(Bin, TrUserData) ->
+    dfp_read_field_def_TorrentWrapper(Bin, 0, 0,
+				      id(<<>>, TrUserData),
+				      id(<<>>, TrUserData),
+				      id(<<>>, TrUserData), TrUserData).
+
+dfp_read_field_def_TorrentWrapper(<<10, Rest/binary>>,
+				  Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    d_field_TorrentWrapper_group(Rest, Z1, Z2, F@_1, F@_2,
+				 F@_3, TrUserData);
+dfp_read_field_def_TorrentWrapper(<<18, Rest/binary>>,
+				  Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    d_field_TorrentWrapper_content(Rest, Z1, Z2, F@_1, F@_2,
+				   F@_3, TrUserData);
+dfp_read_field_def_TorrentWrapper(<<26, Rest/binary>>,
+				  Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    d_field_TorrentWrapper_id(Rest, Z1, Z2, F@_1, F@_2,
+			      F@_3, TrUserData);
+dfp_read_field_def_TorrentWrapper(<<>>, 0, 0, F@_1,
+				  F@_2, F@_3, _) ->
+    #'TorrentWrapper'{group = F@_1, content = F@_2,
+		      id = F@_3};
+dfp_read_field_def_TorrentWrapper(Other, Z1, Z2, F@_1,
+				  F@_2, F@_3, TrUserData) ->
+    dg_read_field_def_TorrentWrapper(Other, Z1, Z2, F@_1,
+				     F@_2, F@_3, TrUserData).
+
+dg_read_field_def_TorrentWrapper(<<1:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 32 - 7 ->
+    dg_read_field_def_TorrentWrapper(Rest, N + 7,
+				     X bsl N + Acc, F@_1, F@_2, F@_3,
+				     TrUserData);
+dg_read_field_def_TorrentWrapper(<<0:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, F@_1, F@_2, F@_3, TrUserData) ->
+    Key = X bsl N + Acc,
+    case Key of
+      10 ->
+	  d_field_TorrentWrapper_group(Rest, 0, 0, F@_1, F@_2,
+				       F@_3, TrUserData);
+      18 ->
+	  d_field_TorrentWrapper_content(Rest, 0, 0, F@_1, F@_2,
+					 F@_3, TrUserData);
+      26 ->
+	  d_field_TorrentWrapper_id(Rest, 0, 0, F@_1, F@_2, F@_3,
+				    TrUserData);
+      _ ->
+	  case Key band 7 of
+	    0 ->
+		skip_varint_TorrentWrapper(Rest, 0, 0, F@_1, F@_2, F@_3,
+					   TrUserData);
+	    1 ->
+		skip_64_TorrentWrapper(Rest, 0, 0, F@_1, F@_2, F@_3,
+				       TrUserData);
+	    2 ->
+		skip_length_delimited_TorrentWrapper(Rest, 0, 0, F@_1,
+						     F@_2, F@_3, TrUserData);
+	    3 ->
+		skip_group_TorrentWrapper(Rest, Key bsr 3, 0, F@_1,
+					  F@_2, F@_3, TrUserData);
+	    5 ->
+		skip_32_TorrentWrapper(Rest, 0, 0, F@_1, F@_2, F@_3,
+				       TrUserData)
+	  end
+    end;
+dg_read_field_def_TorrentWrapper(<<>>, 0, 0, F@_1, F@_2,
+				 F@_3, _) ->
+    #'TorrentWrapper'{group = F@_1, content = F@_2,
+		      id = F@_3}.
+
+d_field_TorrentWrapper_group(<<1:1, X:7, Rest/binary>>,
+			     N, Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 57 ->
+    d_field_TorrentWrapper_group(Rest, N + 7, X bsl N + Acc,
+				 F@_1, F@_2, F@_3, TrUserData);
+d_field_TorrentWrapper_group(<<0:1, X:7, Rest/binary>>,
+			     N, Acc, _, F@_2, F@_3, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
+			   {binary:copy(Bytes), Rest2}
+			 end,
+    dfp_read_field_def_TorrentWrapper(RestF, 0, 0,
+				      NewFValue, F@_2, F@_3, TrUserData).
+
+d_field_TorrentWrapper_content(<<1:1, X:7,
+				 Rest/binary>>,
+			       N, Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 57 ->
+    d_field_TorrentWrapper_content(Rest, N + 7,
+				   X bsl N + Acc, F@_1, F@_2, F@_3, TrUserData);
+d_field_TorrentWrapper_content(<<0:1, X:7,
+				 Rest/binary>>,
+			       N, Acc, F@_1, _, F@_3, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
+			   {binary:copy(Bytes), Rest2}
+			 end,
+    dfp_read_field_def_TorrentWrapper(RestF, 0, 0, F@_1,
+				      NewFValue, F@_3, TrUserData).
+
+d_field_TorrentWrapper_id(<<1:1, X:7, Rest/binary>>, N,
+			  Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 57 ->
+    d_field_TorrentWrapper_id(Rest, N + 7, X bsl N + Acc,
+			      F@_1, F@_2, F@_3, TrUserData);
+d_field_TorrentWrapper_id(<<0:1, X:7, Rest/binary>>, N,
+			  Acc, F@_1, F@_2, _, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
+			   {binary:copy(Bytes), Rest2}
+			 end,
+    dfp_read_field_def_TorrentWrapper(RestF, 0, 0, F@_1,
+				      F@_2, NewFValue, TrUserData).
+
+skip_varint_TorrentWrapper(<<1:1, _:7, Rest/binary>>,
+			   Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    skip_varint_TorrentWrapper(Rest, Z1, Z2, F@_1, F@_2,
+			       F@_3, TrUserData);
+skip_varint_TorrentWrapper(<<0:1, _:7, Rest/binary>>,
+			   Z1, Z2, F@_1, F@_2, F@_3, TrUserData) ->
+    dfp_read_field_def_TorrentWrapper(Rest, Z1, Z2, F@_1,
+				      F@_2, F@_3, TrUserData).
+
+skip_length_delimited_TorrentWrapper(<<1:1, X:7,
+				       Rest/binary>>,
+				     N, Acc, F@_1, F@_2, F@_3, TrUserData)
+    when N < 57 ->
+    skip_length_delimited_TorrentWrapper(Rest, N + 7,
+					 X bsl N + Acc, F@_1, F@_2, F@_3,
+					 TrUserData);
+skip_length_delimited_TorrentWrapper(<<0:1, X:7,
+				       Rest/binary>>,
+				     N, Acc, F@_1, F@_2, F@_3, TrUserData) ->
+    Length = X bsl N + Acc,
+    <<_:Length/binary, Rest2/binary>> = Rest,
+    dfp_read_field_def_TorrentWrapper(Rest2, 0, 0, F@_1,
+				      F@_2, F@_3, TrUserData).
+
+skip_group_TorrentWrapper(Bin, FNum, Z2, F@_1, F@_2,
+			  F@_3, TrUserData) ->
+    {_, Rest} = read_group(Bin, FNum),
+    dfp_read_field_def_TorrentWrapper(Rest, 0, Z2, F@_1,
+				      F@_2, F@_3, TrUserData).
+
+skip_32_TorrentWrapper(<<_:32, Rest/binary>>, Z1, Z2,
+		       F@_1, F@_2, F@_3, TrUserData) ->
+    dfp_read_field_def_TorrentWrapper(Rest, Z1, Z2, F@_1,
+				      F@_2, F@_3, TrUserData).
+
+skip_64_TorrentWrapper(<<_:64, Rest/binary>>, Z1, Z2,
+		       F@_1, F@_2, F@_3, TrUserData) ->
+    dfp_read_field_def_TorrentWrapper(Rest, Z1, Z2, F@_1,
+				      F@_2, F@_3, TrUserData).
+
+d_msg_CreateGroup(Bin, TrUserData) ->
+    dfp_read_field_def_CreateGroup(Bin, 0, 0,
+				   id(<<>>, TrUserData), TrUserData).
+
+dfp_read_field_def_CreateGroup(<<10, Rest/binary>>, Z1,
+			       Z2, F@_1, TrUserData) ->
+    d_field_CreateGroup_group(Rest, Z1, Z2, F@_1,
+			      TrUserData);
+dfp_read_field_def_CreateGroup(<<>>, 0, 0, F@_1, _) ->
+    #'CreateGroup'{group = F@_1};
+dfp_read_field_def_CreateGroup(Other, Z1, Z2, F@_1,
+			       TrUserData) ->
+    dg_read_field_def_CreateGroup(Other, Z1, Z2, F@_1,
+				  TrUserData).
+
+dg_read_field_def_CreateGroup(<<1:1, X:7, Rest/binary>>,
+			      N, Acc, F@_1, TrUserData)
+    when N < 32 - 7 ->
+    dg_read_field_def_CreateGroup(Rest, N + 7,
+				  X bsl N + Acc, F@_1, TrUserData);
+dg_read_field_def_CreateGroup(<<0:1, X:7, Rest/binary>>,
+			      N, Acc, F@_1, TrUserData) ->
+    Key = X bsl N + Acc,
+    case Key of
+      10 ->
+	  d_field_CreateGroup_group(Rest, 0, 0, F@_1, TrUserData);
+      _ ->
+	  case Key band 7 of
+	    0 ->
+		skip_varint_CreateGroup(Rest, 0, 0, F@_1, TrUserData);
+	    1 -> skip_64_CreateGroup(Rest, 0, 0, F@_1, TrUserData);
+	    2 ->
+		skip_length_delimited_CreateGroup(Rest, 0, 0, F@_1,
+						  TrUserData);
+	    3 ->
+		skip_group_CreateGroup(Rest, Key bsr 3, 0, F@_1,
+				       TrUserData);
+	    5 -> skip_32_CreateGroup(Rest, 0, 0, F@_1, TrUserData)
+	  end
+    end;
+dg_read_field_def_CreateGroup(<<>>, 0, 0, F@_1, _) ->
+    #'CreateGroup'{group = F@_1}.
+
+d_field_CreateGroup_group(<<1:1, X:7, Rest/binary>>, N,
+			  Acc, F@_1, TrUserData)
+    when N < 57 ->
+    d_field_CreateGroup_group(Rest, N + 7, X bsl N + Acc,
+			      F@_1, TrUserData);
+d_field_CreateGroup_group(<<0:1, X:7, Rest/binary>>, N,
+			  Acc, _, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
+			   {binary:copy(Bytes), Rest2}
+			 end,
+    dfp_read_field_def_CreateGroup(RestF, 0, 0, NewFValue,
+				   TrUserData).
+
+skip_varint_CreateGroup(<<1:1, _:7, Rest/binary>>, Z1,
+			Z2, F@_1, TrUserData) ->
+    skip_varint_CreateGroup(Rest, Z1, Z2, F@_1, TrUserData);
+skip_varint_CreateGroup(<<0:1, _:7, Rest/binary>>, Z1,
+			Z2, F@_1, TrUserData) ->
+    dfp_read_field_def_CreateGroup(Rest, Z1, Z2, F@_1,
+				   TrUserData).
+
+skip_length_delimited_CreateGroup(<<1:1, X:7,
+				    Rest/binary>>,
+				  N, Acc, F@_1, TrUserData)
+    when N < 57 ->
+    skip_length_delimited_CreateGroup(Rest, N + 7,
+				      X bsl N + Acc, F@_1, TrUserData);
+skip_length_delimited_CreateGroup(<<0:1, X:7,
+				    Rest/binary>>,
+				  N, Acc, F@_1, TrUserData) ->
+    Length = X bsl N + Acc,
+    <<_:Length/binary, Rest2/binary>> = Rest,
+    dfp_read_field_def_CreateGroup(Rest2, 0, 0, F@_1,
+				   TrUserData).
+
+skip_group_CreateGroup(Bin, FNum, Z2, F@_1,
+		       TrUserData) ->
+    {_, Rest} = read_group(Bin, FNum),
+    dfp_read_field_def_CreateGroup(Rest, 0, Z2, F@_1,
+				   TrUserData).
+
+skip_32_CreateGroup(<<_:32, Rest/binary>>, Z1, Z2, F@_1,
+		    TrUserData) ->
+    dfp_read_field_def_CreateGroup(Rest, Z1, Z2, F@_1,
+				   TrUserData).
+
+skip_64_CreateGroup(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
+		    TrUserData) ->
+    dfp_read_field_def_CreateGroup(Rest, Z1, Z2, F@_1,
+				   TrUserData).
+
+d_msg_Response(Bin, TrUserData) ->
+    dfp_read_field_def_Response(Bin, 0, 0,
+				id(false, TrUserData), TrUserData).
+
+dfp_read_field_def_Response(<<8, Rest/binary>>, Z1, Z2,
+			    F@_1, TrUserData) ->
+    d_field_Response_rep(Rest, Z1, Z2, F@_1, TrUserData);
+dfp_read_field_def_Response(<<>>, 0, 0, F@_1, _) ->
+    #'Response'{rep = F@_1};
+dfp_read_field_def_Response(Other, Z1, Z2, F@_1,
+			    TrUserData) ->
+    dg_read_field_def_Response(Other, Z1, Z2, F@_1,
+			       TrUserData).
+
+dg_read_field_def_Response(<<1:1, X:7, Rest/binary>>, N,
+			   Acc, F@_1, TrUserData)
+    when N < 32 - 7 ->
+    dg_read_field_def_Response(Rest, N + 7, X bsl N + Acc,
+			       F@_1, TrUserData);
+dg_read_field_def_Response(<<0:1, X:7, Rest/binary>>, N,
+			   Acc, F@_1, TrUserData) ->
+    Key = X bsl N + Acc,
+    case Key of
+      8 -> d_field_Response_rep(Rest, 0, 0, F@_1, TrUserData);
+      _ ->
+	  case Key band 7 of
+	    0 -> skip_varint_Response(Rest, 0, 0, F@_1, TrUserData);
+	    1 -> skip_64_Response(Rest, 0, 0, F@_1, TrUserData);
+	    2 ->
+		skip_length_delimited_Response(Rest, 0, 0, F@_1,
+					       TrUserData);
+	    3 ->
+		skip_group_Response(Rest, Key bsr 3, 0, F@_1,
+				    TrUserData);
+	    5 -> skip_32_Response(Rest, 0, 0, F@_1, TrUserData)
+	  end
+    end;
+dg_read_field_def_Response(<<>>, 0, 0, F@_1, _) ->
+    #'Response'{rep = F@_1}.
+
+d_field_Response_rep(<<1:1, X:7, Rest/binary>>, N, Acc,
+		     F@_1, TrUserData)
+    when N < 57 ->
+    d_field_Response_rep(Rest, N + 7, X bsl N + Acc, F@_1,
+			 TrUserData);
+d_field_Response_rep(<<0:1, X:7, Rest/binary>>, N, Acc,
+		     _, TrUserData) ->
+    {NewFValue, RestF} = {X bsl N + Acc =/= 0, Rest},
+    dfp_read_field_def_Response(RestF, 0, 0, NewFValue,
+				TrUserData).
+
+skip_varint_Response(<<1:1, _:7, Rest/binary>>, Z1, Z2,
+		     F@_1, TrUserData) ->
+    skip_varint_Response(Rest, Z1, Z2, F@_1, TrUserData);
+skip_varint_Response(<<0:1, _:7, Rest/binary>>, Z1, Z2,
+		     F@_1, TrUserData) ->
+    dfp_read_field_def_Response(Rest, Z1, Z2, F@_1,
+				TrUserData).
+
+skip_length_delimited_Response(<<1:1, X:7,
+				 Rest/binary>>,
+			       N, Acc, F@_1, TrUserData)
+    when N < 57 ->
+    skip_length_delimited_Response(Rest, N + 7,
+				   X bsl N + Acc, F@_1, TrUserData);
+skip_length_delimited_Response(<<0:1, X:7,
+				 Rest/binary>>,
+			       N, Acc, F@_1, TrUserData) ->
+    Length = X bsl N + Acc,
+    <<_:Length/binary, Rest2/binary>> = Rest,
+    dfp_read_field_def_Response(Rest2, 0, 0, F@_1,
+				TrUserData).
+
+skip_group_Response(Bin, FNum, Z2, F@_1, TrUserData) ->
+    {_, Rest} = read_group(Bin, FNum),
+    dfp_read_field_def_Response(Rest, 0, Z2, F@_1,
+				TrUserData).
+
+skip_32_Response(<<_:32, Rest/binary>>, Z1, Z2, F@_1,
+		 TrUserData) ->
+    dfp_read_field_def_Response(Rest, Z1, Z2, F@_1,
+				TrUserData).
+
+skip_64_Response(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
+		 TrUserData) ->
+    dfp_read_field_def_Response(Rest, Z1, Z2, F@_1,
+				TrUserData).
 
 d_msg_ClientMessage(Bin, TrUserData) ->
     dfp_read_field_def_ClientMessage(Bin, 0, 0,
@@ -1420,55 +1457,20 @@ merge_msgs(Prev, New, Opts)
     when element(1, Prev) =:= element(1, New) ->
     TrUserData = proplists:get_value(user_data, Opts),
     case Prev of
-      #'Login'{} -> merge_msg_Login(Prev, New, TrUserData);
-      #'CreateGroup'{} ->
-	  merge_msg_CreateGroup(Prev, New, TrUserData);
-      #'TorrentWrapper'{} ->
-	  merge_msg_TorrentWrapper(Prev, New, TrUserData);
       #'JoinGroup'{} ->
 	  merge_msg_JoinGroup(Prev, New, TrUserData);
-      #'Response'{} ->
-	  merge_msg_Response(Prev, New, TrUserData);
       #'Register'{} ->
 	  merge_msg_Register(Prev, New, TrUserData);
+      #'Login'{} -> merge_msg_Login(Prev, New, TrUserData);
+      #'TorrentWrapper'{} ->
+	  merge_msg_TorrentWrapper(Prev, New, TrUserData);
+      #'CreateGroup'{} ->
+	  merge_msg_CreateGroup(Prev, New, TrUserData);
+      #'Response'{} ->
+	  merge_msg_Response(Prev, New, TrUserData);
       #'ClientMessage'{} ->
 	  merge_msg_ClientMessage(Prev, New, TrUserData)
     end.
-
-merge_msg_Login(#'Login'{username = PFusername,
-			 password = PFpassword},
-		#'Login'{username = NFusername, password = NFpassword},
-		_) ->
-    #'Login'{username =
-		 if NFusername =:= undefined -> PFusername;
-		    true -> NFusername
-		 end,
-	     password =
-		 if NFpassword =:= undefined -> PFpassword;
-		    true -> NFpassword
-		 end}.
-
-merge_msg_CreateGroup(#'CreateGroup'{group = PFgroup},
-		      #'CreateGroup'{group = NFgroup}, _) ->
-    #'CreateGroup'{group =
-		       if NFgroup =:= undefined -> PFgroup;
-			  true -> NFgroup
-		       end}.
-
-merge_msg_TorrentWrapper(#'TorrentWrapper'{group =
-					       PFgroup,
-					   content = PFcontent},
-			 #'TorrentWrapper'{group = NFgroup,
-					   content = NFcontent},
-			 _) ->
-    #'TorrentWrapper'{group =
-			  if NFgroup =:= undefined -> PFgroup;
-			     true -> NFgroup
-			  end,
-		      content =
-			  if NFcontent =:= undefined -> PFcontent;
-			     true -> NFcontent
-			  end}.
 
 merge_msg_JoinGroup(#'JoinGroup'{group = PFgroup},
 		    #'JoinGroup'{group = NFgroup}, _) ->
@@ -1476,13 +1478,6 @@ merge_msg_JoinGroup(#'JoinGroup'{group = PFgroup},
 		     if NFgroup =:= undefined -> PFgroup;
 			true -> NFgroup
 		     end}.
-
-merge_msg_Response(#'Response'{rep = PFrep},
-		   #'Response'{rep = NFrep}, _) ->
-    #'Response'{rep =
-		    if NFrep =:= undefined -> PFrep;
-		       true -> NFrep
-		    end}.
 
 merge_msg_Register(#'Register'{username = PFusername,
 			       password = PFpassword, name = PFname},
@@ -1500,6 +1495,52 @@ merge_msg_Register(#'Register'{username = PFusername,
 		name =
 		    if NFname =:= undefined -> PFname;
 		       true -> NFname
+		    end}.
+
+merge_msg_Login(#'Login'{username = PFusername,
+			 password = PFpassword},
+		#'Login'{username = NFusername, password = NFpassword},
+		_) ->
+    #'Login'{username =
+		 if NFusername =:= undefined -> PFusername;
+		    true -> NFusername
+		 end,
+	     password =
+		 if NFpassword =:= undefined -> PFpassword;
+		    true -> NFpassword
+		 end}.
+
+merge_msg_TorrentWrapper(#'TorrentWrapper'{group =
+					       PFgroup,
+					   content = PFcontent, id = PFid},
+			 #'TorrentWrapper'{group = NFgroup, content = NFcontent,
+					   id = NFid},
+			 _) ->
+    #'TorrentWrapper'{group =
+			  if NFgroup =:= undefined -> PFgroup;
+			     true -> NFgroup
+			  end,
+		      content =
+			  if NFcontent =:= undefined -> PFcontent;
+			     true -> NFcontent
+			  end,
+		      id =
+			  if NFid =:= undefined -> PFid;
+			     true -> NFid
+			  end}.
+
+merge_msg_CreateGroup(#'CreateGroup'{group = PFgroup},
+		      #'CreateGroup'{group = NFgroup}, _) ->
+    #'CreateGroup'{group =
+		       if NFgroup =:= undefined -> PFgroup;
+			  true -> NFgroup
+		       end}.
+
+merge_msg_Response(#'Response'{rep = PFrep},
+		   #'Response'{rep = NFrep}, _) ->
+    #'Response'{rep =
+		    if NFrep =:= undefined -> PFrep;
+		       true -> NFrep
 		    end}.
 
 merge_msg_ClientMessage(#'ClientMessage'{msg = PFmsg},
@@ -1538,61 +1579,23 @@ verify_msg(Msg) -> verify_msg(Msg, []).
 verify_msg(Msg, Opts) ->
     TrUserData = proplists:get_value(user_data, Opts),
     case Msg of
+      #'JoinGroup'{} ->
+	  v_msg_JoinGroup(Msg, ['JoinGroup'], TrUserData);
+      #'Register'{} ->
+	  v_msg_Register(Msg, ['Register'], TrUserData);
       #'Login'{} -> v_msg_Login(Msg, ['Login'], TrUserData);
-      #'CreateGroup'{} ->
-	  v_msg_CreateGroup(Msg, ['CreateGroup'], TrUserData);
       #'TorrentWrapper'{} ->
 	  v_msg_TorrentWrapper(Msg, ['TorrentWrapper'],
 			       TrUserData);
-      #'JoinGroup'{} ->
-	  v_msg_JoinGroup(Msg, ['JoinGroup'], TrUserData);
+      #'CreateGroup'{} ->
+	  v_msg_CreateGroup(Msg, ['CreateGroup'], TrUserData);
       #'Response'{} ->
 	  v_msg_Response(Msg, ['Response'], TrUserData);
-      #'Register'{} ->
-	  v_msg_Register(Msg, ['Register'], TrUserData);
       #'ClientMessage'{} ->
 	  v_msg_ClientMessage(Msg, ['ClientMessage'], TrUserData);
       _ -> mk_type_error(not_a_known_message, Msg, [])
     end.
 
-
--dialyzer({nowarn_function,v_msg_Login/3}).
-v_msg_Login(#'Login'{username = F1, password = F2},
-	    Path, _) ->
-    if F1 == undefined -> ok;
-       true -> v_type_string(F1, [username | Path])
-    end,
-    if F2 == undefined -> ok;
-       true -> v_type_string(F2, [password | Path])
-    end,
-    ok;
-v_msg_Login(X, Path, _TrUserData) ->
-    mk_type_error({expected_msg, 'Login'}, X, Path).
-
--dialyzer({nowarn_function,v_msg_CreateGroup/3}).
-v_msg_CreateGroup(#'CreateGroup'{group = F1}, Path,
-		  _) ->
-    if F1 == undefined -> ok;
-       true -> v_type_string(F1, [group | Path])
-    end,
-    ok;
-v_msg_CreateGroup(X, Path, _TrUserData) ->
-    mk_type_error({expected_msg, 'CreateGroup'}, X, Path).
-
--dialyzer({nowarn_function,v_msg_TorrentWrapper/3}).
-v_msg_TorrentWrapper(#'TorrentWrapper'{group = F1,
-				       content = F2},
-		     Path, _) ->
-    if F1 == undefined -> ok;
-       true -> v_type_string(F1, [group | Path])
-    end,
-    if F2 == undefined -> ok;
-       true -> v_type_bytes(F2, [content | Path])
-    end,
-    ok;
-v_msg_TorrentWrapper(X, Path, _TrUserData) ->
-    mk_type_error({expected_msg, 'TorrentWrapper'}, X,
-		  Path).
 
 -dialyzer({nowarn_function,v_msg_JoinGroup/3}).
 v_msg_JoinGroup(#'JoinGroup'{group = F1}, Path, _) ->
@@ -1602,15 +1605,6 @@ v_msg_JoinGroup(#'JoinGroup'{group = F1}, Path, _) ->
     ok;
 v_msg_JoinGroup(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, 'JoinGroup'}, X, Path).
-
--dialyzer({nowarn_function,v_msg_Response/3}).
-v_msg_Response(#'Response'{rep = F1}, Path, _) ->
-    if F1 == undefined -> ok;
-       true -> v_type_bool(F1, [rep | Path])
-    end,
-    ok;
-v_msg_Response(X, Path, _TrUserData) ->
-    mk_type_error({expected_msg, 'Response'}, X, Path).
 
 -dialyzer({nowarn_function,v_msg_Register/3}).
 v_msg_Register(#'Register'{username = F1, password = F2,
@@ -1628,6 +1622,56 @@ v_msg_Register(#'Register'{username = F1, password = F2,
     ok;
 v_msg_Register(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, 'Register'}, X, Path).
+
+-dialyzer({nowarn_function,v_msg_Login/3}).
+v_msg_Login(#'Login'{username = F1, password = F2},
+	    Path, _) ->
+    if F1 == undefined -> ok;
+       true -> v_type_string(F1, [username | Path])
+    end,
+    if F2 == undefined -> ok;
+       true -> v_type_string(F2, [password | Path])
+    end,
+    ok;
+v_msg_Login(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'Login'}, X, Path).
+
+-dialyzer({nowarn_function,v_msg_TorrentWrapper/3}).
+v_msg_TorrentWrapper(#'TorrentWrapper'{group = F1,
+				       content = F2, id = F3},
+		     Path, _) ->
+    if F1 == undefined -> ok;
+       true -> v_type_string(F1, [group | Path])
+    end,
+    if F2 == undefined -> ok;
+       true -> v_type_bytes(F2, [content | Path])
+    end,
+    if F3 == undefined -> ok;
+       true -> v_type_string(F3, [id | Path])
+    end,
+    ok;
+v_msg_TorrentWrapper(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'TorrentWrapper'}, X,
+		  Path).
+
+-dialyzer({nowarn_function,v_msg_CreateGroup/3}).
+v_msg_CreateGroup(#'CreateGroup'{group = F1}, Path,
+		  _) ->
+    if F1 == undefined -> ok;
+       true -> v_type_string(F1, [group | Path])
+    end,
+    ok;
+v_msg_CreateGroup(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'CreateGroup'}, X, Path).
+
+-dialyzer({nowarn_function,v_msg_Response/3}).
+v_msg_Response(#'Response'{rep = F1}, Path, _) ->
+    if F1 == undefined -> ok;
+       true -> v_type_bool(F1, [rep | Path])
+    end,
+    ok;
+v_msg_Response(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'Response'}, X, Path).
 
 -dialyzer({nowarn_function,v_msg_ClientMessage/3}).
 v_msg_ClientMessage(#'ClientMessage'{msg = F1}, Path,
@@ -1699,24 +1743,8 @@ id(X, _TrUserData) -> X.
 
 
 get_msg_defs() ->
-    [{{msg, 'Login'},
-      [#field{name = username, fnum = 1, rnum = 2,
-	      type = string, occurrence = optional, opts = []},
-       #field{name = password, fnum = 2, rnum = 3,
-	      type = string, occurrence = optional, opts = []}]},
-     {{msg, 'CreateGroup'},
+    [{{msg, 'JoinGroup'},
       [#field{name = group, fnum = 1, rnum = 2, type = string,
-	      occurrence = optional, opts = []}]},
-     {{msg, 'TorrentWrapper'},
-      [#field{name = group, fnum = 1, rnum = 2, type = string,
-	      occurrence = optional, opts = []},
-       #field{name = content, fnum = 2, rnum = 3, type = bytes,
-	      occurrence = optional, opts = []}]},
-     {{msg, 'JoinGroup'},
-      [#field{name = group, fnum = 1, rnum = 2, type = string,
-	      occurrence = optional, opts = []}]},
-     {{msg, 'Response'},
-      [#field{name = rep, fnum = 1, rnum = 2, type = bool,
 	      occurrence = optional, opts = []}]},
      {{msg, 'Register'},
       [#field{name = username, fnum = 1, rnum = 2,
@@ -1724,6 +1752,24 @@ get_msg_defs() ->
        #field{name = password, fnum = 2, rnum = 3,
 	      type = string, occurrence = optional, opts = []},
        #field{name = name, fnum = 3, rnum = 4, type = string,
+	      occurrence = optional, opts = []}]},
+     {{msg, 'Login'},
+      [#field{name = username, fnum = 1, rnum = 2,
+	      type = string, occurrence = optional, opts = []},
+       #field{name = password, fnum = 2, rnum = 3,
+	      type = string, occurrence = optional, opts = []}]},
+     {{msg, 'TorrentWrapper'},
+      [#field{name = group, fnum = 1, rnum = 2, type = string,
+	      occurrence = optional, opts = []},
+       #field{name = content, fnum = 2, rnum = 3, type = bytes,
+	      occurrence = optional, opts = []},
+       #field{name = id, fnum = 3, rnum = 4, type = string,
+	      occurrence = optional, opts = []}]},
+     {{msg, 'CreateGroup'},
+      [#field{name = group, fnum = 1, rnum = 2, type = string,
+	      occurrence = optional, opts = []}]},
+     {{msg, 'Response'},
+      [#field{name = rep, fnum = 1, rnum = 2, type = bool,
 	      occurrence = optional, opts = []}]},
      {{msg, 'ClientMessage'},
       [#gpb_oneof{name = msg, rnum = 2,
@@ -1749,16 +1795,16 @@ get_msg_defs() ->
 
 
 get_msg_names() ->
-    ['Login', 'CreateGroup', 'TorrentWrapper', 'JoinGroup',
-     'Response', 'Register', 'ClientMessage'].
+    ['JoinGroup', 'Register', 'Login', 'TorrentWrapper',
+     'CreateGroup', 'Response', 'ClientMessage'].
 
 
 get_group_names() -> [].
 
 
 get_msg_or_group_names() ->
-    ['Login', 'CreateGroup', 'TorrentWrapper', 'JoinGroup',
-     'Response', 'Register', 'ClientMessage'].
+    ['JoinGroup', 'Register', 'Login', 'TorrentWrapper',
+     'CreateGroup', 'Response', 'ClientMessage'].
 
 
 get_enum_names() -> [].
@@ -1776,24 +1822,8 @@ fetch_enum_def(EnumName) ->
     erlang:error({no_such_enum, EnumName}).
 
 
-find_msg_def('Login') ->
-    [#field{name = username, fnum = 1, rnum = 2,
-	    type = string, occurrence = optional, opts = []},
-     #field{name = password, fnum = 2, rnum = 3,
-	    type = string, occurrence = optional, opts = []}];
-find_msg_def('CreateGroup') ->
-    [#field{name = group, fnum = 1, rnum = 2, type = string,
-	    occurrence = optional, opts = []}];
-find_msg_def('TorrentWrapper') ->
-    [#field{name = group, fnum = 1, rnum = 2, type = string,
-	    occurrence = optional, opts = []},
-     #field{name = content, fnum = 2, rnum = 3, type = bytes,
-	    occurrence = optional, opts = []}];
 find_msg_def('JoinGroup') ->
     [#field{name = group, fnum = 1, rnum = 2, type = string,
-	    occurrence = optional, opts = []}];
-find_msg_def('Response') ->
-    [#field{name = rep, fnum = 1, rnum = 2, type = bool,
 	    occurrence = optional, opts = []}];
 find_msg_def('Register') ->
     [#field{name = username, fnum = 1, rnum = 2,
@@ -1801,6 +1831,24 @@ find_msg_def('Register') ->
      #field{name = password, fnum = 2, rnum = 3,
 	    type = string, occurrence = optional, opts = []},
      #field{name = name, fnum = 3, rnum = 4, type = string,
+	    occurrence = optional, opts = []}];
+find_msg_def('Login') ->
+    [#field{name = username, fnum = 1, rnum = 2,
+	    type = string, occurrence = optional, opts = []},
+     #field{name = password, fnum = 2, rnum = 3,
+	    type = string, occurrence = optional, opts = []}];
+find_msg_def('TorrentWrapper') ->
+    [#field{name = group, fnum = 1, rnum = 2, type = string,
+	    occurrence = optional, opts = []},
+     #field{name = content, fnum = 2, rnum = 3, type = bytes,
+	    occurrence = optional, opts = []},
+     #field{name = id, fnum = 3, rnum = 4, type = string,
+	    occurrence = optional, opts = []}];
+find_msg_def('CreateGroup') ->
+    [#field{name = group, fnum = 1, rnum = 2, type = string,
+	    occurrence = optional, opts = []}];
+find_msg_def('Response') ->
+    [#field{name = rep, fnum = 1, rnum = 2, type = bool,
 	    occurrence = optional, opts = []}];
 find_msg_def('ClientMessage') ->
     [#gpb_oneof{name = msg, rnum = 2,
