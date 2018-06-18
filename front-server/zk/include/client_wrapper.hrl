@@ -7,11 +7,36 @@
 
 -define(client_wrapper_gpb_version, "4.1.1").
 
+-ifndef('JOINGROUP_PB_H').
+-define('JOINGROUP_PB_H', true).
+-record('JoinGroup',
+        {group = <<>>           :: iodata() | undefined % = 1
+        }).
+-endif.
+
+-ifndef('REGISTER_PB_H').
+-define('REGISTER_PB_H', true).
+-record('Register',
+        {username = <<>>        :: iodata() | undefined, % = 1
+         password = <<>>        :: iodata() | undefined, % = 2
+         name = <<>>            :: iodata() | undefined % = 3
+        }).
+-endif.
+
 -ifndef('LOGIN_PB_H').
 -define('LOGIN_PB_H', true).
 -record('Login',
         {username = <<>>        :: iodata() | undefined, % = 1
          password = <<>>        :: iodata() | undefined % = 2
+        }).
+-endif.
+
+-ifndef('TORRENTWRAPPER_PB_H').
+-define('TORRENTWRAPPER_PB_H', true).
+-record('TorrentWrapper',
+        {group = <<>>           :: iodata() | undefined, % = 1
+         content = <<>>         :: binary() | undefined, % = 2
+         id = <<>>              :: iodata() | undefined % = 3
         }).
 -endif.
 
@@ -22,34 +47,10 @@
         }).
 -endif.
 
--ifndef('TORRENTWRAPPER_PB_H').
--define('TORRENTWRAPPER_PB_H', true).
--record('TorrentWrapper',
-        {group = <<>>           :: iodata() | undefined, % = 1
-         content = <<>>         :: binary() | undefined % = 2
-        }).
--endif.
-
--ifndef('JOINGROUP_PB_H').
--define('JOINGROUP_PB_H', true).
--record('JoinGroup',
-        {group = <<>>           :: iodata() | undefined % = 1
-        }).
--endif.
-
 -ifndef('RESPONSE_PB_H').
 -define('RESPONSE_PB_H', true).
 -record('Response',
         {rep = false            :: boolean() | 0 | 1 | undefined % = 1
-        }).
--endif.
-
--ifndef('REGISTER_PB_H').
--define('REGISTER_PB_H', true).
--record('Register',
-        {username = <<>>        :: iodata() | undefined, % = 1
-         password = <<>>        :: iodata() | undefined, % = 2
-         name = <<>>            :: iodata() | undefined % = 3
         }).
 -endif.
 
