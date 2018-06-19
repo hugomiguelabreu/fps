@@ -64,7 +64,6 @@ public class Connector extends Thread{
     public boolean send(ClientWrapper.ClientMessage msg){
         if(!this.connected)
             return false;
-
         try {
             out.write(msg.getSerializedSize());
             msg.writeTo(out);

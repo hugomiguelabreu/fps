@@ -38,6 +38,12 @@ public class MainController implements Initializable{
     private PasswordField login_password;
     @FXML
     private TextField login_username;
+    @FXML
+    private TextField login_username_offline;
+    @FXML
+    private Pane paneOn;
+    @FXML
+    private Pane paneOff;
 
     private Connector channel;
     private ArrayList<String> servers;
@@ -46,7 +52,6 @@ public class MainController implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         type = false;
 
         servers = new ArrayList<>();
@@ -58,6 +63,7 @@ public class MainController implements Initializable{
             channel = new Connector(servers);
 
             if(channel.isConnected()){
+                paneOn.setVisible(true);
                 channel.start();
                 ServerOperations.setChannel(channel);
 
@@ -65,7 +71,6 @@ public class MainController implements Initializable{
 
                 slider.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
                 status.setText("Online");
-                status.setTextFill(Color.WHITE);
 
                 TranslateTransition down = new TranslateTransition();
                 down.setToY(40);
@@ -79,14 +84,15 @@ public class MainController implements Initializable{
             else {
 
                 type = false;
+                paneOff.setVisible(true);
 
                 slider.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
                 status.setText("Offline");
-                status.setTextFill(Color.WHITE);
+
 
                 TranslateTransition down = new TranslateTransition();
                 down.setToY(40);
-                down.setDuration(Duration.seconds(1));
+                down.setDuration(Duration.seconds(2));
                 down.setNode(slider);
 
                 down.play();
@@ -109,12 +115,11 @@ public class MainController implements Initializable{
                 FXMLLoader loader = new FXMLLoader();
                 String fxmlDocPath = "src/main/java/UI/app.fxml";
                 FileInputStream fxmlStream = new FileInputStream(fxmlDocPath);
-                File f = new File("src/main/java/UI/material.css");
-                Pane root = (Pane) loader.load(fxmlStream);
+
+                Parent root = loader.load(fxmlStream);
 
                 //TODO diferenciar login online de offline
-                OfflineUI controller = loader.<OfflineUI>getController();
-                controller.initLocal(login_username.getText());
+                AppController controller = loader.<AppController>getController();
 
                 Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
@@ -125,10 +130,8 @@ public class MainController implements Initializable{
                 error_login.setVisible(true);
             }
 
-        }
-
-        else {
-
+        } else {
+            paneOff.setVisible(true);
             FXMLLoader loader = new FXMLLoader();
 
             String fxmlDocPath = "src/main/java/UI/Offline.fxml";
@@ -137,7 +140,7 @@ public class MainController implements Initializable{
             Parent root = loader.load(fxmlStream);
 
             OfflineUI controller = loader.<OfflineUI>getController();
-            controller.initLocal(login_username.getText());
+            controller.initLocal(login_username_offline.getText());
 
             Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));

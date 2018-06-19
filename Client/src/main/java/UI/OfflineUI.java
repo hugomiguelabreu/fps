@@ -20,6 +20,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SplitPane;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
@@ -47,6 +48,8 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     public Button slider_button;
     public Button button_send;
     public Button button_broadcast;
+    @FXML
+    private SplitPane splitPane1;
 
     private HashMap<String, User> usersOn;
     private ArrayListEvent<Torrent> available;
@@ -56,7 +59,10 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
     @FXML
     void initialize(){
-
+        final double pos = splitPane1.getDividers().get(0).getPosition();
+        splitPane1.getDividers().get(0).positionProperty().addListener(
+                (observable, oldValue, newValue) -> splitPane1.getDividers().get(0).setPosition(pos)
+        );
         notifications = new ArrayList<>();
 
         usersOn = new HashMap<>();
@@ -232,11 +238,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
         StringBuilder sb = new StringBuilder()
                 .append(t.getCreatedBy() + " wants to share ");
-
-        if(t.getFilenames().size() > 1)
-            sb.append(t.getFilenames().size() + " files with you");
-        else
-            sb.append(t.getFilenames().get(0) + " with you");
+        sb.append(t.getFilenames().get(0) + " ( " + t.getSize()/1024/1024 + " MB) " + " with you");
 
 
         // update UI thread
@@ -256,6 +258,9 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                 pane.setPrefHeight(56.0);
                 pane.setPrefWidth(556.0);
                 pane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+                pane.setBorder(new Border(
+                        new BorderStroke(Color.DARKGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)
+                ));
 
                 l.setText(sb.toString());
                 l.setLayoutX(14.0);

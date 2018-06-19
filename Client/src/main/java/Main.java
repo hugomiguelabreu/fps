@@ -172,8 +172,6 @@ public class Main {
             group.shutdownGracefully();
 
         System.exit(0);
-
-        //TODO:Terminar todos os clientes/tarckers abertos
     }
 
 }
