@@ -70,6 +70,34 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         available.registerCallback(this);
     }
 
+    public void initLocal(String username){
+
+        this.username = username;
+
+        System.out.println("username " + username);
+
+        try {
+
+            String httpAddress = Offline.findLocalAddresses().get(0).getIpv4();
+            offlineTck = new Tracker(new InetSocketAddress(InetAddress.getByName(httpAddress), 6969));
+            offlineTck.start();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        ConcurrentHashMapEvent<String , User> map = new ConcurrentHashMapEvent<>();
+        map.registerCallback(this);
+
+        Offline.startProbes(username, available, this);
+
+        //UI
+        paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+
+    }
+
+
+    //Drop File
     @FXML
     void handleDragOver(DragEvent event) {
 
@@ -80,8 +108,9 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         paneDrop.setBackground(new Background(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, Insets.EMPTY)));
     }
 
+    //File droped to paneDrop
     @FXML
-    void handleDragDropped(DragEvent event) { // TODO meter botao broadcast
+    void handleDragDropped(DragEvent event) {
 
         Dragboard db = event.getDragboard();
         String path;
@@ -152,6 +181,38 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         event.consume();
     }
 
+    //send Torrent
+    private void sendLocal(String path, String username, String userToSend){
+
+        label_file.setText("Drop Files Here");
+
+        if(!username.equals(userToSend)){
+
+            OfflineUploadThread uploadThread = new OfflineUploadThread();
+            uploadThread.newUpload(path,username, offlineTck, userToSend);
+            uploadThread.start();
+        }
+    }
+
+    // drag sai do dropPane
+    public void handleDragExited(DragEvent dragEvent) {
+
+        paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+
+    }
+
+    //broadcast do file para a rede
+    public void handleBroadcastClicked(MouseEvent mouseEvent) {
+
+        String path = (String) button_broadcast.getUserData();
+        sendLocal(path, username, null);
+        button_send.setVisible(false);
+        button_broadcast.setVisible(false);
+        label_send.setVisible(false);
+
+    }
+
+    // Add Peer to List
     @Override
     public void putEvent() {
 
@@ -187,6 +248,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
     }
 
+    //Remove peer from List
     @Override
     public void removeEvent() {
 
@@ -214,18 +276,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         });
     }
 
-    private void sendLocal(String path, String username, String userToSend){
-
-        label_file.setText("Drop Files Here");
-
-        if(!username.equals(userToSend)){
-
-            OfflineUploadThread uploadThread = new OfflineUploadThread();
-            uploadThread.newUpload(path,username, offlineTck, userToSend);
-            uploadThread.start();
-        }
-    }
-
+    //Torrent received
     @Override
     public void addEventTorrent(Torrent t) {
 
@@ -243,8 +294,6 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-
-                notifications.add(pane);
 
                 pane.getChildren().add(l);
                 pane.getChildren().add(accept);
@@ -295,6 +344,8 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                     down.setNode(p);
                     down.play();
                 }
+
+                notifications.add(pane);
             }
         });
 
@@ -352,45 +403,4 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         });
     }
 
-    public void initLocal(String username){
-
-        this.username = username;
-
-        System.out.println("username " + username);
-
-        try {
-
-            String httpAddress = Offline.findLocalAddresses().get(0).getIpv4();
-            offlineTck = new Tracker(new InetSocketAddress(InetAddress.getByName(httpAddress), 6969));
-            offlineTck.start();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Offline.startProbes(username, available, this);
-
-        ConcurrentHashMapEvent<String , User> map = new ConcurrentHashMapEvent<>();
-        map.registerCallback(this);
-
-        //UI
-        paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-
-    }
-
-    public void handleDragExited(DragEvent dragEvent) {
-
-        paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-
-    }
-
-    public void handleBroadcastClicked(MouseEvent mouseEvent) {
-
-        String path = (String) button_broadcast.getUserData();
-        sendLocal(path, username, null);
-        button_send.setVisible(false);
-        button_broadcast.setVisible(false);
-        label_send.setVisible(false);
-
-    }
 }
