@@ -53,17 +53,7 @@ public class OfflineUploadThread extends Thread {
 
             System.out.println("Upload intention initiated");
 
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
+        } catch (SAXException | IOException | InterruptedException | NoSuchAlgorithmException | ParserConfigurationException e) {
             e.printStackTrace();
         }
 

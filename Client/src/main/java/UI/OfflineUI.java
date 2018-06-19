@@ -20,6 +20,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SplitPane;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
@@ -46,6 +47,9 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     public Label slider_label;
     public Button slider_button;
     public Button button_send;
+    public Button button_broadcast;
+    @FXML
+    private SplitPane splitPane1;
 
     private HashMap<String, User> usersOn;
     private ArrayListEvent<Torrent> available;
@@ -55,7 +59,10 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
     @FXML
     void initialize(){
-
+        final double pos = splitPane1.getDividers().get(0).getPosition();
+        splitPane1.getDividers().get(0).positionProperty().addListener(
+                (observable, oldValue, newValue) -> splitPane1.getDividers().get(0).setPosition(pos)
+        );
         notifications = new ArrayList<>();
 
         usersOn = new HashMap<>();
@@ -63,6 +70,34 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         available.registerCallback(this);
     }
 
+    public void initLocal(String username){
+
+        this.username = username;
+
+        System.out.println("username " + username);
+
+        try {
+
+            String httpAddress = Offline.findLocalAddresses().get(0).getIpv4();
+            offlineTck = new Tracker(new InetSocketAddress(InetAddress.getByName(httpAddress), 6969));
+            offlineTck.start();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        ConcurrentHashMapEvent<String , User> map = new ConcurrentHashMapEvent<>();
+        map.registerCallback(this);
+
+        Offline.startProbes(username, available, this);
+
+        //UI
+        paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+
+    }
+
+
+    //Drop File
     @FXML
     void handleDragOver(DragEvent event) {
 
@@ -71,11 +106,11 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
         //TODO fade para cinzento
         paneDrop.setBackground(new Background(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, Insets.EMPTY)));
-
     }
 
+    //File droped to paneDrop
     @FXML
-    void handleDragDropped(DragEvent event) { // TODO meter botao broadcast
+    void handleDragDropped(DragEvent event) {
 
         Dragboard db = event.getDragboard();
         String path;
@@ -86,6 +121,9 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
             label_send.setVisible(true);
             label_send.setText("Select user to send");
+
+            button_broadcast.setUserData(path);
+            button_broadcast.setVisible(true);
 
             if (list_users.getSelectionModel().getSelectedItem() != null){
 
@@ -99,11 +137,10 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                 button_send.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
-
                         db.clear();
-
                         paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
                         button_send.setVisible(false);
+                        button_broadcast.setVisible(false);
 
                         System.out.println("clicked on user, init local send process");
                         sendLocal(path, username, value);
@@ -130,6 +167,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
                             paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
                             button_send.setVisible(false);
+                            button_broadcast.setVisible(false);
 
                             System.out.println("clicked on user, init local send process");
                             sendLocal(path, username, newValue);
@@ -143,8 +181,40 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         event.consume();
     }
 
+    //send Torrent
+    private void sendLocal(String path, String username, String userToSend){
+
+        label_file.setText("Drop Files Here");
+
+        if(!username.equals(userToSend)){
+
+            OfflineUploadThread uploadThread = new OfflineUploadThread();
+            uploadThread.newUpload(path,username, offlineTck, userToSend);
+            uploadThread.start();
+        }
+    }
+
+    // drag sai do dropPane
+    public void handleDragExited(DragEvent dragEvent) {
+
+        paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+
+    }
+
+    //broadcast do file para a rede
+    public void handleBroadcastClicked(MouseEvent mouseEvent) {
+
+        String path = (String) button_broadcast.getUserData();
+        sendLocal(path, username, null);
+        button_send.setVisible(false);
+        button_broadcast.setVisible(false);
+        label_send.setVisible(false);
+
+    }
+
+    // Add Peer to List
     @Override
-    public void putEvent() {
+    public void putEvent(int a, Object group) {
 
         try{
 
@@ -175,9 +245,9 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         catch (NullPointerException e){
             System.out.println("listner null, inseriu o self");
         }
-
     }
 
+    //Remove peer from List
     @Override
     public void removeEvent() {
 
@@ -205,16 +275,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         });
     }
 
-    private void sendLocal(String path, String username, String userToSend){
-
-        if(!username.equals(userToSend)){
-
-            OfflineUploadThread uploadThread = new OfflineUploadThread();
-            uploadThread.newUpload(path,username, offlineTck, userToSend);
-            uploadThread.start();
-        }
-    }
-
+    //Torrent received
     @Override
     public void addEventTorrent(Torrent t) {
 
@@ -225,19 +286,13 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
         StringBuilder sb = new StringBuilder()
                 .append(t.getCreatedBy() + " wants to share ");
-
-        if(t.getFilenames().size() > 1)
-            sb.append(t.getFilenames().size() + " files with you");
-        else
-            sb.append(t.getFilenames().get(0) + " with you");
+        sb.append(t.getFilenames().get(0) + " ( " + t.getSize()/1024/1024 + " MB) " + " with you");
 
 
         // update UI thread
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-
-                notifications.add(pane);
 
                 pane.getChildren().add(l);
                 pane.getChildren().add(accept);
@@ -249,6 +304,9 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                 pane.setPrefHeight(56.0);
                 pane.setPrefWidth(556.0);
                 pane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+                pane.setBorder(new Border(
+                        new BorderStroke(Color.DARKGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)
+                ));
 
                 l.setText(sb.toString());
                 l.setLayoutX(14.0);
@@ -270,17 +328,23 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                 close.setText("Close");
                 close.setUserData(pane);
 
-
-                //TODO close button close.setUserdata(pane);
-
                 TranslateTransition down = new TranslateTransition();
-                down.setFromY(56 * (notifications.size() - 1));
-                down.setToY(56 * notifications.size());
-
+                down.setFromY(0);
+                down.setToY(56);
                 down.setDuration(Duration.seconds(1));
                 down.setNode(pane);
-
                 down.play();
+
+                for(AnchorPane p : notifications){
+
+                    down = new TranslateTransition();
+                    down.setByY(-56);
+                    down.setDuration(Duration.seconds(1));
+                    down.setNode(p);
+                    down.play();
+                }
+
+                notifications.add(pane);
             }
         });
 
@@ -336,94 +400,6 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                 }
             }
         });
-
-//        StringBuilder sb = new StringBuilder()
-//                .append(t.getCreatedBy() + " wants to share ");
-//
-//        if(t.getFilenames().size() > 1)
-//            sb.append(t.getFilenames().size() + " files with you");
-//        else
-//            sb.append(t.getFilenames().get(0) + " with you");
-//
-//        // update UI thread
-//        Platform.runLater(new Runnable() {
-//            @Override
-//            public void run() {
-//                slider_label.setText(sb.toString());
-//            }
-//        });
-//
-//        TranslateTransition down = new TranslateTransition();
-//        down.setToY(56);
-//
-//        down.setDuration(Duration.seconds(1));
-//        down.setNode(this.slider);
-//
-//        down.play();
-//
-//        slider_button.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//            @Override
-//            public void handle(MouseEvent mouseEvent) {
-//
-//                //System.out.println("accept torrent " + t.toString());
-//
-//                TranslateTransition up = new TranslateTransition();
-//                up.setToY(-56);
-//
-//                up.setDuration(Duration.seconds(1));
-//                up.setNode(slider);
-//
-//                up.play();
-//
-//                //TODO mudar para a diretoria certa
-//                File dest = new File("/tmp/");
-//
-//                try {
-//
-//                    SharedTorrent st = new SharedTorrent(t, dest);
-//
-//                    TorrentUtil.download(st, false, username);
-//
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                } catch (NoSuchAlgorithmException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//        });
-
     }
 
-    public void initLocal(String username){
-
-        this.username = username;
-
-        System.out.println("username " + username);
-
-        try {
-
-            String httpAddress = Offline.findLocalAddresses().get(0).getIpv4();
-            offlineTck = new Tracker(new InetSocketAddress(InetAddress.getByName(httpAddress), 6969));
-            offlineTck.start();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Offline.startProbes(username, available, this);
-
-        ConcurrentHashMapEvent<String , User> map = new ConcurrentHashMapEvent<>();
-        map.registerCallback(this);
-
-        //UI
-        paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-
-    }
-
-    public void handleDragExited(DragEvent dragEvent) {
-
-        paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-
-    }
 }

@@ -6,12 +6,11 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
 
 <AnchorPane fx:id="mainPane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.OfflineUI">
 
     <children>
-        <SplitPane dividerPositions="0.298" prefHeight="600.0" prefWidth="800.0">
+        <SplitPane dividerPositions="0.298" prefHeight="600.0" prefWidth="800.0" fx:id="splitPane1">
             <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                     <children>
@@ -27,6 +26,7 @@
                                     <Label fx:id="label_file" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="272.0" prefHeight="52.0" prefWidth="475.0" text="Drop Files Here" />
                                     <Label fx:id="label_send" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="346.0" prefHeight="52.0" prefWidth="475.0" />
                                     <Button fx:id="button_send" contentDisplay="CENTER" layoutX="40.0" layoutY="346.0" mnemonicParsing="false" prefHeight="52.0" prefWidth="475.0" visible="false" />
+                                    <Button fx:id="button_broadcast" contentDisplay="CENTER" layoutX="40.0" layoutY="400.0" mnemonicParsing="false" onMouseClicked="#handleBroadcastClicked" prefHeight="52.0" prefWidth="475.0" text="Broadcast para a rede" visible="false" />
                                 </AnchorPane>
                             </items>
                         </SplitPane>

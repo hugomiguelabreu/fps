@@ -18,10 +18,10 @@ public class FileUtils {
         new File(System.getProperty( "user.home" ) + "/.fps").mkdirs();
     }
 
-    public static void addTorrent(Torrent t){
+    public static void addTorrent(Torrent t, String group){
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(System.getProperty( "user.home" ) + "/.fps/" + t.getHexInfoHash());
+            fos = new FileOutputStream(System.getProperty( "user.home" ) + "/.fps/" + group + "/" + t.getHexInfoHash());
             t.save(fos);
             IOUtils.closeQuietly(fos);
         } catch (IOException e) {
@@ -29,7 +29,7 @@ public class FileUtils {
         }
     }
 
-    public static List<Torrent> load(String group) throws IOException, NoSuchAlgorithmException {
+    public static ArrayList<Torrent> load(String group) throws IOException, NoSuchAlgorithmException {
         ArrayList<Torrent> ret = new ArrayList<>();
 
         File parent = new File(System.getProperty("user.home") + "/.fps/" + group);

@@ -25,9 +25,7 @@ import java.util.*;
 
 public class Main {
 
-    private static final Logger logger = LoggerFactory.getLogger(Object.class);
     private static ArrayList<Client> activeClients;
-    private static EventLoopGroup group = null;
     private static ArrayList<String> servers = new ArrayList<>();
     private static Connector channel;
 
@@ -168,12 +166,7 @@ public class Main {
             offlineTck.stop();
         }
 
-        if(group != null)
-            group.shutdownGracefully();
-
         System.exit(0);
-
-        //TODO:Terminar todos os clientes/tarckers abertos
     }
 
 }

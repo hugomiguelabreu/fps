@@ -1,5 +1,5 @@
 syntax = "proto3";
-package Network;
+package client_network;
 
 message Login {
 	string username = 1;
@@ -27,6 +27,7 @@ message JoinGroup {
 message TorrentWrapper{
 	string group = 1;
     bytes content = 2;
+    string id = 3;
 }
 
 message ClientMessage {
