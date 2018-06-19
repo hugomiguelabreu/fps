@@ -3,10 +3,14 @@ package Util;
 import Core.Connector;
 import Event.ConcurrentHashMapEvent;
 import Network.ClientWrapper;
+import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.common.Torrent;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +19,8 @@ public class ServerOperations {
     private static Connector channel;
     private static ConcurrentHashMapEvent<String, ArrayList<Torrent>> groupTorrents;
     private static ConcurrentHashMapEvent<String, ArrayList<Torrent>> groupUsers;
+    private static String username;
+    private static ArrayList<Client> activeClients = new ArrayList<>();
 
     public static void setGroupTorrents(ConcurrentHashMapEvent<String, ArrayList<Torrent>> groupTorrents) { ServerOperations.groupTorrents = groupTorrents; }
 
@@ -24,22 +30,45 @@ public class ServerOperations {
         ServerOperations.channel = channel;
     }
 
+    public static void setUsername(String usernameParam){
+        username = usernameParam;
+    }
+
+    public static void sendTorrent(String path, String group){
+        ArrayList<String> trc = new ArrayList<>();
+        //TODO: This IP must be dynamic
+        trc.add("http://localhost:6969/announce");
+        trc.add("http://localhost:7070/announce");
+
+        Torrent t;
+        try {
+            t = TorrentUtil.createTorrent(path, username, trc);
+            FileUtils.addTorrent(t, group);
+            activeClients.add(TorrentUtil.upload(t, path, channel, username, group));
+        } catch (IOException | InterruptedException | ParserConfigurationException | SAXException | NoSuchAlgorithmException e) {
+            System.out.println("Couldn't bind, fallback to local");
+            e.printStackTrace();
+        }
+    }
+
     public static void addTorrent(Torrent t, String group){
         ArrayList<Torrent> gt = groupTorrents.get(group);
         gt.add(0, t);
         groupTorrents.put(group, gt);
+        FileUtils.addTorrent(t, group);
     }
 
     public static void updateUsers(ArrayList<String> users, String group){
 
     }
 
-    public static boolean login(String username, String password) throws IOException {
+    public static boolean login(String usernameLogin, String password) throws IOException {
         if(channel == null)
             return false;
-        boolean ret = true;
+        boolean ret;
+
         ClientWrapper.Login request = ClientWrapper.Login.newBuilder()
-                .setUsername(username)
+                .setUsername(usernameLogin)
                 .setPassword(password).build();
         ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
                 .setLogin(request).build();
@@ -54,6 +83,9 @@ public class ServerOperations {
             e.printStackTrace();
             return false;
         }
+
+        if(ret)
+            username = usernameLogin;
 
         return ret;
     }
@@ -75,10 +107,13 @@ public class ServerOperations {
         if(!channel.send(wrapper)){
             return false;
         }
-//        socket.getOutputStream().write(wrapper.getSerializedSize());
-//        wrapper.writeTo(socket.getOutputStream());
 
-//        ret = ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep();
+        try {
+            ret = channel.readResponse();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        }
 
         return ret;
     }
@@ -95,12 +130,14 @@ public class ServerOperations {
         ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
                 .setCreateGroup(request).build();
 
-        //socket.getOutputStream().write(wrapper.getSerializedSize());
-        //wrapper.writeTo(socket.getOutputStream());
-
-        //ret = ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep();
-
         if(!channel.send(wrapper)){
+            return false;
+        }
+
+        try {
+            ret = channel.readResponse();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
             return false;
         }
 
@@ -119,11 +156,14 @@ public class ServerOperations {
         ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
                 .setJoinGroup(request).build();
 
-        //socket.getOutputStream().write(wrapper.getSerializedSize());
-        //wrapper.writeTo(socket.getOutputStream());
-
-        //ret = ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep();
         if(!channel.send(wrapper)){
+            return false;
+        }
+
+        try {
+            ret = channel.readResponse();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
             return false;
         }
 

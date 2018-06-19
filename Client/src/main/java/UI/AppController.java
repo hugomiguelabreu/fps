@@ -5,6 +5,7 @@ import Event.ConcurrentHashMapEvent;
 import Event.MapEvent;
 import Util.FileUtils;
 import Util.ServerOperations;
+import Util.TorrentUtil;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
 import javafx.animation.TranslateTransition;
@@ -23,6 +24,9 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -105,7 +109,8 @@ public class AppController implements MapEvent{
         notifications.clear();
         if(groupTorrents.get(group).size() == 0)
             groupTorrents.put(group, FileUtils.load(group));
-        else
+
+        if(groupTorrents.get(group).size() > 0)
             label_file.setVisible(false);
 
         for(Torrent t: groupTorrents.get(group)){
@@ -223,7 +228,7 @@ public class AppController implements MapEvent{
             a.setContentText("No group selected");
             a.showAndWait().filter(response -> response == ButtonType.OK);
         }else{
-
+            ServerOperations.sendTorrent((event.getDragboard().getFiles().get(0).getAbsolutePath()), groupSelected);
         }
         event.setDropCompleted(true);
         event.consume();

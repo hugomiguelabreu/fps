@@ -65,10 +65,7 @@ public class Connector extends Thread{
                     boolean response = cm.getResponse().getRep();
                     this.responses.offer(response);
                 }
-
-                System.out.println("RECEBI CENAS ");
                 //TODO: check if not null
-
             } catch (Exception e) {
                 e.printStackTrace();
                 this.close();
