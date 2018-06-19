@@ -12,22 +12,18 @@ import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SplitPane;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+import org.controlsfx.control.CheckComboBox;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,14 +44,16 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     public Button slider_button;
     public Button button_send;
     public Button button_broadcast;
+    public Button createGroupButton;
+    public ListView groupsList;
     @FXML
     private SplitPane splitPane1;
 
     private HashMap<String, User> usersOn;
-    private ArrayListEvent<Torrent> available;
     private Tracker offlineTck;
     private String username;
     private ArrayList<AnchorPane> notifications;
+    private HashMap<String, ArrayList<String>> groups;
 
     @FXML
     void initialize(){
@@ -63,11 +61,10 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         splitPane1.getDividers().get(0).positionProperty().addListener(
                 (observable, oldValue, newValue) -> splitPane1.getDividers().get(0).setPosition(pos)
         );
-        notifications = new ArrayList<>();
 
+        notifications = new ArrayList<>();
         usersOn = new HashMap<>();
-        available = new ArrayListEvent<>();
-        available.registerCallback(this);
+        groups = new HashMap<>();
     }
 
     public void initLocal(String username){
@@ -89,11 +86,17 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         ConcurrentHashMapEvent<String , User> map = new ConcurrentHashMapEvent<>();
         map.registerCallback(this);
 
-        Offline.startProbes(username, available, this);
+        ArrayListEvent<Torrent> available;
+        available = new ArrayListEvent<>();
+        available.registerCallback(this);
+
+        Offline.startProbes(username, available, map);
 
         //UI
         paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 
+//        TestThread t = new TestThread(available);
+//        t.start();
     }
 
 
@@ -150,8 +153,36 @@ public class OfflineUI implements MapEvent, ArrayEvent {
             }
             else{
 
+                groupsList.getSelectionModel().selectedItemProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
+
+                    System.out.println("Selected item: " + newValue);
+
+                    label_send.setVisible(false);
+
+                    button_send.setText("send to group " + newValue);
+                    button_send.setVisible(true);
+
+                    button_send.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent mouseEvent) {
+
+                            db.clear();
+
+                            paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
+                            button_send.setVisible(false);
+                            button_broadcast.setVisible(false);
+
+                            System.out.println("Sending to all menbers of the group");
+
+                            for(String users : groups.get(newValue)){
+                                sendLocal(path, username, users);
+                            }
+                        }
+                    });
+                });
+
                 list_users.getSelectionModel().selectedItemProperty().addListener((ChangeListener<String>) (observable, oldValue, newValue) -> {
-                    // Your action here
+
                     System.out.println("Selected item: " + newValue);
 
                     label_send.setVisible(false);
@@ -186,12 +217,12 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
         label_file.setText("Drop Files Here");
 
-        if(!username.equals(userToSend)){
+        //if(!username.equals(userToSend)){
 
             OfflineUploadThread uploadThread = new OfflineUploadThread();
             uploadThread.newUpload(path,username, offlineTck, userToSend);
             uploadThread.start();
-        }
+        //}
     }
 
     // drag sai do dropPane
@@ -339,7 +370,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                 for(AnchorPane p : notifications){
 
                     down = new TranslateTransition();
-                    down.setByY(-56);
+                    down.setByY(56);
                     down.setDuration(Duration.seconds(1));
                     down.setNode(p);
                     down.play();
@@ -386,7 +417,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
                 for(AnchorPane p : notifications){
 
-                    if(notifications.indexOf(p) >= index){
+                    if(notifications.indexOf(p) < index){
 
                         System.out.println("go up");
 
@@ -403,4 +434,89 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         });
     }
 
+    public void handleCreateGroup(MouseEvent mouseEvent) {
+
+        ObservableList<String> items = FXCollections.observableArrayList(groups.keySet());
+
+        items.add(null);
+
+        groupsList.setItems(items);
+
+        groupsList.setCellFactory(param -> new ListCell<String>() {
+
+            @Override
+            public void updateItem(String name, boolean empty) {
+                super.updateItem(name, empty);
+
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+
+                } else {
+
+                    if(name == null){
+
+                        AnchorPane p = new AnchorPane();
+                        TextField tf = new TextField();
+                        tf.setPromptText("Name");
+                        tf.setMaxHeight(5);
+                        tf.setMaxWidth(170);
+                        p.getChildren().add(tf);
+                        setGraphic(p);
+
+                        tf.setOnKeyPressed((event) -> {
+
+                            if(event.getCode().equals(KeyCode.ENTER)) {
+
+                                String groupName = tf.getText();
+                                p.getChildren().remove(tf);
+
+                                ObservableList<String> users = FXCollections.observableArrayList(usersOn.keySet());
+
+                                CheckComboBox cb = new CheckComboBox<String>(users);
+                                cb.setMaxWidth(140);
+
+                                p.getChildren().add(cb);
+
+                                Button create = new Button();
+                                create.setText("Done");
+                                create.setLayoutX(161);
+
+                                p.getChildren().add(create);
+
+                                create.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+                                    @Override
+                                    public void handle(MouseEvent mouseEvent) {
+
+                                        ArrayList<String> selectedList = new ArrayList<>();
+
+                                        for (Object o : cb.getCheckModel().getCheckedItems()) {
+                                            selectedList.add((String) o);
+                                        }
+
+                                        groups.put(groupName, selectedList);
+
+                                        p.getChildren().remove(cb);
+                                        p.getChildren().remove(create);
+
+                                        setGraphic(null);
+                                        setText(groupName);
+
+                                        items.remove(null);
+                                        items.add(groupName);
+                                        groupsList.setItems(items);
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    else{
+                        setText(name);
+                    }
+                }
+            }
+        });
+    }
 }

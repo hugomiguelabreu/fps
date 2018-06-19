@@ -202,9 +202,6 @@ public class TorrentUtil {
                 }
             }
         }
-
-
-
         return c;
     }
 

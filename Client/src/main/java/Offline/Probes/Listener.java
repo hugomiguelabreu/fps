@@ -24,10 +24,9 @@ public class Listener extends Thread {
     private final int sendPort = 5556; // porta de onde saem os multicasts
     private final int receivePort = 5557; // porta de destino dos multicasts
 
-    public Listener(String username, ArrayList<LocalAddresses> ips, OfflineUI ui){
+    public Listener(String username, ArrayList<LocalAddresses> ips, ConcurrentHashMapEvent<String, User> peers){
 
-        peers = new ConcurrentHashMapEvent<>();
-        peers.registerCallback(ui);
+        this.peers = peers;
 
         for(LocalAddresses addr : ips){
             User p = new User(username, addr.getIpv6(), addr.getIpv4(), new Timestamp(System.currentTimeMillis()));
