@@ -29,7 +29,7 @@ public class FileUtils {
         }
     }
 
-    public static List<Torrent> load(String group) throws IOException, NoSuchAlgorithmException {
+    public static ArrayList<Torrent> load(String group) throws IOException, NoSuchAlgorithmException {
         ArrayList<Torrent> ret = new ArrayList<>();
 
         File parent = new File(System.getProperty("user.home") + "/.fps/" + group);

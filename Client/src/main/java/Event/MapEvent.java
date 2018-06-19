@@ -2,6 +2,6 @@ package Event;
 
 public interface MapEvent {
 
-    void putEvent();
+    void putEvent(int a, Object group);
     void removeEvent();
 }

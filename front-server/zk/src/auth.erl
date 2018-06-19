@@ -12,7 +12,7 @@
 %%====================================================================
 
 init(ID,Port) ->
-	{ok, LSock} = gen_tcp:listen(Port, [binary, {reuseaddr, true}, {packet, 1}]),
+	{ok, LSock} = gen_tcp:listen(Port, [binary, {reuseaddr, true}, {packet, 4}]),
 	io:format("> autentication started\n"),
 	acceptor(LSock, ID),
 	receive 
@@ -84,6 +84,7 @@ login(Username, Password, ID, Socket) ->
 	end.
 
 loggedLoop(Socket, Username, ID) ->
+
 	receive
 		{tcp, Socket, Data} ->
 			msgDecriptor(Data, Username, Socket, ID),
@@ -107,9 +108,9 @@ loggedLoop(Socket, Username, ID) ->
 			gen_tcp:send(Socket, T),
 			loggedLoop(Socket, Username, ID);
 
-		{Username, unpacked_torrent, Group, Data} ->
+		{Username, unpacked_torrent, Group, Data, TID} ->
 			io:format("> received from another server and redirected\n"),
-			Wrapped = client_wrapper:encode_msg(#'ClientMessage'{msg = {torrentWrapper,#'TorrentWrapper'{group=Group, content=Data}}}),
+			Wrapped = client_wrapper:encode_msg(#'ClientMessage'{msg = {torrentWrapper,#'TorrentWrapper'{group=Group, content=Data, id=TID}}}),
 			gen_tcp:send(Socket, Wrapped),
 			loggedLoop(Socket, Username, ID)
 	end.
@@ -141,9 +142,11 @@ joinGroup(User, GroupName, Socket) ->
 
 
 msgDecriptor(Data, User, Socket, ID) ->
+	io:format("decriptor\n"),
 	{_, {T, D}} =  client_wrapper:decode_msg(Data, 'ClientMessage'),
 	case T of
 		login ->
+			io:format("drcrypt_login\n"),
 			{'Login',U,P}=D,
 			login(binary_to_list(U),binary_to_list(P),ID, Socket);
 		register ->
@@ -156,25 +159,25 @@ msgDecriptor(Data, User, Socket, ID) ->
 			{G} = D,
 			joinGroup(User, G, Socket);
 		torrentWrapper ->
+			io:format("decrtpytor_torrent \n"),
 			redirect(D, integer_to_list(ID), User)
 	end.
 
 redirect(ProtoTorrent, ID, CurrentUser) ->
 	io:format("> starting to redirect to group " ++ binary_to_list(ProtoTorrent#'TorrentWrapper'.group) ++ "\n"),
-	
-	{'TorrentWrapper', _, _, TID} = ProtoTorrent,
-	zk:newTorrent(binary_to_list(TID), CurrentUser, binary_to_list(ProtoTorrent#'TorrentWrapper'.group)),
 	%sendTracker(ID,ProtoTorrent#'TorrentWrapper'.content),
 	%file:write_file("./torrents/" ++ TID, ProtoTorrent),
 	
 	case zk:getGroupUsers(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
-		{ok, UsersMap} ->
+		{ok, UsersMap, Length} ->
+			{'TorrentWrapper', _, Content , TID} = ProtoTorrent,
+			zk:newTorrent(binary_to_list(TID), CurrentUser, binary_to_list(ProtoTorrent#'TorrentWrapper'.group), Length),
 			lists:foreach(fun(ServerID) ->
 							case ServerID of
 								offline ->
 									UsersOffline = maps:get(offline,UsersMap),
 									lists:foreach(fun(Usr) -> 
-										zk:setUnreceivedTorrent(TID, Usr, binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) end, UsersOffline);
+									zk:setUnreceivedTorrent(TID, Usr, binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) end, UsersOffline);
 								ID ->
 									lists:foreach(fun(Usr) -> 
 										UsrPid = data:get_pid(Usr),
@@ -186,7 +189,6 @@ redirect(ProtoTorrent, ID, CurrentUser) ->
 										end
 									 end, maps:get(ID, UsersMap));
 								_ ->
-									{'TorrentWrapper', _, Content, _} = ProtoTorrent,
 									UsersSv = lists:concat(lists:join(";",maps:get(ServerID,UsersMap))),
 									server_comm:sendFrontServer(ServerID, UsersSv, binary_to_list(ProtoTorrent#'TorrentWrapper'.group), TID, Content)
 							end
