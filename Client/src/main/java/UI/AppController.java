@@ -54,8 +54,12 @@ public class AppController {
     private SplitPane splitPane1;
     @FXML
     private SplitPane splitPane2;
+    @FXML
+    private Label label_file;
 
     private ArrayList<Pane> notifications;
+
+    private String groupSelected;
     private HashMap<String, List<Torrent>> groupTorrents;
 
     @FXML
@@ -65,13 +69,21 @@ public class AppController {
 
         dragNdrop.setBackground(new Background(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, Insets.EMPTY)));
         dragNdrop.setOpacity(0.8);
-        dragNdrop.setPrefWidth(405);
+        dragNdrop.setPrefWidth(385);
+        label_file.setVisible(false);
         dragNdrop.setVisible(true);
     }
 
     @FXML
     void handleDragDropped(DragEvent event) {
         System.out.println(event.getDragboard().getFiles().get(0).getName());
+        if(groupSelected == null || groupSelected == "") {
+            Alert a = new Alert(Alert.AlertType.WARNING);
+            a.setContentText("No group selected");
+            a.showAndWait().filter(response -> response == ButtonType.OK);
+        }else{
+
+        }
 
         event.setDropCompleted(true);
         event.consume();
@@ -103,8 +115,9 @@ public class AppController {
         list_users.setItems(items);
         list_groups.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, event -> {
             try {
+                label_file.setVisible(true);
                 list_groups_files.getChildren().remove(0, list_groups_files.getChildren().size());
-                String groupSelected = list_groups.getSelectionModel().getSelectedItem();
+                groupSelected = list_groups.getSelectionModel().getSelectedItem();
                 this.loadFiles(groupSelected);
             } catch (IOException | NoSuchAlgorithmException e) {
                 e.printStackTrace();
@@ -117,7 +130,8 @@ public class AppController {
         if(groupTorrents.get(group) == null)
             groupTorrents.put(group, FileUtils.load(group));
         notifications.clear();
-
+        if(groupTorrents.get(group).size() > 0)
+            label_file.setVisible(false);
         for(Torrent t: groupTorrents.get(group)){
 
             Label l = new Label();
@@ -144,8 +158,9 @@ public class AppController {
 
                     //pane.setLayoutX(244.0);
                     pane.setLayoutY(-92);
+                    pane.setLayoutX(2);
                     pane.setPrefHeight(92);
-                    pane.setPrefWidth(385.0);
+                    pane.setPrefWidth(365);
                     pane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
                     pane.setBorder(new Border(
                             new BorderStroke(Color.DARKGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)
@@ -156,7 +171,7 @@ public class AppController {
                     l.setLayoutX(14.0);
                     l.setLayoutY(20.0);
                     l.setPrefHeight(16.0);
-                    l.setPrefWidth(385.0);
+                    l.setPrefWidth(365);
 
                     accept.setAlignment(Pos.CENTER);
                     accept.setLayoutX(116);
@@ -249,6 +264,8 @@ public class AppController {
 
     public void handleDragExited(DragEvent dragEvent) {
         dragNdrop.setVisible(false);
+        if(groupSelected != null && groupTorrents.get(groupSelected).size() == 0)
+            label_file.setVisible(true);
         dragEvent.consume();
     }
 

@@ -25,15 +25,16 @@
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                         <children>
                             <ListView fx:id="list_users" layoutY="41.0" prefHeight="558.0" prefWidth="161.0" />
-                              <Label layoutX="11.0" layoutY="13.0" text="Users Online" />
+                              <Label layoutX="11.0" layoutY="13.0" text="Users Operations" />
                         </children>
                         </AnchorPane>
-                        <AnchorPane onDragDropped="#handleDragDropped" onDragExited="#handleDragExited" onDragOver="#handleDragOver" prefWidth="397.0">
+                        <AnchorPane onDragDropped="#handleDragDropped" onDragExited="#handleDragExited" onDragOver="#handleDragOver" prefWidth="385.0">
                            <children>
-                                  <AnchorPane fx:id="list_groups_files" prefHeight="600.0" prefWidth="397.0" />
-                               <AnchorPane fx:id="dragNdrop" prefHeight="600.0" prefWidth="397.0" visible="false">
+                               <AnchorPane fx:id="list_groups_files" prefHeight="600.0" prefWidth="385.0" />
+                               <Label fx:id="label_file" alignment="CENTER" contentDisplay="CENTER" layoutX="148.0" layoutY="293.0" text="Drop Files Here" />
+                               <AnchorPane fx:id="dragNdrop" prefHeight="600.0" prefWidth="375.0" visible="false">
                                  <children>
-                                    <Label layoutX="29.0" layoutY="276.0" text="Drop file to share">
+                                    <Label layoutX="19.0" layoutY="250.0" text="Drop file to share">
                                        <font>
                                           <Font size="39.0" />
                                        </font>

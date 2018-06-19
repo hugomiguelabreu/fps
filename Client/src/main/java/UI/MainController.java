@@ -70,7 +70,7 @@ public class MainController implements Initializable{
                 type = true;
 
                 slider.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
-                status.setText("Online");
+                status.setText("Operations");
 
                 TranslateTransition down = new TranslateTransition();
                 down.setToY(40);

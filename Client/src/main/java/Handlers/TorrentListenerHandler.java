@@ -26,8 +26,9 @@ public class TorrentListenerHandler extends SimpleChannelInboundHandler<ClientWr
         Torrent t = new Torrent(
                 torrentWrapper.getTorrentWrapper().getContent().toByteArray(),
                 true);
+        String group = torrentWrapper.getTorrentWrapper().getGroup();
         available.addTorrent(t);
-        FileUtils.addTorrent(t);
+        FileUtils.addTorrent(t, group);
     }
 
     @Override

@@ -25,7 +25,6 @@ import java.util.*;
 
 public class Main {
 
-    private static final Logger logger = LoggerFactory.getLogger(Object.class);
     private static ArrayList<Client> activeClients;
     private static EventLoopGroup group = null;
     private static ArrayList<String> servers = new ArrayList<>();
@@ -84,8 +83,8 @@ public class Main {
             System.out.println("---------------------------------");
         }
 
-        System.out.println("Online or Offline?");
-        boolean type = sc.nextLine().equals("Online");
+        System.out.println("Operations or Offline?");
+        boolean type = sc.nextLine().equals("Operations");
 
         if(!type) {
             Offline.startProbes(username, available);

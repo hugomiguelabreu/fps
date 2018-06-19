@@ -108,9 +108,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                 button_send.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
-
                         db.clear();
-
                         paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
                         button_send.setVisible(false);
                         button_broadcast.setVisible(false);
