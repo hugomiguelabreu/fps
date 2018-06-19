@@ -3,7 +3,7 @@
 -include("server_wrapper.hrl").
 
 init(Port, ID) ->
-	{ok, LSock} = gen_tcp:listen(Port, [binary, {reuseaddr, true}, {packet, 1}]),
+	{ok, LSock} = gen_tcp:listen(Port, [binary, {reuseaddr, true}, {packet, 4}]),
 	io:format("> Listening for server communication\n"),
 	acceptor(LSock, ID),
 	receive 
@@ -35,7 +35,7 @@ msgDecriptor(Data, ID) ->
 			lists:foreach( fun(User) ->
 				case data:get_pid(User) of
 					{ok, Pid} ->
-						Pid ! {User, unpacked_torrent, binary_to_list(Group), Content};
+						Pid ! {User, unpacked_torrent, binary_to_list(Group), Content, TID};
 					_ ->
 						zk:setUnreceivedTorrent(binary_to_list(TID), User, binary_to_list(Group))
 				end
@@ -50,7 +50,7 @@ sendFrontServer(Loc, User, Group, TID, Data) ->
 		_ ->
 			[IP,PORT] = string:split(IP_PORT,":"),
 			Msg = server_wrapper:encode_msg(#'ServerMessage'{msg={frontEndTorrent, #'FrontEndTorrent'{id=TID, user=User, group=Group, content=Data}}}),
-			case gen_tcp:connect(IP, list_to_integer(PORT), [binary, {reuseaddr, true}, {packet, 1}]) of
+			case gen_tcp:connect(IP, list_to_integer(PORT), [binary, {reuseaddr, true}, {packet, 4}]) of
 				{ok, Socket} ->
 		    		gen_tcp:send(Socket, Msg),
 		    		gen_tcp:close(Socket);
@@ -70,7 +70,7 @@ sendTracker(ID, Data) ->
 			[T_IP,T_PORT] = string:split(TrackerLOC,":"),
 
 			Msg = server_wrapper:encode_msg(#'ServerMessage'{msg = {trackerTorrent, #'TrackerTorrent'{content=Data}}}),
-			case gen_tcp:connect(T_IP, list_to_integer(T_PORT), [binary, {reuseaddr, true}, {packet, 1}]) of
+			case gen_tcp:connect(T_IP, list_to_integer(T_PORT), [binary, {reuseaddr, true}, {packet, 4}]) of
 				{ok, TrackerSocket} ->
 		    		gen_tcp:send(TrackerSocket, Msg),
 		    		gen_tcp:close(TrackerSocket),

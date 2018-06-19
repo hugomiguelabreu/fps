@@ -1,8 +1,15 @@
 import client_network.ClientWrapper;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.CodedInputStream;
 
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.lang.reflect.Array;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.util.UUID;
 
@@ -25,6 +32,10 @@ public class Client implements Runnable{
             else
                 socket = new Socket("localhost"  , 2001);
 
+
+            CodedInputStream in = CodedInputStream.newInstance(socket.getInputStream());
+
+
             ClientWrapper.Login login = ClientWrapper.Login.newBuilder()
                     .setUsername(username)
                     .setPassword(password).build();
@@ -32,33 +43,45 @@ public class Client implements Runnable{
             ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
                     .setLogin(login).build();
 
-            socket.getOutputStream().write(wrapper.getSerializedSize());
+
+            byte[] size = ByteBuffer.allocate(4).putInt(wrapper.getSerializedSize()).array();
+            socket.getOutputStream().write(size);
             wrapper.writeTo(socket.getOutputStream());
-            System.out.println(ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getResponse().getRep());
-            Thread.sleep(2000);
+
+            byte[] header = in.readRawBytes(4);
+            int l = ByteBuffer.wrap(header).getInt();
+            byte[] data = in.readRawBytes(l);
+
+            System.out.println(ClientWrapper.ClientMessage.parseFrom(data).getResponse());
+            Thread.sleep(100000);
 
 
-            char[] data = new char[100000000];
             String uniqueId = UUID.randomUUID().toString().split("-")[4];
 
             StringBuilder sb = new StringBuilder();
 
             if (username.equals("jib")){
-
-                File file = new File("/home/jreis/Documents/output.dat");
                 ClientWrapper.TorrentWrapper torr = ClientWrapper.TorrentWrapper.newBuilder()
                         .setGroup("leddit")
                         .setId(uniqueId)
-                        .setContent(ByteString.copyFrom(Files.readAllBytes(file.toPath()))).build();
-
+                        .setContent(ByteString.copyFromUtf8("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffasdasdasdasdaaaaaaaaaaaaaaaaaaaaaakc.xmqdslllllllllllllllllcccccccccccccccccccccccwooooooooooooooooooooooouuuuuuuuuuuuuuhhhhhhhhhhhhhhhhhhhhhhhhhffffffffffffffffffffvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv            wwwwwwwwwqqqqqqqqqqqrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"))
+                        .build();
 
                 wrapper = ClientWrapper.ClientMessage.newBuilder()
                         .setTorrentWrapper(torr).build();
 
-                socket.getOutputStream().write(wrapper.getSerializedSize());
+
+                System.out.println("tamanho do proto: " + wrapper.getSerializedSize());
+                socket.getOutputStream().write(ByteBuffer.allocate(4).putInt(wrapper.getSerializedSize()).array());
                 wrapper.writeTo(socket.getOutputStream());
             }
-            System.out.println(username + " : " + ClientWrapper.ClientMessage.parseDelimitedFrom(socket.getInputStream()).getTorrentWrapper());
+
+            byte[] length_b = in.readRawBytes(4);
+            l = ByteBuffer.wrap(length_b).getInt();
+
+            data = in.readRawBytes(l);
+
+            System.out.println(ClientWrapper.ClientMessage.parseFrom(data).getTorrentWrapper());
             socket.close();
 
 
@@ -67,7 +90,7 @@ public class Client implements Runnable{
 
     public static void main(String[] args) {
         (new Thread(new Client("jib", "asd"))).start();
-            (new Thread(new Client("divisao", "123"))).start();
+        //(new Thread(new Client("divisao", "123"))).start();
         (new Thread(new Client("cr7", "123"))).start();
     }
 }

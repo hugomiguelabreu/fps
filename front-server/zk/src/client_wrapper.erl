@@ -1337,6 +1337,7 @@ d_field_ClientMessage_torrentWrapper(<<0:1, X:7,
 				     N, Acc, Prev, TrUserData) ->
     {NewFValue, RestF} = begin
 			   Len = X bsl N + Acc,
+			   io:format("X="  ++  integer_to_list(X) ++ " || N=" ++ integer_to_list(N) ++ " || ACC=" ++ integer_to_list(Acc) ++ "|| LEN=" ++ integer_to_list(Len) ++ " |\n"),
 			   <<Bs:Len/binary, Rest2/binary>> = Rest,
 			   {id(d_msg_TorrentWrapper(Bs, TrUserData),
 			       TrUserData),

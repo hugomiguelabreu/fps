@@ -1,5 +1,5 @@
 -module(zk).
--export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/2, setOffline/1, getGroupUsers/1, getTrackerList/0, getFrontSv/1, newTorrent/3, setUnreceivedTorrent/3, getTracker/1, getNewContent/1]).
+-export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/2, setOffline/1, getGroupUsers/1, getTrackerList/0, getFrontSv/1, newTorrent/4, setUnreceivedTorrent/3, getTracker/1, getNewContent/1]).
 
 
 init(Host, Port) ->
@@ -51,8 +51,8 @@ loop(Pid) ->
 			V = getTracker(ID, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);	
-    	{{new_torrent, TID, U, G}, From} ->
-    		V = newTorrent(TID, U, G, Pid),
+    	{{new_torrent, TID, U, G, L}, From} ->
+    		V = newTorrent(TID, U, G, L, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
     	{{new_content, U}, From} ->
@@ -134,7 +134,8 @@ joinGroup(Name, Username, PID) ->
 		{error, no_node} ->
 			no_group;
 		{ok, _} ->
-			erlzk:create(PID,GroupPath ++ "/users/" ++ Username, list_to_binary("user")),
+			erlzk:create(PID, GroupPath ++ "/users/" ++ Username, list_to_binary("user")),
+			erlzk:create(PID, "/users/groups/" ++ Name, ""),
 			ok;
 		_ ->
 			error
@@ -172,7 +173,7 @@ getGroupUsers(Name, PID) ->
 	R = erlzk:get_children(PID,GroupPath),
 	case R of
 		{ok, L} ->
-			{ok, getLoc(L, #{}, PID)};
+			{ok, getLoc(L, #{}, PID), length(L)};
 		{error, no_node} ->
 			no_group;
 		_ ->
@@ -249,11 +250,16 @@ getTracker(ID, PID) ->
 		 	binary_to_list(RP)
 	 	end.
 
-newTorrent(TID, U, G) -> rpc({new_torrent, TID, U, G}). 
-newTorrent(TID, User, Group, PID) ->
+newTorrent(TID, U, G, L) -> rpc({new_torrent, TID, U, G, L}). 
+newTorrent(TID, User, Group, Length, PID) ->
 	GroupPath = "/groups/" ++ Group ++ "/torrents/" ++ TID,
 	erlzk:create(PID, GroupPath, list_to_binary(User)),
-	erlzk:create(PID, GroupPath ++ "/file/", list_to_binary("")),
+	erlzk:create(PID, GroupPath ++ "/file", list_to_binary("")),
+	erlzk:create(PID, GroupPath ++ "/torrent", list_to_binary("")),
+	erlzk:create(PID, GroupPath ++ "/file" ++ "/total", list_to_binary(integer_to_list(Length))),
+	erlzk:create(PID, GroupPath ++ "/file" ++ "/current", list_to_binary("0")),
+	erlzk:create(PID, GroupPath ++ "/torrent" ++ "/total", list_to_binary(integer_to_list(Length))),
+	erlzk:create(PID, GroupPath ++ "/torrent" ++ "/current", list_to_binary("0")),
 	ok.	
 
 setUnreceivedTorrent(TID, U, G) -> rpc({unreceived_torrent, TID, U, G}). 
