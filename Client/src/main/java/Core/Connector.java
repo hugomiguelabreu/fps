@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.concurrent.BlockingQueue;
 
 public class Connector extends Thread{
 
@@ -19,6 +20,7 @@ public class Connector extends Thread{
     private Socket socket;
     private boolean connected;
     private boolean stop;
+
 
     public Connector(Collection<String> ips) throws URISyntaxException {
         for (String ip : ips) {
@@ -44,7 +46,7 @@ public class Connector extends Thread{
                 ClientWrapper.ClientMessage cm = ClientWrapper.ClientMessage.parseDelimitedFrom(in);
                 boolean torrent =
                         cm.getMsgCase().equals(ClientWrapper.ClientMessage.MsgCase.TORRENTWRAPPER);
-
+                //Recieved a torrent for a group. Add that torrent to the map;
                 if(torrent){
                     byte[] byteTorrent = cm.getTorrentWrapper().getContent().toByteArray();
                     String group = cm.getTorrentWrapper().getGroup();

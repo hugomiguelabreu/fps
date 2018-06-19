@@ -1,3 +1,5 @@
+package Core;
+
 import Core.Connector;
 import Event.ArrayListEvent;
 import Event.MapEvent;
@@ -21,6 +23,14 @@ public class Online implements MapEvent{
     private static EventLoopGroup group = null;
     private static ArrayList<String> servers = new ArrayList<>();
     private static Connector channel;
+
+    public Online(){
+
+    }
+
+    public static void addTorrent(){
+
+    }
 
     public static void upload(String path, String group) throws IOException, NoSuchAlgorithmException {
         ArrayList<String> trc = new ArrayList<String>();
