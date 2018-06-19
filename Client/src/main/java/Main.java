@@ -83,8 +83,8 @@ public class Main {
             System.out.println("---------------------------------");
         }
 
-        System.out.println("Operations or Offline?");
-        boolean type = sc.nextLine().equals("Operations");
+        System.out.println("Online or Offline?");
+        boolean type = sc.nextLine().equals("Online");
 
         if(!type) {
             Offline.startProbes(username, available);

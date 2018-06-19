@@ -1,6 +1,8 @@
 package Core;
 
 import Network.ClientWrapper;
+import Util.FileUtils;
+import com.turn.ttorrent.common.Torrent;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +48,10 @@ public class Connector extends Thread{
                 if(torrent){
                     byte[] byteTorrent = cm.getTorrentWrapper().getContent().toByteArray();
                     String group = cm.getTorrentWrapper().getGroup();
-                    System.out.println(group);
+                    Torrent t = new Torrent(
+                            byteTorrent,
+                            true);
+                    FileUtils.addTorrent(t, group);
                 }else{
                     boolean response = cm.getResponse().getRep();
                     System.out.println(response);
@@ -54,6 +59,7 @@ public class Connector extends Thread{
 
                 System.out.println("RECEBI CENAS ");
                 //TODO: check if not null
+
             } catch (Exception e) {
                 e.printStackTrace();
                 this.close();

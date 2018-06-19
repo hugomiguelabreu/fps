@@ -62,6 +62,8 @@ public class AppController {
     private String groupSelected;
     private HashMap<String, List<Torrent>> groupTorrents;
 
+
+
     @FXML
     void handleDragOver(DragEvent event) {
         event.acceptTransferModes(TransferMode.ANY);
@@ -84,7 +86,6 @@ public class AppController {
         }else{
 
         }
-
         event.setDropCompleted(true);
         event.consume();
     }

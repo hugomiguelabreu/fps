@@ -1,5 +1,6 @@
 import Core.Connector;
 import Event.ArrayListEvent;
+import Event.MapEvent;
 import Util.FileUtils;
 import Util.TorrentUtil;
 import com.turn.ttorrent.client.Client;
@@ -13,10 +14,8 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-public class Operations {
+public class Online implements MapEvent{
 
-    private static ArrayListEvent<Torrent> available = new ArrayListEvent<>();
-    private static Tracker offlineTck = null;
     private static String username;
     private static ArrayList<Client> activeClients = new ArrayList<>();
     private static EventLoopGroup group = null;
@@ -43,4 +42,13 @@ public class Operations {
         }
     }
 
+    @Override
+    public void putEvent() {
+
+    }
+
+    @Override
+    public void removeEvent() {
+
+    }
 }

@@ -6,9 +6,9 @@
 
 <AnchorPane fx:id="pane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.Type">
    <children>
-      <Circle fx:id="onlineCircle" accessibleText="Operations" fill="DODGERBLUE" layoutX="202.0" layoutY="300.0" onMouseClicked="#clickOnline" onMouseEntered="#resizeOnline" onMouseExited="#resizeOnlineReverse" radius="100.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="onlineCircle" accessibleText="Online" fill="DODGERBLUE" layoutX="202.0" layoutY="300.0" onMouseClicked="#clickOnline" onMouseEntered="#resizeOnline" onMouseExited="#resizeOnlineReverse" radius="100.0" stroke="BLACK" strokeType="INSIDE" />
       <Circle fx:id="offlineCircle" fill="DODGERBLUE" layoutX="616.0" layoutY="300.0" onMouseClicked="#clickOffline" onMouseEntered="#resizeOffline" onMouseExited="#resizeOfflineReverse" radius="100.0" stroke="BLACK" strokeType="INSIDE" />
-      <Text fx:id="textOnline" boundsType="VISUAL" layoutX="181.0" layoutY="305.0" onMouseClicked="#clickOnline" onMouseEntered="#resizeOnline" text="Operations" />
+      <Text fx:id="textOnline" boundsType="VISUAL" layoutX="181.0" layoutY="305.0" onMouseClicked="#clickOnline" onMouseEntered="#resizeOnline" text="Online" />
       <Text fx:id="textOffline" boundsType="VISUAL" layoutX="594.0" layoutY="305.0" onMouseClicked="#clickOffline" onMouseEntered="#resizeOffline" text="Offline" />
    </children>
 </AnchorPane>
