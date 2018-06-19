@@ -10,7 +10,7 @@
 <AnchorPane fx:id="mainPane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.OfflineUI">
 
     <children>
-        <SplitPane dividerPositions="0.298" prefHeight="600.0" prefWidth="800.0">
+        <SplitPane dividerPositions="0.298" prefHeight="600.0" prefWidth="800.0" fx:id="splitPane1">
             <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                     <children>
