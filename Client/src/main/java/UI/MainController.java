@@ -56,6 +56,7 @@ public class MainController implements Initializable{
 
         servers = new ArrayList<>();
         servers.add("localhost:2000");
+        servers.add("localhost:2001");
 
         try {
             channel = new Connector(servers);
@@ -66,21 +67,16 @@ public class MainController implements Initializable{
                 ServerOperations.setChannel(channel);
 
                 type = true;
-
                 slider.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
                 status.setText("Online");
-
                 TranslateTransition down = new TranslateTransition();
                 down.setToY(40);
                 down.setDuration(Duration.seconds(2));
                 down.setNode(slider);
 
                 down.play();
-
             }
-
             else {
-
                 type = false;
                 paneOff.setVisible(true);
 
@@ -105,7 +101,6 @@ public class MainController implements Initializable{
 
     @FXML
     void loginHandle(ActionEvent event) throws IOException {
-
         if(type){
             if(ServerOperations.login(login_username.getText(), login_password.getText())){
                 FXMLLoader loader = new FXMLLoader();

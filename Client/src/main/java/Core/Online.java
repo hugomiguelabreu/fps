@@ -7,8 +7,6 @@ import Util.FileUtils;
 import Util.TorrentUtil;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.common.Torrent;
-import com.turn.ttorrent.tracker.Tracker;
-import io.netty.channel.EventLoopGroup;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -16,19 +14,17 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
-public class Online implements MapEvent{
+public class Online {
 
     private static String username;
     private static ArrayList<Client> activeClients = new ArrayList<>();
-    private static EventLoopGroup group = null;
-    private static ArrayList<String> servers = new ArrayList<>();
     private static Connector channel;
 
-    public Online(){
-
+    public static void addTorrent(Torrent t, String group){
+        FileUtils.addTorrent(t, group);
     }
 
-    public static void addTorrent(){
+    public static void updateUsers(ArrayList<String> users){
 
     }
 
@@ -52,13 +48,4 @@ public class Online implements MapEvent{
         }
     }
 
-    @Override
-    public void putEvent() {
-
-    }
-
-    @Override
-    public void removeEvent() {
-
-    }
 }

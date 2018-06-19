@@ -13,7 +13,13 @@ public class ConcurrentHashMapEvent<K,V> extends ConcurrentHashMap<K,V> {
     @Override
     public V put(K key, V value){
         V ret = super.put(key,value);
-        mapEvent.putEvent();
+        mapEvent.putEvent(0, key);
+        return ret;
+    }
+
+    public V putTorrent(K key, V value){
+        V ret = super.put(key,value);
+        mapEvent.putEvent(1, key);
         return ret;
     }
 

@@ -1,7 +1,10 @@
 package UI;
 
+import Core.Connector;
 import Event.ConcurrentHashMapEvent;
+import Event.MapEvent;
 import Util.FileUtils;
+import Util.ServerOperations;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
 import javafx.animation.TranslateTransition;
@@ -27,7 +30,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.List;
 
-public class AppController {
+public class AppController implements MapEvent{
 
     @FXML
     private ResourceBundle resources;
@@ -50,8 +53,8 @@ public class AppController {
 
     private ArrayList<Pane> notifications;
     private String groupSelected;
-    private ConcurrentHashMapEvent<String, List<Torrent>> groupTorrents;
-    private ConcurrentHashMapEvent<String, List<Torrent>> groupUsers;
+    private ConcurrentHashMapEvent<String, ArrayList<Torrent>> groupTorrents;
+    private ConcurrentHashMapEvent<String, ArrayList<Torrent>> groupUsers;
 
 
     @FXML
@@ -66,13 +69,20 @@ public class AppController {
         );
 
         Collection<String> labels = new ArrayList<>();
-        notifications = new ArrayList<>();
         groupTorrents = new ConcurrentHashMapEvent<>();
+        groupTorrents.registerCallback(this);
+        ServerOperations.setGroupTorrents(groupTorrents);
+        groupUsers = new ConcurrentHashMapEvent<>();
+        groupUsers.registerCallback(this);
+        ServerOperations.setGroupUsers(groupUsers);
+
+        notifications = new ArrayList<>();
+
         labels.add("migos");
-        groupTorrents.put("migos", null);
+        groupTorrents.put("migos", new ArrayList<>());
         for (int i = 0; i < 50; i++) {
             labels.add("okok" + i);
-            groupTorrents.put("okok" + i, null);
+            groupTorrents.put("okok" + i, new ArrayList<>());
         }
 
         ObservableList<String> items = FXCollections.observableArrayList(labels);
@@ -92,118 +102,105 @@ public class AppController {
     }
 
     private void loadFiles(String group) throws IOException, NoSuchAlgorithmException {
-        if(groupTorrents.get(group) == null)
-            groupTorrents.put(group, FileUtils.load(group));
         notifications.clear();
-        if(groupTorrents.get(group).size() > 0)
+        if(groupTorrents.get(group).size() == 0)
+            groupTorrents.put(group, FileUtils.load(group));
+        else
             label_file.setVisible(false);
+
         for(Torrent t: groupTorrents.get(group)){
-
-            Label l = new Label();
-            Button accept = new Button();
-            Button close = new Button();
-            AnchorPane pane = new AnchorPane();
-
-            StringBuilder sb = new StringBuilder()
-                    .append(t.getCreatedBy() + " wants to share ");
-            sb.append(t.getFilenames().get(0) + " ( " + t.getSize()/1024/1024 + " MB) " + " with you");
-
-            // update UI thread
-            Platform.runLater(() -> {
-                notifications.add(pane);
-
-                pane.getChildren().add(l);
-                pane.getChildren().add(accept);
-                pane.getChildren().add(close);
-                list_groups_files.getChildren().add(pane);
-
-                //pane.setLayoutX(244.0);
-                pane.setLayoutY(-92);
-                pane.setLayoutX(2);
-                pane.setPrefHeight(92);
-                pane.setPrefWidth(365);
-                pane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
-                pane.setBorder(new Border(
-                        new BorderStroke(Color.DARKGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)
-                ));
-
-                l.setText(sb.toString());
-                l.setAlignment(Pos.CENTER);
-                l.setLayoutX(14.0);
-                l.setLayoutY(20.0);
-                l.setPrefHeight(16.0);
-                l.setPrefWidth(365);
-
-                accept.setAlignment(Pos.CENTER);
-                accept.setLayoutX(116);
-                accept.setLayoutY(55);
-                accept.setBackground(new Background(new BackgroundFill(Color.LIGHTGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
-                accept.setText("Accept");
-                accept.setUserData(l);
-
-                close.setAlignment(Pos.CENTER);
-                close.setLayoutX(209);
-                close.setLayoutY(55);
-                close.setBackground(new Background(new BackgroundFill(Color.INDIANRED, CornerRadii.EMPTY, Insets.EMPTY)));
-                close.setText("Delete");
-                close.setUserData(pane);
-
-                //TODO close button close.setUserdata(pane);
-
-                TranslateTransition down = new TranslateTransition();
-                down.setFromY(94 * (notifications.size() - 1));
-                down.setToY(94 * notifications.size());
-
-                down.setDuration(Duration.seconds(1));
-                down.setNode(pane);
-
-                down.play();
-            });
-
-            accept.setOnMouseClicked(mouseEvent -> {
-                //TODO mudar para a diretoria certa
-                File dest = new File("/tmp/");
-
-                try {
-
-                    SharedTorrent st = new SharedTorrent(t, dest);
-                    //TorrentUtil.download(st, false, username, (Label)accept.getUserData());
-
-                } catch (IOException | NoSuchAlgorithmException e) {
-                    e.printStackTrace();
-                }
-
-            });
-
-            close.setOnMouseClicked(mouseEvent -> {
-
-                //System.out.println("accept torrent " + t.toString());
-
-                AnchorPane selectedPane = (AnchorPane) close.getUserData();
-
-                list_groups_files.getChildren().remove(selectedPane);
-
-                int index = notifications.indexOf(selectedPane);
-
-                notifications.remove(selectedPane);
-
-                for(Pane p : notifications){
-
-                    if(notifications.indexOf(p) >= index){
-
-                        System.out.println("go up");
-
-                        TranslateTransition up = new TranslateTransition();
-                        up.setDuration(Duration.seconds(1));
-                        up.setByY(-94);
-                        up.setNode(p);
-                        up.play();
-
-                    }
-
-                }
-            });
+            panelUI(t);
         }
+    }
+
+    void panelUI(Torrent t){
+        Label l = new Label();
+        Button accept = new Button();
+        Button close = new Button();
+        AnchorPane pane = new AnchorPane();
+
+        StringBuilder sb = new StringBuilder()
+                .append(t.getCreatedBy() + " wants to share ");
+        sb.append(t.getFilenames().get(0) + " ( " + t.getSize()/1024/1024 + " MB) " + " with you");
+
+        // update UI thread
+        Platform.runLater(() -> {
+            notifications.add(pane);
+
+            pane.getChildren().add(l);
+            pane.getChildren().add(accept);
+            pane.getChildren().add(close);
+            list_groups_files.getChildren().add(pane);
+
+            //pane.setLayoutX(244.0);
+            pane.setLayoutY(-92);
+            pane.setLayoutX(2);
+            pane.setPrefHeight(92);
+            pane.setPrefWidth(365);
+            pane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+            pane.setBorder(new Border(
+                    new BorderStroke(Color.DARKGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)
+            ));
+
+            l.setText(sb.toString());
+            l.setAlignment(Pos.CENTER);
+            l.setLayoutX(14.0);
+            l.setLayoutY(20.0);
+            l.setPrefHeight(16.0);
+            l.setPrefWidth(365);
+
+            accept.setAlignment(Pos.CENTER);
+            accept.setLayoutX(116);
+            accept.setLayoutY(55);
+            accept.setBackground(new Background(new BackgroundFill(Color.LIGHTGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+            accept.setText("Accept");
+            accept.setUserData(l);
+
+            close.setAlignment(Pos.CENTER);
+            close.setLayoutX(209);
+            close.setLayoutY(55);
+            close.setBackground(new Background(new BackgroundFill(Color.INDIANRED, CornerRadii.EMPTY, Insets.EMPTY)));
+            close.setText("Delete");
+            close.setUserData(pane);
+
+            //TODO close button close.setUserdata(pane);
+
+            TranslateTransition down = new TranslateTransition();
+            down.setFromY(94 * (notifications.size() - 1));
+            down.setToY(94 * notifications.size());
+
+            down.setDuration(Duration.seconds(1));
+            down.setNode(pane);
+            down.play();
+        });
+
+        accept.setOnMouseClicked(mouseEvent -> {
+            //TODO mudar para a diretoria certa
+            File dest = new File("/tmp/");
+            try {
+                SharedTorrent st = new SharedTorrent(t, dest);
+                //TorrentUtil.download(st, false, username, (Label)accept.getUserData());
+            } catch (IOException | NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
+        });
+
+        close.setOnMouseClicked(mouseEvent -> {
+            AnchorPane selectedPane = (AnchorPane) close.getUserData();
+            list_groups_files.getChildren().remove(selectedPane);
+            int index = notifications.indexOf(selectedPane);
+            notifications.remove(selectedPane);
+            for(Pane p : notifications){
+                if(notifications.indexOf(p) >= index){
+                    System.out.println("go up");
+                    TranslateTransition up = new TranslateTransition();
+                    up.setDuration(Duration.seconds(1));
+                    up.setByY(-94);
+                    up.setNode(p);
+                    up.play();
+                }
+            }
+        });
     }
 
     @FXML
@@ -239,4 +236,17 @@ public class AppController {
         dragEvent.consume();
     }
 
+    @Override
+    public void putEvent(int type, Object key) {
+        if(type == 1){
+            //Torrent novo;
+            String group = String.valueOf(key);
+            panelUI(groupTorrents.get(group).get(0));
+        }
+    }
+
+    @Override
+    public void removeEvent() {
+
+    }
 }

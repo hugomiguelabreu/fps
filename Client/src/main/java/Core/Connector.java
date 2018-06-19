@@ -1,8 +1,11 @@
 package Core;
 
 import Network.ClientWrapper;
+import UI.AppController;
 import Util.FileUtils;
+import Util.ServerOperations;
 import com.turn.ttorrent.common.Torrent;
+import javafx.fxml.FXMLLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,17 +15,20 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Connector extends Thread{
 
     private OutputStream out;
     private InputStream in;
     private Socket socket;
+    private LinkedBlockingQueue<Boolean> responses;
     private boolean connected;
     private boolean stop;
 
 
     public Connector(Collection<String> ips) throws URISyntaxException {
+        responses = new LinkedBlockingQueue<>();
         for (String ip : ips) {
             URI uri = new URI("fps://" + ip);
             try {
@@ -46,6 +52,7 @@ public class Connector extends Thread{
                 ClientWrapper.ClientMessage cm = ClientWrapper.ClientMessage.parseDelimitedFrom(in);
                 boolean torrent =
                         cm.getMsgCase().equals(ClientWrapper.ClientMessage.MsgCase.TORRENTWRAPPER);
+
                 //Recieved a torrent for a group. Add that torrent to the map;
                 if(torrent){
                     byte[] byteTorrent = cm.getTorrentWrapper().getContent().toByteArray();
@@ -53,10 +60,10 @@ public class Connector extends Thread{
                     Torrent t = new Torrent(
                             byteTorrent,
                             true);
-                    FileUtils.addTorrent(t, group);
+                    ServerOperations.addTorrent(t, group);
                 }else{
                     boolean response = cm.getResponse().getRep();
-                    System.out.println(response);
+                    this.responses.offer(response);
                 }
 
                 System.out.println("RECEBI CENAS ");
@@ -67,6 +74,10 @@ public class Connector extends Thread{
                 this.close();
             }
         }
+    }
+
+    public boolean readResponse() throws InterruptedException {
+        return this.responses.take();
     }
 
     public boolean send(ClientWrapper.ClientMessage msg){

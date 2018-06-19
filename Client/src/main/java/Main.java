@@ -26,7 +26,6 @@ import java.util.*;
 public class Main {
 
     private static ArrayList<Client> activeClients;
-    private static EventLoopGroup group = null;
     private static ArrayList<String> servers = new ArrayList<>();
     private static Connector channel;
 
@@ -166,9 +165,6 @@ public class Main {
         if (offlineTck != null) {
             offlineTck.stop();
         }
-
-        if(group != null)
-            group.shutdownGracefully();
 
         System.exit(0);
     }

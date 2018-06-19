@@ -214,7 +214,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
     // Add Peer to List
     @Override
-    public void putEvent() {
+    public void putEvent(int a, Object group) {
 
         try{
 
@@ -245,7 +245,6 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         catch (NullPointerException e){
             System.out.println("listner null, inseriu o self");
         }
-
     }
 
     //Remove peer from List
