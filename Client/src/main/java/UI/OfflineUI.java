@@ -277,17 +277,21 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                 close.setText("Close");
                 close.setUserData(pane);
 
-
-                //TODO close button close.setUserdata(pane);
-
                 TranslateTransition down = new TranslateTransition();
-                down.setFromY(56 * (notifications.size() - 1));
-                down.setToY(56 * notifications.size());
-
+                down.setFromY(0);
+                down.setToY(56);
                 down.setDuration(Duration.seconds(1));
                 down.setNode(pane);
-
                 down.play();
+
+                for(AnchorPane p : notifications){
+
+                    down = new TranslateTransition();
+                    down.setByY(-56);
+                    down.setDuration(Duration.seconds(1));
+                    down.setNode(p);
+                    down.play();
+                }
             }
         });
 
@@ -343,63 +347,6 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                 }
             }
         });
-
-//        StringBuilder sb = new StringBuilder()
-//                .append(t.getCreatedBy() + " wants to share ");
-//
-//        if(t.getFilenames().size() > 1)
-//            sb.append(t.getFilenames().size() + " files with you");
-//        else
-//            sb.append(t.getFilenames().get(0) + " with you");
-//
-//        // update UI thread
-//        Platform.runLater(new Runnable() {
-//            @Override
-//            public void run() {
-//                slider_label.setText(sb.toString());
-//            }
-//        });
-//
-//        TranslateTransition down = new TranslateTransition();
-//        down.setToY(56);
-//
-//        down.setDuration(Duration.seconds(1));
-//        down.setNode(this.slider);
-//
-//        down.play();
-//
-//        slider_button.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//            @Override
-//            public void handle(MouseEvent mouseEvent) {
-//
-//                //System.out.println("accept torrent " + t.toString());
-//
-//                TranslateTransition up = new TranslateTransition();
-//                up.setToY(-56);
-//
-//                up.setDuration(Duration.seconds(1));
-//                up.setNode(slider);
-//
-//                up.play();
-//
-//                //TODO mudar para a diretoria certa
-//                File dest = new File("/tmp/");
-//
-//                try {
-//
-//                    SharedTorrent st = new SharedTorrent(t, dest);
-//
-//                    TorrentUtil.download(st, false, username);
-//
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                } catch (NoSuchAlgorithmException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//        });
-
     }
 
     public void initLocal(String username){
