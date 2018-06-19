@@ -25,14 +25,4 @@ public class ArrayListEvent<E> extends ArrayList<E>{
         arrayEvent.addEventTorrent((Torrent) e);
         return b;
     }
-
-
-//    // TODO vai dar bosta eventualmente
-//    public boolean addReturnIndex(E e){
-//        boolean b = super.add(e);
-//        arrayEvent.addReturnIndex(super.size()); // so e coerente se for single thread
-//        return b;
-//    }
-
-
 }
