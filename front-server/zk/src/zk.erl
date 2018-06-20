@@ -1,5 +1,5 @@
 -module(zk).
--export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/2, setOffline/1, getGroupUsers/1, getTrackerList/0, getFrontSv/1, newTorrent/4, setUnreceivedTorrent/3, setReceivedTorrent/3, getTracker/1, getNewContent/1]).
+-export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/2, setOffline/1, getGroupUsers/1, getTrackerList/0, getFrontSv/1, newTorrent/4, setUnreceivedTorrent/3, setReceivedTorrent/3, getTracker/1, getNewContent/1, getGroups/1, getGroupOnline/1]).
 
 
 init(Host, Port) ->
@@ -66,7 +66,16 @@ loop(Pid) ->
     	{{received_torrent, TID, U, G}, From} ->
     		V = setReceivedTorrent(TID, U, G, Pid),
 			From ! {?MODULE, V},
+    		loop(Pid);
+		{{group_online, G}, From} ->
+    		V = getGroupOnline(G, Pid),
+			From ! {?MODULE, V},
+    		loop(Pid);
+		{{groups_user, U}, From} ->
+    		V = getGroups(U, Pid),
+			From ! {?MODULE, V},
     		loop(Pid)
+
 	end.
 
 rpc(Request) ->
@@ -124,6 +133,7 @@ createGroup(PID,Name,User) ->
 			erlzk:create(PID,GroupPath ++ "/torrents", list_to_binary("")),
 			erlzk:create(PID,GroupPath ++ "/users", list_to_binary("")),
 			erlzk:create(PID,GroupPath ++ "/users/" ++ User, list_to_binary("admin")),
+			erlzk:create(PID, "/users/" ++ User ++ "/groups/" ++ Name, ""),
 			ok;
 		{ok, _} ->
 			group_exists;
@@ -139,7 +149,7 @@ joinGroup(Name, Username, PID) ->
 			no_group;
 		{ok, _} ->
 			erlzk:create(PID, GroupPath ++ "/users/" ++ Username, list_to_binary("user")),
-			erlzk:create(PID, "/users/groups/" ++ Name, ""),
+			erlzk:create(PID, "/users/" ++ Username ++ "/groups/" ++ Name, ""),
 			ok;
 		_ ->
 			error
@@ -304,12 +314,32 @@ getNewContent(User, PID) ->
 			error
 	end.
 
+getGroupOnline(G) -> rpc({group_online, G}).
+getGroupOnline(Group, PID) ->
+	case getGroupUsers(Group) of 
+		{ok, L} ->
+			lists:filter(fun(X) -> isUserOnline(X,PID)== true end, L);
+		_ ->
+			[]
+	end.
 	
+isUserOnline(User, PID) ->
+	case erlzk:get_data(PID, "/users/" ++ User ++ "/online") of
+		{error, _} ->
+			false;
+		{ok,{R,_}} ->
+			string:equal(binary_to_list(R), "true")
+	end.
 
-
- 
-
-
+getGroups(U) -> rpc({groups_user, U}).
+getGroups(User, PID) ->
+	GroupPath = "/users/" ++ User ++ "/groups",
+	case erlzk:get_children(PID,GroupPath) of 
+		{ok, L} ->
+			L;
+		_ ->
+			[]
+	end.
 
 
 

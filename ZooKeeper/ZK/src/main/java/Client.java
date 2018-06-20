@@ -31,11 +31,6 @@ public class Client implements Runnable{
             else
                 socket = new Socket("localhost"  , 2001);
 
-
-
-
-
-
             CodedInputStream in = CodedInputStream.newInstance(socket.getInputStream());
 
 
@@ -60,12 +55,12 @@ public class Client implements Runnable{
             Thread.sleep(2000);
 
 
-            ClientWrapper.JoinGroup cg = ClientWrapper.JoinGroup.newBuilder()
-                                            .setGroup("xisde")
+            ClientWrapper.GroupUsers cg = ClientWrapper.GroupUsers.newBuilder()
+                                            .setGroupUsers(username)
                                             .build();
 
             wrapper = ClientWrapper.ClientMessage.newBuilder()
-                    .setJoinGroup(cg).build();
+                    .setGroupUsers(cg).build();
 
             System.out.println(wrapper);
 
@@ -77,7 +72,7 @@ public class Client implements Runnable{
             l = ByteBuffer.wrap(header).getInt();
             data = in.readRawBytes(l);
 
-            System.out.println(ClientWrapper.ClientMessage.parseFrom(data).getResponse());
+            System.out.println(ClientWrapper.ClientMessage.parseFrom(data));
 
 
             /*
@@ -138,8 +133,8 @@ public class Client implements Runnable{
     }
 
     public static void main(String[] args) {
-        //(new Thread(new Client("jib", "asd"))).start();
-        (new Thread(new Client("merda", "123"))).start();
+         (new Thread(new Client("jib", "asd"))).start();
+        //(new Thread(new Client("merda", "123"))).start();
         //(new Thread(new Client("cr7", "123"))).start();
     }
 }

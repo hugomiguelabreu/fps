@@ -46,24 +46,6 @@ auth(Socket, ID) ->
 
 	end.
 
-msgDecriptor(Data, User, Socket, ID) ->
-	{_, {T, D}} =  client_wrapper:decode_msg(Data, 'ClientMessage'),
-	case T of
-		login ->
-			{'Login',U,P}=D,
-			login(binary_to_list(U),binary_to_list(P),ID, Socket);
-		register ->
-			{'Register',U,P,N}=D,
-			register(binary_to_list(U),binary_to_list(P),binary_to_list(N),Socket);
-		createGroup ->
-			{'CreateGroup', G} = D,
-			createGroup(User, binary_to_list(G), Socket);
-		joinGroup ->
-			{'JoinGroup', G} = D,
-			joinGroup(User, binary_to_list(G), Socket);
-		torrentWrapper ->
-			redirect(D, integer_to_list(ID), User)
-	end.
 
 loggedLoop(Socket, Username, ID) ->
 
@@ -104,6 +86,32 @@ loggedLoop(Socket, Username, ID) ->
 			gen_tcp:send(Socket, Wrapped),
 			loggedLoop(Socket, Username, ID)
 	end.
+
+msgDecriptor(Data, User, Socket, ID) ->
+	{_, {T, D}} =  client_wrapper:decode_msg(Data, 'ClientMessage'),
+	case T of
+		login ->
+			{'Login',U,P}=D,
+			login(binary_to_list(U),binary_to_list(P),ID, Socket);
+		register ->
+			{'Register',U,P,N}=D,
+			register(binary_to_list(U),binary_to_list(P),binary_to_list(N),Socket);
+		createGroup ->
+			{'CreateGroup', G} = D,
+			createGroup(User, binary_to_list(G), Socket);
+		joinGroup ->
+			{'JoinGroup', G} = D,
+			joinGroup(User, binary_to_list(G), Socket);
+		torrentWrapper ->
+			redirect(D, integer_to_list(ID), User);
+		onlineUsers ->
+			{'OnlineUsers', G} = D,
+			get_online_users(binary_to_list(G),Socket);
+        groupUsers ->
+			{'GroupUsers', U} = D,
+			get_user_groups(binary_to_list(U), Socket)
+	end.
+
 
 %%====================================================================
 %% Available features
@@ -167,6 +175,16 @@ joinGroup(User, GroupName, Socket) ->
 		error -> 
 			joinGroup(User,GroupName,Socket)
 	end.
+
+get_online_users(Group, Socket) ->
+	List = lists:concat(lists:join(";",zk:getGroupOnline(Group))), 
+	MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {onlineUsers,#'OnlineUsers'{onlineUsers = List}}}),
+	gen_tcp:send(Socket, MsgContainer).
+			
+get_user_groups(User, Socket) ->
+	List = lists:concat(lists:join(";",zk:getGroups(User))), 
+	MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {groupUsers,#'GroupUsers'{groupUsers = List }}}),
+	gen_tcp:send(Socket, MsgContainer).		
 
 %%====================================================================
 %% Private functions

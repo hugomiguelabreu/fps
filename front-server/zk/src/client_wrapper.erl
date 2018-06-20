@@ -33,19 +33,19 @@
 -type 'GroupUsers'() :: #'GroupUsers'{}.
 -type 'JoinGroup'() :: #'JoinGroup'{}.
 -type 'Register'() :: #'Register'{}.
+-type 'OnlineUsers'() :: #'OnlineUsers'{}.
 -type 'TorrentWrapper'() :: #'TorrentWrapper'{}.
 -type 'CreateGroup'() :: #'CreateGroup'{}.
 -type 'Response'() :: #'Response'{}.
 -type 'Login'() :: #'Login'{}.
 -type 'ClientMessage'() :: #'ClientMessage'{}.
--type 'OnlineUsers'() :: #'OnlineUsers'{}.
--export_type(['GroupUsers'/0, 'JoinGroup'/0, 'Register'/0, 'TorrentWrapper'/0, 'CreateGroup'/0, 'Response'/0, 'Login'/0, 'ClientMessage'/0, 'OnlineUsers'/0]).
+-export_type(['GroupUsers'/0, 'JoinGroup'/0, 'Register'/0, 'OnlineUsers'/0, 'TorrentWrapper'/0, 'CreateGroup'/0, 'Response'/0, 'Login'/0, 'ClientMessage'/0]).
 
--spec encode_msg(#'GroupUsers'{} | #'JoinGroup'{} | #'Register'{} | #'TorrentWrapper'{} | #'CreateGroup'{} | #'Response'{} | #'Login'{} | #'ClientMessage'{} | #'OnlineUsers'{}) -> binary().
+-spec encode_msg(#'GroupUsers'{} | #'JoinGroup'{} | #'Register'{} | #'OnlineUsers'{} | #'TorrentWrapper'{} | #'CreateGroup'{} | #'Response'{} | #'Login'{} | #'ClientMessage'{}) -> binary().
 encode_msg(Msg) -> encode_msg(Msg, []).
 
 
--spec encode_msg(#'GroupUsers'{} | #'JoinGroup'{} | #'Register'{} | #'TorrentWrapper'{} | #'CreateGroup'{} | #'Response'{} | #'Login'{} | #'ClientMessage'{} | #'OnlineUsers'{}, list()) -> binary().
+-spec encode_msg(#'GroupUsers'{} | #'JoinGroup'{} | #'Register'{} | #'OnlineUsers'{} | #'TorrentWrapper'{} | #'CreateGroup'{} | #'Response'{} | #'Login'{} | #'ClientMessage'{}, list()) -> binary().
 encode_msg(Msg, Opts) ->
     case proplists:get_bool(verify, Opts) of
       true -> verify_msg(Msg, Opts);
@@ -56,14 +56,14 @@ encode_msg(Msg, Opts) ->
       #'GroupUsers'{} -> e_msg_GroupUsers(Msg, TrUserData);
       #'JoinGroup'{} -> e_msg_JoinGroup(Msg, TrUserData);
       #'Register'{} -> e_msg_Register(Msg, TrUserData);
+      #'OnlineUsers'{} -> e_msg_OnlineUsers(Msg, TrUserData);
       #'TorrentWrapper'{} ->
 	  e_msg_TorrentWrapper(Msg, TrUserData);
       #'CreateGroup'{} -> e_msg_CreateGroup(Msg, TrUserData);
       #'Response'{} -> e_msg_Response(Msg, TrUserData);
       #'Login'{} -> e_msg_Login(Msg, TrUserData);
       #'ClientMessage'{} ->
-	  e_msg_ClientMessage(Msg, TrUserData);
-      #'OnlineUsers'{} -> e_msg_OnlineUsers(Msg, TrUserData)
+	  e_msg_ClientMessage(Msg, TrUserData)
     end.
 
 
@@ -136,6 +136,23 @@ e_msg_Register(#'Register'{username = F1, password = F2,
 	     case is_empty_string(TrF3) of
 	       true -> B2;
 	       false -> e_type_string(TrF3, <<B2/binary, 26>>)
+	     end
+	   end
+    end.
+
+e_msg_OnlineUsers(Msg, TrUserData) ->
+    e_msg_OnlineUsers(Msg, <<>>, TrUserData).
+
+
+e_msg_OnlineUsers(#'OnlineUsers'{onlineUsers = F1}, Bin,
+		  TrUserData) ->
+    if F1 == undefined -> Bin;
+       true ->
+	   begin
+	     TrF1 = id(F1, TrUserData),
+	     case is_empty_string(TrF1) of
+	       true -> Bin;
+	       false -> e_type_string(TrF1, <<Bin/binary, 10>>)
 	     end
 	   end
     end.
@@ -282,24 +299,19 @@ e_msg_ClientMessage(#'ClientMessage'{msg = F1}, Bin,
 	    e_mfield_ClientMessage_torrentWrapper(TrOF1,
 						  <<Bin/binary, 50>>,
 						  TrUserData)
+	  end;
+      {onlineUsers, OF1} ->
+	  begin
+	    TrOF1 = id(OF1, TrUserData),
+	    e_mfield_ClientMessage_onlineUsers(TrOF1,
+					       <<Bin/binary, 58>>, TrUserData)
+	  end;
+      {groupUsers, OF1} ->
+	  begin
+	    TrOF1 = id(OF1, TrUserData),
+	    e_mfield_ClientMessage_groupUsers(TrOF1,
+					      <<Bin/binary, 66>>, TrUserData)
 	  end
-    end.
-
-e_msg_OnlineUsers(Msg, TrUserData) ->
-    e_msg_OnlineUsers(Msg, <<>>, TrUserData).
-
-
-e_msg_OnlineUsers(#'OnlineUsers'{onlineUsers = F1}, Bin,
-		  TrUserData) ->
-    if F1 == undefined -> Bin;
-       true ->
-	   begin
-	     TrF1 = id(F1, TrUserData),
-	     case is_empty_string(TrF1) of
-	       true -> Bin;
-	       false -> e_type_string(TrF1, <<Bin/binary, 10>>)
-	     end
-	   end
     end.
 
 e_mfield_ClientMessage_login(Msg, Bin, TrUserData) ->
@@ -332,6 +344,18 @@ e_mfield_ClientMessage_joinGroup(Msg, Bin,
 e_mfield_ClientMessage_torrentWrapper(Msg, Bin,
 				      TrUserData) ->
     SubBin = e_msg_TorrentWrapper(Msg, <<>>, TrUserData),
+    Bin2 = e_varint(byte_size(SubBin), Bin),
+    <<Bin2/binary, SubBin/binary>>.
+
+e_mfield_ClientMessage_onlineUsers(Msg, Bin,
+				   TrUserData) ->
+    SubBin = e_msg_OnlineUsers(Msg, <<>>, TrUserData),
+    Bin2 = e_varint(byte_size(SubBin), Bin),
+    <<Bin2/binary, SubBin/binary>>.
+
+e_mfield_ClientMessage_groupUsers(Msg, Bin,
+				  TrUserData) ->
+    SubBin = e_msg_GroupUsers(Msg, <<>>, TrUserData),
     Bin2 = e_varint(byte_size(SubBin), Bin),
     <<Bin2/binary, SubBin/binary>>.
 
@@ -408,6 +432,14 @@ decode_msg(Bin, MsgName, Opts) when is_binary(Bin) ->
 		       {decoding_failure,
 			{Bin, 'Register', {Class, Reason, StackTrace}}}})
 	  end;
+      'OnlineUsers' ->
+	  try d_msg_OnlineUsers(Bin, TrUserData) catch
+	    Class:Reason ->
+		StackTrace = erlang:get_stacktrace(),
+		error({gpb_error,
+		       {decoding_failure,
+			{Bin, 'OnlineUsers', {Class, Reason, StackTrace}}}})
+	  end;
       'TorrentWrapper' ->
 	  try d_msg_TorrentWrapper(Bin, TrUserData) catch
 	    Class:Reason ->
@@ -447,14 +479,6 @@ decode_msg(Bin, MsgName, Opts) when is_binary(Bin) ->
 		error({gpb_error,
 		       {decoding_failure,
 			{Bin, 'ClientMessage', {Class, Reason, StackTrace}}}})
-	  end;
-      'OnlineUsers' ->
-	  try d_msg_OnlineUsers(Bin, TrUserData) catch
-	    Class:Reason ->
-		StackTrace = erlang:get_stacktrace(),
-		error({gpb_error,
-		       {decoding_failure,
-			{Bin, 'OnlineUsers', {Class, Reason, StackTrace}}}})
 	  end
     end.
 
@@ -802,6 +826,105 @@ skip_64_Register(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
 		 F@_2, F@_3, TrUserData) ->
     dfp_read_field_def_Register(Rest, Z1, Z2, F@_1, F@_2,
 				F@_3, TrUserData).
+
+d_msg_OnlineUsers(Bin, TrUserData) ->
+    dfp_read_field_def_OnlineUsers(Bin, 0, 0,
+				   id(<<>>, TrUserData), TrUserData).
+
+dfp_read_field_def_OnlineUsers(<<10, Rest/binary>>, Z1,
+			       Z2, F@_1, TrUserData) ->
+    d_field_OnlineUsers_onlineUsers(Rest, Z1, Z2, F@_1,
+				    TrUserData);
+dfp_read_field_def_OnlineUsers(<<>>, 0, 0, F@_1, _) ->
+    #'OnlineUsers'{onlineUsers = F@_1};
+dfp_read_field_def_OnlineUsers(Other, Z1, Z2, F@_1,
+			       TrUserData) ->
+    dg_read_field_def_OnlineUsers(Other, Z1, Z2, F@_1,
+				  TrUserData).
+
+dg_read_field_def_OnlineUsers(<<1:1, X:7, Rest/binary>>,
+			      N, Acc, F@_1, TrUserData)
+    when N < 32 - 7 ->
+    dg_read_field_def_OnlineUsers(Rest, N + 7,
+				  X bsl N + Acc, F@_1, TrUserData);
+dg_read_field_def_OnlineUsers(<<0:1, X:7, Rest/binary>>,
+			      N, Acc, F@_1, TrUserData) ->
+    Key = X bsl N + Acc,
+    case Key of
+      10 ->
+	  d_field_OnlineUsers_onlineUsers(Rest, 0, 0, F@_1,
+					  TrUserData);
+      _ ->
+	  case Key band 7 of
+	    0 ->
+		skip_varint_OnlineUsers(Rest, 0, 0, F@_1, TrUserData);
+	    1 -> skip_64_OnlineUsers(Rest, 0, 0, F@_1, TrUserData);
+	    2 ->
+		skip_length_delimited_OnlineUsers(Rest, 0, 0, F@_1,
+						  TrUserData);
+	    3 ->
+		skip_group_OnlineUsers(Rest, Key bsr 3, 0, F@_1,
+				       TrUserData);
+	    5 -> skip_32_OnlineUsers(Rest, 0, 0, F@_1, TrUserData)
+	  end
+    end;
+dg_read_field_def_OnlineUsers(<<>>, 0, 0, F@_1, _) ->
+    #'OnlineUsers'{onlineUsers = F@_1}.
+
+d_field_OnlineUsers_onlineUsers(<<1:1, X:7,
+				  Rest/binary>>,
+				N, Acc, F@_1, TrUserData)
+    when N < 57 ->
+    d_field_OnlineUsers_onlineUsers(Rest, N + 7,
+				    X bsl N + Acc, F@_1, TrUserData);
+d_field_OnlineUsers_onlineUsers(<<0:1, X:7,
+				  Rest/binary>>,
+				N, Acc, _, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
+			   {binary:copy(Bytes), Rest2}
+			 end,
+    dfp_read_field_def_OnlineUsers(RestF, 0, 0, NewFValue,
+				   TrUserData).
+
+skip_varint_OnlineUsers(<<1:1, _:7, Rest/binary>>, Z1,
+			Z2, F@_1, TrUserData) ->
+    skip_varint_OnlineUsers(Rest, Z1, Z2, F@_1, TrUserData);
+skip_varint_OnlineUsers(<<0:1, _:7, Rest/binary>>, Z1,
+			Z2, F@_1, TrUserData) ->
+    dfp_read_field_def_OnlineUsers(Rest, Z1, Z2, F@_1,
+				   TrUserData).
+
+skip_length_delimited_OnlineUsers(<<1:1, X:7,
+				    Rest/binary>>,
+				  N, Acc, F@_1, TrUserData)
+    when N < 57 ->
+    skip_length_delimited_OnlineUsers(Rest, N + 7,
+				      X bsl N + Acc, F@_1, TrUserData);
+skip_length_delimited_OnlineUsers(<<0:1, X:7,
+				    Rest/binary>>,
+				  N, Acc, F@_1, TrUserData) ->
+    Length = X bsl N + Acc,
+    <<_:Length/binary, Rest2/binary>> = Rest,
+    dfp_read_field_def_OnlineUsers(Rest2, 0, 0, F@_1,
+				   TrUserData).
+
+skip_group_OnlineUsers(Bin, FNum, Z2, F@_1,
+		       TrUserData) ->
+    {_, Rest} = read_group(Bin, FNum),
+    dfp_read_field_def_OnlineUsers(Rest, 0, Z2, F@_1,
+				   TrUserData).
+
+skip_32_OnlineUsers(<<_:32, Rest/binary>>, Z1, Z2, F@_1,
+		    TrUserData) ->
+    dfp_read_field_def_OnlineUsers(Rest, Z1, Z2, F@_1,
+				   TrUserData).
+
+skip_64_OnlineUsers(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
+		    TrUserData) ->
+    dfp_read_field_def_OnlineUsers(Rest, Z1, Z2, F@_1,
+				   TrUserData).
 
 d_msg_TorrentWrapper(Bin, TrUserData) ->
     dfp_read_field_def_TorrentWrapper(Bin, 0, 0,
@@ -1292,6 +1415,14 @@ dfp_read_field_def_ClientMessage(<<50, Rest/binary>>,
 				 Z1, Z2, F@_1, TrUserData) ->
     d_field_ClientMessage_torrentWrapper(Rest, Z1, Z2, F@_1,
 					 TrUserData);
+dfp_read_field_def_ClientMessage(<<58, Rest/binary>>,
+				 Z1, Z2, F@_1, TrUserData) ->
+    d_field_ClientMessage_onlineUsers(Rest, Z1, Z2, F@_1,
+				      TrUserData);
+dfp_read_field_def_ClientMessage(<<66, Rest/binary>>,
+				 Z1, Z2, F@_1, TrUserData) ->
+    d_field_ClientMessage_groupUsers(Rest, Z1, Z2, F@_1,
+				     TrUserData);
 dfp_read_field_def_ClientMessage(<<>>, 0, 0, F@_1, _) ->
     #'ClientMessage'{msg = F@_1};
 dfp_read_field_def_ClientMessage(Other, Z1, Z2, F@_1,
@@ -1328,6 +1459,12 @@ dg_read_field_def_ClientMessage(<<0:1, X:7,
       50 ->
 	  d_field_ClientMessage_torrentWrapper(Rest, 0, 0, F@_1,
 					       TrUserData);
+      58 ->
+	  d_field_ClientMessage_onlineUsers(Rest, 0, 0, F@_1,
+					    TrUserData);
+      66 ->
+	  d_field_ClientMessage_groupUsers(Rest, 0, 0, F@_1,
+					   TrUserData);
       _ ->
 	  case Key band 7 of
 	    0 ->
@@ -1505,6 +1642,60 @@ d_field_ClientMessage_torrentWrapper(<<0:1, X:7,
 				     end,
 				     TrUserData).
 
+d_field_ClientMessage_onlineUsers(<<1:1, X:7,
+				    Rest/binary>>,
+				  N, Acc, F@_1, TrUserData)
+    when N < 57 ->
+    d_field_ClientMessage_onlineUsers(Rest, N + 7,
+				      X bsl N + Acc, F@_1, TrUserData);
+d_field_ClientMessage_onlineUsers(<<0:1, X:7,
+				    Rest/binary>>,
+				  N, Acc, Prev, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bs:Len/binary, Rest2/binary>> = Rest,
+			   {id(d_msg_OnlineUsers(Bs, TrUserData), TrUserData),
+			    Rest2}
+			 end,
+    dfp_read_field_def_ClientMessage(RestF, 0, 0,
+				     case Prev of
+				       undefined -> {onlineUsers, NewFValue};
+				       {onlineUsers, MVPrev} ->
+					   {onlineUsers,
+					    merge_msg_OnlineUsers(MVPrev,
+								  NewFValue,
+								  TrUserData)};
+				       _ -> {onlineUsers, NewFValue}
+				     end,
+				     TrUserData).
+
+d_field_ClientMessage_groupUsers(<<1:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, F@_1, TrUserData)
+    when N < 57 ->
+    d_field_ClientMessage_groupUsers(Rest, N + 7,
+				     X bsl N + Acc, F@_1, TrUserData);
+d_field_ClientMessage_groupUsers(<<0:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, Prev, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bs:Len/binary, Rest2/binary>> = Rest,
+			   {id(d_msg_GroupUsers(Bs, TrUserData), TrUserData),
+			    Rest2}
+			 end,
+    dfp_read_field_def_ClientMessage(RestF, 0, 0,
+				     case Prev of
+				       undefined -> {groupUsers, NewFValue};
+				       {groupUsers, MVPrev} ->
+					   {groupUsers,
+					    merge_msg_GroupUsers(MVPrev,
+								 NewFValue,
+								 TrUserData)};
+				       _ -> {groupUsers, NewFValue}
+				     end,
+				     TrUserData).
+
 skip_varint_ClientMessage(<<1:1, _:7, Rest/binary>>, Z1,
 			  Z2, F@_1, TrUserData) ->
     skip_varint_ClientMessage(Rest, Z1, Z2, F@_1,
@@ -1543,105 +1734,6 @@ skip_64_ClientMessage(<<_:64, Rest/binary>>, Z1, Z2,
 		      F@_1, TrUserData) ->
     dfp_read_field_def_ClientMessage(Rest, Z1, Z2, F@_1,
 				     TrUserData).
-
-d_msg_OnlineUsers(Bin, TrUserData) ->
-    dfp_read_field_def_OnlineUsers(Bin, 0, 0,
-				   id(<<>>, TrUserData), TrUserData).
-
-dfp_read_field_def_OnlineUsers(<<10, Rest/binary>>, Z1,
-			       Z2, F@_1, TrUserData) ->
-    d_field_OnlineUsers_onlineUsers(Rest, Z1, Z2, F@_1,
-				    TrUserData);
-dfp_read_field_def_OnlineUsers(<<>>, 0, 0, F@_1, _) ->
-    #'OnlineUsers'{onlineUsers = F@_1};
-dfp_read_field_def_OnlineUsers(Other, Z1, Z2, F@_1,
-			       TrUserData) ->
-    dg_read_field_def_OnlineUsers(Other, Z1, Z2, F@_1,
-				  TrUserData).
-
-dg_read_field_def_OnlineUsers(<<1:1, X:7, Rest/binary>>,
-			      N, Acc, F@_1, TrUserData)
-    when N < 32 - 7 ->
-    dg_read_field_def_OnlineUsers(Rest, N + 7,
-				  X bsl N + Acc, F@_1, TrUserData);
-dg_read_field_def_OnlineUsers(<<0:1, X:7, Rest/binary>>,
-			      N, Acc, F@_1, TrUserData) ->
-    Key = X bsl N + Acc,
-    case Key of
-      10 ->
-	  d_field_OnlineUsers_onlineUsers(Rest, 0, 0, F@_1,
-					  TrUserData);
-      _ ->
-	  case Key band 7 of
-	    0 ->
-		skip_varint_OnlineUsers(Rest, 0, 0, F@_1, TrUserData);
-	    1 -> skip_64_OnlineUsers(Rest, 0, 0, F@_1, TrUserData);
-	    2 ->
-		skip_length_delimited_OnlineUsers(Rest, 0, 0, F@_1,
-						  TrUserData);
-	    3 ->
-		skip_group_OnlineUsers(Rest, Key bsr 3, 0, F@_1,
-				       TrUserData);
-	    5 -> skip_32_OnlineUsers(Rest, 0, 0, F@_1, TrUserData)
-	  end
-    end;
-dg_read_field_def_OnlineUsers(<<>>, 0, 0, F@_1, _) ->
-    #'OnlineUsers'{onlineUsers = F@_1}.
-
-d_field_OnlineUsers_onlineUsers(<<1:1, X:7,
-				  Rest/binary>>,
-				N, Acc, F@_1, TrUserData)
-    when N < 57 ->
-    d_field_OnlineUsers_onlineUsers(Rest, N + 7,
-				    X bsl N + Acc, F@_1, TrUserData);
-d_field_OnlineUsers_onlineUsers(<<0:1, X:7,
-				  Rest/binary>>,
-				N, Acc, _, TrUserData) ->
-    {NewFValue, RestF} = begin
-			   Len = X bsl N + Acc,
-			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
-			   {binary:copy(Bytes), Rest2}
-			 end,
-    dfp_read_field_def_OnlineUsers(RestF, 0, 0, NewFValue,
-				   TrUserData).
-
-skip_varint_OnlineUsers(<<1:1, _:7, Rest/binary>>, Z1,
-			Z2, F@_1, TrUserData) ->
-    skip_varint_OnlineUsers(Rest, Z1, Z2, F@_1, TrUserData);
-skip_varint_OnlineUsers(<<0:1, _:7, Rest/binary>>, Z1,
-			Z2, F@_1, TrUserData) ->
-    dfp_read_field_def_OnlineUsers(Rest, Z1, Z2, F@_1,
-				   TrUserData).
-
-skip_length_delimited_OnlineUsers(<<1:1, X:7,
-				    Rest/binary>>,
-				  N, Acc, F@_1, TrUserData)
-    when N < 57 ->
-    skip_length_delimited_OnlineUsers(Rest, N + 7,
-				      X bsl N + Acc, F@_1, TrUserData);
-skip_length_delimited_OnlineUsers(<<0:1, X:7,
-				    Rest/binary>>,
-				  N, Acc, F@_1, TrUserData) ->
-    Length = X bsl N + Acc,
-    <<_:Length/binary, Rest2/binary>> = Rest,
-    dfp_read_field_def_OnlineUsers(Rest2, 0, 0, F@_1,
-				   TrUserData).
-
-skip_group_OnlineUsers(Bin, FNum, Z2, F@_1,
-		       TrUserData) ->
-    {_, Rest} = read_group(Bin, FNum),
-    dfp_read_field_def_OnlineUsers(Rest, 0, Z2, F@_1,
-				   TrUserData).
-
-skip_32_OnlineUsers(<<_:32, Rest/binary>>, Z1, Z2, F@_1,
-		    TrUserData) ->
-    dfp_read_field_def_OnlineUsers(Rest, Z1, Z2, F@_1,
-				   TrUserData).
-
-skip_64_OnlineUsers(<<_:64, Rest/binary>>, Z1, Z2, F@_1,
-		    TrUserData) ->
-    dfp_read_field_def_OnlineUsers(Rest, Z1, Z2, F@_1,
-				   TrUserData).
 
 read_group(Bin, FieldNum) ->
     {NumBytes, EndTagLen} = read_gr_b(Bin, 0, 0, 0, 0, FieldNum),
@@ -1713,6 +1805,8 @@ merge_msgs(Prev, New, Opts)
 	  merge_msg_JoinGroup(Prev, New, TrUserData);
       #'Register'{} ->
 	  merge_msg_Register(Prev, New, TrUserData);
+      #'OnlineUsers'{} ->
+	  merge_msg_OnlineUsers(Prev, New, TrUserData);
       #'TorrentWrapper'{} ->
 	  merge_msg_TorrentWrapper(Prev, New, TrUserData);
       #'CreateGroup'{} ->
@@ -1721,9 +1815,7 @@ merge_msgs(Prev, New, Opts)
 	  merge_msg_Response(Prev, New, TrUserData);
       #'Login'{} -> merge_msg_Login(Prev, New, TrUserData);
       #'ClientMessage'{} ->
-	  merge_msg_ClientMessage(Prev, New, TrUserData);
-      #'OnlineUsers'{} ->
-	  merge_msg_OnlineUsers(Prev, New, TrUserData)
+	  merge_msg_ClientMessage(Prev, New, TrUserData)
     end.
 
 merge_msg_GroupUsers(#'GroupUsers'{groupUsers =
@@ -1758,6 +1850,14 @@ merge_msg_Register(#'Register'{username = PFusername,
 		    if NFname =:= undefined -> PFname;
 		       true -> NFname
 		    end}.
+
+merge_msg_OnlineUsers(#'OnlineUsers'{onlineUsers =
+					 PFonlineUsers},
+		      #'OnlineUsers'{onlineUsers = NFonlineUsers}, _) ->
+    #'OnlineUsers'{onlineUsers =
+		       if NFonlineUsers =:= undefined -> PFonlineUsers;
+			  true -> NFonlineUsers
+		       end}.
 
 merge_msg_TorrentWrapper(#'TorrentWrapper'{group =
 					       PFgroup,
@@ -1831,17 +1931,17 @@ merge_msg_ClientMessage(#'ClientMessage'{msg = PFmsg},
 			       {torrentWrapper,
 				merge_msg_TorrentWrapper(OPFmsg, ONFmsg,
 							 TrUserData)};
+			   {{onlineUsers, OPFmsg}, {onlineUsers, ONFmsg}} ->
+			       {onlineUsers,
+				merge_msg_OnlineUsers(OPFmsg, ONFmsg,
+						      TrUserData)};
+			   {{groupUsers, OPFmsg}, {groupUsers, ONFmsg}} ->
+			       {groupUsers,
+				merge_msg_GroupUsers(OPFmsg, ONFmsg,
+						     TrUserData)};
 			   {_, undefined} -> PFmsg;
 			   _ -> NFmsg
 			 end}.
-
-merge_msg_OnlineUsers(#'OnlineUsers'{onlineUsers =
-					 PFonlineUsers},
-		      #'OnlineUsers'{onlineUsers = NFonlineUsers}, _) ->
-    #'OnlineUsers'{onlineUsers =
-		       if NFonlineUsers =:= undefined -> PFonlineUsers;
-			  true -> NFonlineUsers
-		       end}.
 
 
 verify_msg(Msg) -> verify_msg(Msg, []).
@@ -1855,6 +1955,8 @@ verify_msg(Msg, Opts) ->
 	  v_msg_JoinGroup(Msg, ['JoinGroup'], TrUserData);
       #'Register'{} ->
 	  v_msg_Register(Msg, ['Register'], TrUserData);
+      #'OnlineUsers'{} ->
+	  v_msg_OnlineUsers(Msg, ['OnlineUsers'], TrUserData);
       #'TorrentWrapper'{} ->
 	  v_msg_TorrentWrapper(Msg, ['TorrentWrapper'],
 			       TrUserData);
@@ -1865,8 +1967,6 @@ verify_msg(Msg, Opts) ->
       #'Login'{} -> v_msg_Login(Msg, ['Login'], TrUserData);
       #'ClientMessage'{} ->
 	  v_msg_ClientMessage(Msg, ['ClientMessage'], TrUserData);
-      #'OnlineUsers'{} ->
-	  v_msg_OnlineUsers(Msg, ['OnlineUsers'], TrUserData);
       _ -> mk_type_error(not_a_known_message, Msg, [])
     end.
 
@@ -1877,7 +1977,9 @@ v_msg_GroupUsers(#'GroupUsers'{groupUsers = F1}, Path,
     if F1 == undefined -> ok;
        true -> v_type_string(F1, [groupUsers | Path])
     end,
-    ok.
+    ok;
+v_msg_GroupUsers(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'GroupUsers'}, X, Path).
 
 -dialyzer({nowarn_function,v_msg_JoinGroup/3}).
 v_msg_JoinGroup(#'JoinGroup'{group = F1}, Path, _) ->
@@ -1904,6 +2006,16 @@ v_msg_Register(#'Register'{username = F1, password = F2,
     ok;
 v_msg_Register(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, 'Register'}, X, Path).
+
+-dialyzer({nowarn_function,v_msg_OnlineUsers/3}).
+v_msg_OnlineUsers(#'OnlineUsers'{onlineUsers = F1},
+		  Path, _) ->
+    if F1 == undefined -> ok;
+       true -> v_type_string(F1, [onlineUsers | Path])
+    end,
+    ok;
+v_msg_OnlineUsers(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'OnlineUsers'}, X, Path).
 
 -dialyzer({nowarn_function,v_msg_TorrentWrapper/3}).
 v_msg_TorrentWrapper(#'TorrentWrapper'{group = F1,
@@ -1975,15 +2087,13 @@ v_msg_ClientMessage(#'ClientMessage'{msg = F1}, Path,
       {torrentWrapper, OF1} ->
 	  v_msg_TorrentWrapper(OF1, [torrentWrapper, msg | Path],
 			       TrUserData);
+      {onlineUsers, OF1} ->
+	  v_msg_OnlineUsers(OF1, [onlineUsers, msg | Path],
+			    TrUserData);
+      {groupUsers, OF1} ->
+	  v_msg_GroupUsers(OF1, [groupUsers, msg | Path],
+			   TrUserData);
       _ -> mk_type_error(invalid_oneof, F1, [msg | Path])
-    end,
-    ok.
-
--dialyzer({nowarn_function,v_msg_OnlineUsers/3}).
-v_msg_OnlineUsers(#'OnlineUsers'{onlineUsers = F1},
-		  Path, _) ->
-    if F1 == undefined -> ok;
-       true -> v_type_string(F1, [onlineUsers | Path])
     end,
     ok.
 
@@ -2046,6 +2156,9 @@ get_msg_defs() ->
 	      type = string, occurrence = optional, opts = []},
        #field{name = name, fnum = 3, rnum = 4, type = string,
 	      occurrence = optional, opts = []}]},
+     {{msg, 'OnlineUsers'},
+      [#field{name = onlineUsers, fnum = 1, rnum = 2,
+	      type = string, occurrence = optional, opts = []}]},
      {{msg, 'TorrentWrapper'},
       [#field{name = group, fnum = 1, rnum = 2, type = string,
 	      occurrence = optional, opts = []},
@@ -2084,25 +2197,28 @@ get_msg_defs() ->
 			      opts = []},
 		       #field{name = torrentWrapper, fnum = 6, rnum = 2,
 			      type = {msg, 'TorrentWrapper'},
-			      occurrence = optional, opts = []}]}]},
-     {{msg, 'OnlineUsers'},
-      [#field{name = onlineUsers, fnum = 1, rnum = 2,
-	      type = string, occurrence = optional, opts = []}]}].
+			      occurrence = optional, opts = []},
+		       #field{name = onlineUsers, fnum = 7, rnum = 2,
+			      type = {msg, 'OnlineUsers'},
+			      occurrence = optional, opts = []},
+		       #field{name = groupUsers, fnum = 8, rnum = 2,
+			      type = {msg, 'GroupUsers'}, occurrence = optional,
+			      opts = []}]}]}].
 
 
 get_msg_names() ->
-    ['GroupUsers', 'JoinGroup', 'Register',
+    ['GroupUsers', 'JoinGroup', 'Register', 'OnlineUsers',
      'TorrentWrapper', 'CreateGroup', 'Response', 'Login',
-     'ClientMessage', 'OnlineUsers'].
+     'ClientMessage'].
 
 
 get_group_names() -> [].
 
 
 get_msg_or_group_names() ->
-    ['GroupUsers', 'JoinGroup', 'Register',
+    ['GroupUsers', 'JoinGroup', 'Register', 'OnlineUsers',
      'TorrentWrapper', 'CreateGroup', 'Response', 'Login',
-     'ClientMessage', 'OnlineUsers'].
+     'ClientMessage'].
 
 
 get_enum_names() -> [].
@@ -2133,6 +2249,9 @@ find_msg_def('Register') ->
 	    type = string, occurrence = optional, opts = []},
      #field{name = name, fnum = 3, rnum = 4, type = string,
 	    occurrence = optional, opts = []}];
+find_msg_def('OnlineUsers') ->
+    [#field{name = onlineUsers, fnum = 1, rnum = 2,
+	    type = string, occurrence = optional, opts = []}];
 find_msg_def('TorrentWrapper') ->
     [#field{name = group, fnum = 1, rnum = 2, type = string,
 	    occurrence = optional, opts = []},
@@ -2171,10 +2290,13 @@ find_msg_def('ClientMessage') ->
 			    opts = []},
 		     #field{name = torrentWrapper, fnum = 6, rnum = 2,
 			    type = {msg, 'TorrentWrapper'},
-			    occurrence = optional, opts = []}]}];
-find_msg_def('OnlineUsers') ->
-    [#field{name = onlineUsers, fnum = 1, rnum = 2,
-	    type = string, occurrence = optional, opts = []}];
+			    occurrence = optional, opts = []},
+		     #field{name = onlineUsers, fnum = 7, rnum = 2,
+			    type = {msg, 'OnlineUsers'}, occurrence = optional,
+			    opts = []},
+		     #field{name = groupUsers, fnum = 8, rnum = 2,
+			    type = {msg, 'GroupUsers'}, occurrence = optional,
+			    opts = []}]}];
 find_msg_def(_) -> error.
 
 

@@ -46,5 +46,7 @@ message ClientMessage {
         CreateGroup createGroup = 4;
         JoinGroup joinGroup = 5;
         TorrentWrapper torrentWrapper = 6;
+        OnlineUsers onlineUsers = 7;
+        GroupUsers groupUsers = 8;
     }   
 }

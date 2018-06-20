@@ -30,6 +30,13 @@
         }).
 -endif.
 
+-ifndef('ONLINEUSERS_PB_H').
+-define('ONLINEUSERS_PB_H', true).
+-record('OnlineUsers',
+        {onlineUsers = <<>>     :: iodata() | undefined % = 1
+        }).
+-endif.
+
 -ifndef('TORRENTWRAPPER_PB_H').
 -define('TORRENTWRAPPER_PB_H', true).
 -record('TorrentWrapper',
@@ -64,14 +71,7 @@
 -ifndef('CLIENTMESSAGE_PB_H').
 -define('CLIENTMESSAGE_PB_H', true).
 -record('ClientMessage',
-        {msg                    :: {login, #'Login'{}} | {register, #'Register'{}} | {response, #'Response'{}} | {createGroup, #'CreateGroup'{}} | {joinGroup, #'JoinGroup'{}} | {torrentWrapper, #'TorrentWrapper'{}} | undefined % oneof
-        }).
--endif.
-
--ifndef('ONLINEUSERS_PB_H').
--define('ONLINEUSERS_PB_H', true).
--record('OnlineUsers',
-        {onlineUsers = <<>>     :: iodata() | undefined % = 1
+        {msg                    :: {login, #'Login'{}} | {register, #'Register'{}} | {response, #'Response'{}} | {createGroup, #'CreateGroup'{}} | {joinGroup, #'JoinGroup'{}} | {torrentWrapper, #'TorrentWrapper'{}} | {onlineUsers, #'OnlineUsers'{}} | {groupUsers, #'GroupUsers'{}} | undefined % oneof
         }).
 -endif.
 

@@ -3687,6 +3687,1050 @@ public final class ClientWrapper {
 
   }
 
+  public interface OnlineUsersOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:client_network.OnlineUsers)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string onlineUsers = 1;</code>
+     */
+    String getOnlineUsers();
+    /**
+     * <code>string onlineUsers = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getOnlineUsersBytes();
+  }
+  /**
+   * Protobuf type {@code client_network.OnlineUsers}
+   */
+  public  static final class OnlineUsers extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:client_network.OnlineUsers)
+      OnlineUsersOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use OnlineUsers.newBuilder() to construct.
+    private OnlineUsers(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private OnlineUsers() {
+      onlineUsers_ = "";
+    }
+
+    @Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private OnlineUsers(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              String s = input.readStringRequireUtf8();
+
+              onlineUsers_ = s;
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return ClientWrapper.internal_static_client_network_OnlineUsers_descriptor;
+    }
+
+    protected FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return ClientWrapper.internal_static_client_network_OnlineUsers_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              OnlineUsers.class, Builder.class);
+    }
+
+    public static final int ONLINEUSERS_FIELD_NUMBER = 1;
+    private volatile Object onlineUsers_;
+    /**
+     * <code>string onlineUsers = 1;</code>
+     */
+    public String getOnlineUsers() {
+      Object ref = onlineUsers_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        onlineUsers_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string onlineUsers = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOnlineUsersBytes() {
+      Object ref = onlineUsers_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (String) ref);
+        onlineUsers_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getOnlineUsersBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, onlineUsers_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getOnlineUsersBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, onlineUsers_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof OnlineUsers)) {
+        return super.equals(obj);
+      }
+      OnlineUsers other = (OnlineUsers) obj;
+
+      boolean result = true;
+      result = result && getOnlineUsers()
+          .equals(other.getOnlineUsers());
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + ONLINEUSERS_FIELD_NUMBER;
+      hash = (53 * hash) + getOnlineUsers().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static OnlineUsers parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static OnlineUsers parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static OnlineUsers parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static OnlineUsers parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static OnlineUsers parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static OnlineUsers parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static OnlineUsers parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static OnlineUsers parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static OnlineUsers parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static OnlineUsers parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static OnlineUsers parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static OnlineUsers parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(OnlineUsers prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @Override
+    protected Builder newBuilderForType(
+        BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code client_network.OnlineUsers}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:client_network.OnlineUsers)
+        OnlineUsersOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return ClientWrapper.internal_static_client_network_OnlineUsers_descriptor;
+      }
+
+      protected FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return ClientWrapper.internal_static_client_network_OnlineUsers_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                OnlineUsers.class, Builder.class);
+      }
+
+      // Construct using client_network.ClientWrapper.OnlineUsers.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        onlineUsers_ = "";
+
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return ClientWrapper.internal_static_client_network_OnlineUsers_descriptor;
+      }
+
+      public OnlineUsers getDefaultInstanceForType() {
+        return OnlineUsers.getDefaultInstance();
+      }
+
+      public OnlineUsers build() {
+        OnlineUsers result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public OnlineUsers buildPartial() {
+        OnlineUsers result = new OnlineUsers(this);
+        result.onlineUsers_ = onlineUsers_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof OnlineUsers) {
+          return mergeFrom((OnlineUsers)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(OnlineUsers other) {
+        if (other == OnlineUsers.getDefaultInstance()) return this;
+        if (!other.getOnlineUsers().isEmpty()) {
+          onlineUsers_ = other.onlineUsers_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        OnlineUsers parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (OnlineUsers) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private Object onlineUsers_ = "";
+      /**
+       * <code>string onlineUsers = 1;</code>
+       */
+      public String getOnlineUsers() {
+        Object ref = onlineUsers_;
+        if (!(ref instanceof String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          String s = bs.toStringUtf8();
+          onlineUsers_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      /**
+       * <code>string onlineUsers = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOnlineUsersBytes() {
+        Object ref = onlineUsers_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (String) ref);
+          onlineUsers_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string onlineUsers = 1;</code>
+       */
+      public Builder setOnlineUsers(
+          String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        onlineUsers_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string onlineUsers = 1;</code>
+       */
+      public Builder clearOnlineUsers() {
+        
+        onlineUsers_ = getDefaultInstance().getOnlineUsers();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string onlineUsers = 1;</code>
+       */
+      public Builder setOnlineUsersBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        onlineUsers_ = value;
+        onChanged();
+        return this;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFieldsProto3(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:client_network.OnlineUsers)
+    }
+
+    // @@protoc_insertion_point(class_scope:client_network.OnlineUsers)
+    private static final OnlineUsers DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new OnlineUsers();
+    }
+
+    public static OnlineUsers getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<OnlineUsers>
+        PARSER = new com.google.protobuf.AbstractParser<OnlineUsers>() {
+      public OnlineUsers parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new OnlineUsers(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<OnlineUsers> parser() {
+      return PARSER;
+    }
+
+    @Override
+    public com.google.protobuf.Parser<OnlineUsers> getParserForType() {
+      return PARSER;
+    }
+
+    public OnlineUsers getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface GroupUsersOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:client_network.GroupUsers)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string groupUsers = 1;</code>
+     */
+    String getGroupUsers();
+    /**
+     * <code>string groupUsers = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getGroupUsersBytes();
+  }
+  /**
+   * Protobuf type {@code client_network.GroupUsers}
+   */
+  public  static final class GroupUsers extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:client_network.GroupUsers)
+      GroupUsersOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use GroupUsers.newBuilder() to construct.
+    private GroupUsers(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private GroupUsers() {
+      groupUsers_ = "";
+    }
+
+    @Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private GroupUsers(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              String s = input.readStringRequireUtf8();
+
+              groupUsers_ = s;
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return ClientWrapper.internal_static_client_network_GroupUsers_descriptor;
+    }
+
+    protected FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return ClientWrapper.internal_static_client_network_GroupUsers_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              GroupUsers.class, Builder.class);
+    }
+
+    public static final int GROUPUSERS_FIELD_NUMBER = 1;
+    private volatile Object groupUsers_;
+    /**
+     * <code>string groupUsers = 1;</code>
+     */
+    public String getGroupUsers() {
+      Object ref = groupUsers_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        groupUsers_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string groupUsers = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getGroupUsersBytes() {
+      Object ref = groupUsers_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (String) ref);
+        groupUsers_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getGroupUsersBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, groupUsers_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getGroupUsersBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, groupUsers_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof GroupUsers)) {
+        return super.equals(obj);
+      }
+      GroupUsers other = (GroupUsers) obj;
+
+      boolean result = true;
+      result = result && getGroupUsers()
+          .equals(other.getGroupUsers());
+      result = result && unknownFields.equals(other.unknownFields);
+      return result;
+    }
+
+    @Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + GROUPUSERS_FIELD_NUMBER;
+      hash = (53 * hash) + getGroupUsers().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static GroupUsers parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static GroupUsers parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static GroupUsers parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static GroupUsers parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static GroupUsers parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static GroupUsers parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static GroupUsers parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static GroupUsers parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static GroupUsers parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static GroupUsers parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static GroupUsers parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static GroupUsers parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(GroupUsers prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @Override
+    protected Builder newBuilderForType(
+        BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code client_network.GroupUsers}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:client_network.GroupUsers)
+        GroupUsersOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return ClientWrapper.internal_static_client_network_GroupUsers_descriptor;
+      }
+
+      protected FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return ClientWrapper.internal_static_client_network_GroupUsers_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                GroupUsers.class, Builder.class);
+      }
+
+      // Construct using client_network.ClientWrapper.GroupUsers.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        groupUsers_ = "";
+
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return ClientWrapper.internal_static_client_network_GroupUsers_descriptor;
+      }
+
+      public GroupUsers getDefaultInstanceForType() {
+        return GroupUsers.getDefaultInstance();
+      }
+
+      public GroupUsers build() {
+        GroupUsers result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public GroupUsers buildPartial() {
+        GroupUsers result = new GroupUsers(this);
+        result.groupUsers_ = groupUsers_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof GroupUsers) {
+          return mergeFrom((GroupUsers)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(GroupUsers other) {
+        if (other == GroupUsers.getDefaultInstance()) return this;
+        if (!other.getGroupUsers().isEmpty()) {
+          groupUsers_ = other.groupUsers_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        GroupUsers parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (GroupUsers) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private Object groupUsers_ = "";
+      /**
+       * <code>string groupUsers = 1;</code>
+       */
+      public String getGroupUsers() {
+        Object ref = groupUsers_;
+        if (!(ref instanceof String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          String s = bs.toStringUtf8();
+          groupUsers_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      /**
+       * <code>string groupUsers = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getGroupUsersBytes() {
+        Object ref = groupUsers_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (String) ref);
+          groupUsers_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string groupUsers = 1;</code>
+       */
+      public Builder setGroupUsers(
+          String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        groupUsers_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string groupUsers = 1;</code>
+       */
+      public Builder clearGroupUsers() {
+        
+        groupUsers_ = getDefaultInstance().getGroupUsers();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string groupUsers = 1;</code>
+       */
+      public Builder setGroupUsersBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        groupUsers_ = value;
+        onChanged();
+        return this;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFieldsProto3(unknownFields);
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:client_network.GroupUsers)
+    }
+
+    // @@protoc_insertion_point(class_scope:client_network.GroupUsers)
+    private static final GroupUsers DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new GroupUsers();
+    }
+
+    public static GroupUsers getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<GroupUsers>
+        PARSER = new com.google.protobuf.AbstractParser<GroupUsers>() {
+      public GroupUsers parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new GroupUsers(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<GroupUsers> parser() {
+      return PARSER;
+    }
+
+    @Override
+    public com.google.protobuf.Parser<GroupUsers> getParserForType() {
+      return PARSER;
+    }
+
+    public GroupUsers getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface ClientMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:client_network.ClientMessage)
       com.google.protobuf.MessageOrBuilder {
@@ -3768,6 +4812,32 @@ public final class ClientWrapper {
      * <code>.client_network.TorrentWrapper torrentWrapper = 6;</code>
      */
     TorrentWrapperOrBuilder getTorrentWrapperOrBuilder();
+
+    /**
+     * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+     */
+    boolean hasOnlineUsers();
+    /**
+     * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+     */
+    OnlineUsers getOnlineUsers();
+    /**
+     * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+     */
+    OnlineUsersOrBuilder getOnlineUsersOrBuilder();
+
+    /**
+     * <code>.client_network.GroupUsers groupUsers = 8;</code>
+     */
+    boolean hasGroupUsers();
+    /**
+     * <code>.client_network.GroupUsers groupUsers = 8;</code>
+     */
+    GroupUsers getGroupUsers();
+    /**
+     * <code>.client_network.GroupUsers groupUsers = 8;</code>
+     */
+    GroupUsersOrBuilder getGroupUsersOrBuilder();
 
     public ClientMessage.MsgCase getMsgCase();
   }
@@ -3898,6 +4968,34 @@ public final class ClientWrapper {
               msgCase_ = 6;
               break;
             }
+            case 58: {
+              OnlineUsers.Builder subBuilder = null;
+              if (msgCase_ == 7) {
+                subBuilder = ((OnlineUsers) msg_).toBuilder();
+              }
+              msg_ =
+                  input.readMessage(OnlineUsers.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((OnlineUsers) msg_);
+                msg_ = subBuilder.buildPartial();
+              }
+              msgCase_ = 7;
+              break;
+            }
+            case 66: {
+              GroupUsers.Builder subBuilder = null;
+              if (msgCase_ == 8) {
+                subBuilder = ((GroupUsers) msg_).toBuilder();
+              }
+              msg_ =
+                  input.readMessage(GroupUsers.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((GroupUsers) msg_);
+                msg_ = subBuilder.buildPartial();
+              }
+              msgCase_ = 8;
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -3932,6 +5030,8 @@ public final class ClientWrapper {
       CREATEGROUP(4),
       JOINGROUP(5),
       TORRENTWRAPPER(6),
+      ONLINEUSERS(7),
+      GROUPUSERS(8),
       MSG_NOT_SET(0);
       private final int value;
       private MsgCase(int value) {
@@ -3953,6 +5053,8 @@ public final class ClientWrapper {
           case 4: return CREATEGROUP;
           case 5: return JOINGROUP;
           case 6: return TORRENTWRAPPER;
+          case 7: return ONLINEUSERS;
+          case 8: return GROUPUSERS;
           case 0: return MSG_NOT_SET;
           default: return null;
         }
@@ -4124,6 +5226,58 @@ public final class ClientWrapper {
       return TorrentWrapper.getDefaultInstance();
     }
 
+    public static final int ONLINEUSERS_FIELD_NUMBER = 7;
+    /**
+     * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+     */
+    public boolean hasOnlineUsers() {
+      return msgCase_ == 7;
+    }
+    /**
+     * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+     */
+    public OnlineUsers getOnlineUsers() {
+      if (msgCase_ == 7) {
+         return (OnlineUsers) msg_;
+      }
+      return OnlineUsers.getDefaultInstance();
+    }
+    /**
+     * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+     */
+    public OnlineUsersOrBuilder getOnlineUsersOrBuilder() {
+      if (msgCase_ == 7) {
+         return (OnlineUsers) msg_;
+      }
+      return OnlineUsers.getDefaultInstance();
+    }
+
+    public static final int GROUPUSERS_FIELD_NUMBER = 8;
+    /**
+     * <code>.client_network.GroupUsers groupUsers = 8;</code>
+     */
+    public boolean hasGroupUsers() {
+      return msgCase_ == 8;
+    }
+    /**
+     * <code>.client_network.GroupUsers groupUsers = 8;</code>
+     */
+    public GroupUsers getGroupUsers() {
+      if (msgCase_ == 8) {
+         return (GroupUsers) msg_;
+      }
+      return GroupUsers.getDefaultInstance();
+    }
+    /**
+     * <code>.client_network.GroupUsers groupUsers = 8;</code>
+     */
+    public GroupUsersOrBuilder getGroupUsersOrBuilder() {
+      if (msgCase_ == 8) {
+         return (GroupUsers) msg_;
+      }
+      return GroupUsers.getDefaultInstance();
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -4153,6 +5307,12 @@ public final class ClientWrapper {
       }
       if (msgCase_ == 6) {
         output.writeMessage(6, (TorrentWrapper) msg_);
+      }
+      if (msgCase_ == 7) {
+        output.writeMessage(7, (OnlineUsers) msg_);
+      }
+      if (msgCase_ == 8) {
+        output.writeMessage(8, (GroupUsers) msg_);
       }
       unknownFields.writeTo(output);
     }
@@ -4185,6 +5345,14 @@ public final class ClientWrapper {
       if (msgCase_ == 6) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(6, (TorrentWrapper) msg_);
+      }
+      if (msgCase_ == 7) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(7, (OnlineUsers) msg_);
+      }
+      if (msgCase_ == 8) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(8, (GroupUsers) msg_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -4230,6 +5398,14 @@ public final class ClientWrapper {
           result = result && getTorrentWrapper()
               .equals(other.getTorrentWrapper());
           break;
+        case 7:
+          result = result && getOnlineUsers()
+              .equals(other.getOnlineUsers());
+          break;
+        case 8:
+          result = result && getGroupUsers()
+              .equals(other.getGroupUsers());
+          break;
         case 0:
         default:
       }
@@ -4268,6 +5444,14 @@ public final class ClientWrapper {
         case 6:
           hash = (37 * hash) + TORRENTWRAPPER_FIELD_NUMBER;
           hash = (53 * hash) + getTorrentWrapper().hashCode();
+          break;
+        case 7:
+          hash = (37 * hash) + ONLINEUSERS_FIELD_NUMBER;
+          hash = (53 * hash) + getOnlineUsers().hashCode();
+          break;
+        case 8:
+          hash = (37 * hash) + GROUPUSERS_FIELD_NUMBER;
+          hash = (53 * hash) + getGroupUsers().hashCode();
           break;
         case 0:
         default:
@@ -4467,6 +5651,20 @@ public final class ClientWrapper {
             result.msg_ = torrentWrapperBuilder_.build();
           }
         }
+        if (msgCase_ == 7) {
+          if (onlineUsersBuilder_ == null) {
+            result.msg_ = msg_;
+          } else {
+            result.msg_ = onlineUsersBuilder_.build();
+          }
+        }
+        if (msgCase_ == 8) {
+          if (groupUsersBuilder_ == null) {
+            result.msg_ = msg_;
+          } else {
+            result.msg_ = groupUsersBuilder_.build();
+          }
+        }
         result.msgCase_ = msgCase_;
         onBuilt();
         return result;
@@ -4532,6 +5730,14 @@ public final class ClientWrapper {
           }
           case TORRENTWRAPPER: {
             mergeTorrentWrapper(other.getTorrentWrapper());
+            break;
+          }
+          case ONLINEUSERS: {
+            mergeOnlineUsers(other.getOnlineUsers());
+            break;
+          }
+          case GROUPUSERS: {
+            mergeGroupUsers(other.getGroupUsers());
             break;
           }
           case MSG_NOT_SET: {
@@ -5395,6 +6601,278 @@ public final class ClientWrapper {
         onChanged();;
         return torrentWrapperBuilder_;
       }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          OnlineUsers, OnlineUsers.Builder, OnlineUsersOrBuilder> onlineUsersBuilder_;
+      /**
+       * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+       */
+      public boolean hasOnlineUsers() {
+        return msgCase_ == 7;
+      }
+      /**
+       * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+       */
+      public OnlineUsers getOnlineUsers() {
+        if (onlineUsersBuilder_ == null) {
+          if (msgCase_ == 7) {
+            return (OnlineUsers) msg_;
+          }
+          return OnlineUsers.getDefaultInstance();
+        } else {
+          if (msgCase_ == 7) {
+            return onlineUsersBuilder_.getMessage();
+          }
+          return OnlineUsers.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+       */
+      public Builder setOnlineUsers(OnlineUsers value) {
+        if (onlineUsersBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          msg_ = value;
+          onChanged();
+        } else {
+          onlineUsersBuilder_.setMessage(value);
+        }
+        msgCase_ = 7;
+        return this;
+      }
+      /**
+       * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+       */
+      public Builder setOnlineUsers(
+          OnlineUsers.Builder builderForValue) {
+        if (onlineUsersBuilder_ == null) {
+          msg_ = builderForValue.build();
+          onChanged();
+        } else {
+          onlineUsersBuilder_.setMessage(builderForValue.build());
+        }
+        msgCase_ = 7;
+        return this;
+      }
+      /**
+       * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+       */
+      public Builder mergeOnlineUsers(OnlineUsers value) {
+        if (onlineUsersBuilder_ == null) {
+          if (msgCase_ == 7 &&
+              msg_ != OnlineUsers.getDefaultInstance()) {
+            msg_ = OnlineUsers.newBuilder((OnlineUsers) msg_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            msg_ = value;
+          }
+          onChanged();
+        } else {
+          if (msgCase_ == 7) {
+            onlineUsersBuilder_.mergeFrom(value);
+          }
+          onlineUsersBuilder_.setMessage(value);
+        }
+        msgCase_ = 7;
+        return this;
+      }
+      /**
+       * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+       */
+      public Builder clearOnlineUsers() {
+        if (onlineUsersBuilder_ == null) {
+          if (msgCase_ == 7) {
+            msgCase_ = 0;
+            msg_ = null;
+            onChanged();
+          }
+        } else {
+          if (msgCase_ == 7) {
+            msgCase_ = 0;
+            msg_ = null;
+          }
+          onlineUsersBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+       */
+      public OnlineUsers.Builder getOnlineUsersBuilder() {
+        return getOnlineUsersFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+       */
+      public OnlineUsersOrBuilder getOnlineUsersOrBuilder() {
+        if ((msgCase_ == 7) && (onlineUsersBuilder_ != null)) {
+          return onlineUsersBuilder_.getMessageOrBuilder();
+        } else {
+          if (msgCase_ == 7) {
+            return (OnlineUsers) msg_;
+          }
+          return OnlineUsers.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.client_network.OnlineUsers onlineUsers = 7;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          OnlineUsers, OnlineUsers.Builder, OnlineUsersOrBuilder>
+          getOnlineUsersFieldBuilder() {
+        if (onlineUsersBuilder_ == null) {
+          if (!(msgCase_ == 7)) {
+            msg_ = OnlineUsers.getDefaultInstance();
+          }
+          onlineUsersBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              OnlineUsers, OnlineUsers.Builder, OnlineUsersOrBuilder>(
+                  (OnlineUsers) msg_,
+                  getParentForChildren(),
+                  isClean());
+          msg_ = null;
+        }
+        msgCase_ = 7;
+        onChanged();;
+        return onlineUsersBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          GroupUsers, GroupUsers.Builder, GroupUsersOrBuilder> groupUsersBuilder_;
+      /**
+       * <code>.client_network.GroupUsers groupUsers = 8;</code>
+       */
+      public boolean hasGroupUsers() {
+        return msgCase_ == 8;
+      }
+      /**
+       * <code>.client_network.GroupUsers groupUsers = 8;</code>
+       */
+      public GroupUsers getGroupUsers() {
+        if (groupUsersBuilder_ == null) {
+          if (msgCase_ == 8) {
+            return (GroupUsers) msg_;
+          }
+          return GroupUsers.getDefaultInstance();
+        } else {
+          if (msgCase_ == 8) {
+            return groupUsersBuilder_.getMessage();
+          }
+          return GroupUsers.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.client_network.GroupUsers groupUsers = 8;</code>
+       */
+      public Builder setGroupUsers(GroupUsers value) {
+        if (groupUsersBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          msg_ = value;
+          onChanged();
+        } else {
+          groupUsersBuilder_.setMessage(value);
+        }
+        msgCase_ = 8;
+        return this;
+      }
+      /**
+       * <code>.client_network.GroupUsers groupUsers = 8;</code>
+       */
+      public Builder setGroupUsers(
+          GroupUsers.Builder builderForValue) {
+        if (groupUsersBuilder_ == null) {
+          msg_ = builderForValue.build();
+          onChanged();
+        } else {
+          groupUsersBuilder_.setMessage(builderForValue.build());
+        }
+        msgCase_ = 8;
+        return this;
+      }
+      /**
+       * <code>.client_network.GroupUsers groupUsers = 8;</code>
+       */
+      public Builder mergeGroupUsers(GroupUsers value) {
+        if (groupUsersBuilder_ == null) {
+          if (msgCase_ == 8 &&
+              msg_ != GroupUsers.getDefaultInstance()) {
+            msg_ = GroupUsers.newBuilder((GroupUsers) msg_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            msg_ = value;
+          }
+          onChanged();
+        } else {
+          if (msgCase_ == 8) {
+            groupUsersBuilder_.mergeFrom(value);
+          }
+          groupUsersBuilder_.setMessage(value);
+        }
+        msgCase_ = 8;
+        return this;
+      }
+      /**
+       * <code>.client_network.GroupUsers groupUsers = 8;</code>
+       */
+      public Builder clearGroupUsers() {
+        if (groupUsersBuilder_ == null) {
+          if (msgCase_ == 8) {
+            msgCase_ = 0;
+            msg_ = null;
+            onChanged();
+          }
+        } else {
+          if (msgCase_ == 8) {
+            msgCase_ = 0;
+            msg_ = null;
+          }
+          groupUsersBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.client_network.GroupUsers groupUsers = 8;</code>
+       */
+      public GroupUsers.Builder getGroupUsersBuilder() {
+        return getGroupUsersFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.client_network.GroupUsers groupUsers = 8;</code>
+       */
+      public GroupUsersOrBuilder getGroupUsersOrBuilder() {
+        if ((msgCase_ == 8) && (groupUsersBuilder_ != null)) {
+          return groupUsersBuilder_.getMessageOrBuilder();
+        } else {
+          if (msgCase_ == 8) {
+            return (GroupUsers) msg_;
+          }
+          return GroupUsers.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.client_network.GroupUsers groupUsers = 8;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          GroupUsers, GroupUsers.Builder, GroupUsersOrBuilder>
+          getGroupUsersFieldBuilder() {
+        if (groupUsersBuilder_ == null) {
+          if (!(msgCase_ == 8)) {
+            msg_ = GroupUsers.getDefaultInstance();
+          }
+          groupUsersBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              GroupUsers, GroupUsers.Builder, GroupUsersOrBuilder>(
+                  (GroupUsers) msg_,
+                  getParentForChildren(),
+                  isClean());
+          msg_ = null;
+        }
+        msgCase_ = 8;
+        onChanged();;
+        return groupUsersBuilder_;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
@@ -5475,6 +6953,16 @@ public final class ClientWrapper {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_client_network_TorrentWrapper_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_client_network_OnlineUsers_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_client_network_OnlineUsers_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_client_network_GroupUsers_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_client_network_GroupUsers_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_client_network_ClientMessage_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -5495,15 +6983,19 @@ public final class ClientWrapper {
       "\003rep\030\001 \001(\010\"\034\n\013CreateGroup\022\r\n\005group\030\001 \001(\t" +
       "\"\032\n\tJoinGroup\022\r\n\005group\030\001 \001(\t\"<\n\016TorrentW" +
       "rapper\022\r\n\005group\030\001 \001(\t\022\017\n\007content\030\002 \001(\014\022\n" +
-      "\n\002id\030\003 \001(\t\"\270\002\n\rClientMessage\022&\n\005login\030\001 " +
-      "\001(\0132\025.client_network.LoginH\000\022,\n\010register" +
-      "\030\002 \001(\0132\030.client_network.RegisterH\000\022,\n\010re",
-      "sponse\030\003 \001(\0132\030.client_network.ResponseH\000" +
-      "\0222\n\013createGroup\030\004 \001(\0132\033.client_network.C" +
-      "reateGroupH\000\022.\n\tjoinGroup\030\005 \001(\0132\031.client" +
-      "_network.JoinGroupH\000\0228\n\016torrentWrapper\030\006" +
-      " \001(\0132\036.client_network.TorrentWrapperH\000B\005" +
-      "\n\003msgb\006proto3"
+      "\n\002id\030\003 \001(\t\"\"\n\013OnlineUsers\022\023\n\013onlineUsers" +
+      "\030\001 \001(\t\" \n\nGroupUsers\022\022\n\ngroupUsers\030\001 \001(\t" +
+      "\"\236\003\n\rClientMessage\022&\n\005login\030\001 \001(\0132\025.clie",
+      "nt_network.LoginH\000\022,\n\010register\030\002 \001(\0132\030.c" +
+      "lient_network.RegisterH\000\022,\n\010response\030\003 \001" +
+      "(\0132\030.client_network.ResponseH\000\0222\n\013create" +
+      "Group\030\004 \001(\0132\033.client_network.CreateGroup" +
+      "H\000\022.\n\tjoinGroup\030\005 \001(\0132\031.client_network.J" +
+      "oinGroupH\000\0228\n\016torrentWrapper\030\006 \001(\0132\036.cli" +
+      "ent_network.TorrentWrapperH\000\0222\n\013onlineUs" +
+      "ers\030\007 \001(\0132\033.client_network.OnlineUsersH\000" +
+      "\0220\n\ngroupUsers\030\010 \001(\0132\032.client_network.Gr" +
+      "oupUsersH\000B\005\n\003msgb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -5553,12 +7045,24 @@ public final class ClientWrapper {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_client_network_TorrentWrapper_descriptor,
         new String[] { "Group", "Content", "Id", });
-    internal_static_client_network_ClientMessage_descriptor =
+    internal_static_client_network_OnlineUsers_descriptor =
       getDescriptor().getMessageTypes().get(6);
+    internal_static_client_network_OnlineUsers_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_client_network_OnlineUsers_descriptor,
+        new String[] { "OnlineUsers", });
+    internal_static_client_network_GroupUsers_descriptor =
+      getDescriptor().getMessageTypes().get(7);
+    internal_static_client_network_GroupUsers_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_client_network_GroupUsers_descriptor,
+        new String[] { "GroupUsers", });
+    internal_static_client_network_ClientMessage_descriptor =
+      getDescriptor().getMessageTypes().get(8);
     internal_static_client_network_ClientMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_client_network_ClientMessage_descriptor,
-        new String[] { "Login", "Register", "Response", "CreateGroup", "JoinGroup", "TorrentWrapper", "Msg", });
+        new String[] { "Login", "Register", "Response", "CreateGroup", "JoinGroup", "TorrentWrapper", "OnlineUsers", "GroupUsers", "Msg", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
