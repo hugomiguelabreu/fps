@@ -1,38 +1,37 @@
 package UI;
 
-import Core.Connector;
 import Event.ConcurrentHashMapEvent;
 import Event.MapEvent;
 import Util.FileUtils;
 import Util.ServerOperations;
-import Util.TorrentUtil;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.util.Duration;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.ParserConfigurationException;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.List;
 
 public class AppController implements MapEvent{
 
@@ -54,11 +53,15 @@ public class AppController implements MapEvent{
     private SplitPane splitPane2;
     @FXML
     private Label label_file;
+    @FXML
+    private Button join_button;
+    @FXML
+    private Button create_button;
 
     private ArrayList<Pane> notifications;
     private String groupSelected;
     private ConcurrentHashMapEvent<String, ArrayList<Torrent>> groupTorrents;
-    private ConcurrentHashMapEvent<String, ArrayList<Torrent>> groupUsers;
+    private ConcurrentHashMapEvent<String, ArrayList<String>> groupUsers;
 
 
     @FXML
@@ -72,7 +75,6 @@ public class AppController implements MapEvent{
                 (observable, oldValue, newValue) -> splitPane2.getDividers().get(0).setPosition(pos2)
         );
 
-        Collection<String> labels = new ArrayList<>();
         groupTorrents = new ConcurrentHashMapEvent<>();
         groupTorrents.registerCallback(this);
         ServerOperations.setGroupTorrents(groupTorrents);
@@ -82,27 +84,26 @@ public class AppController implements MapEvent{
 
         notifications = new ArrayList<>();
 
-        labels.add("migos");
         groupTorrents.put("migos", new ArrayList<>());
-        for (int i = 0; i < 50; i++) {
-            labels.add("okok" + i);
-            groupTorrents.put("okok" + i, new ArrayList<>());
-        }
+        groupUsers.put("migos", new ArrayList<>());
+        groupTorrents.put("leddit", new ArrayList<>());
+        groupUsers.put("leddit", new ArrayList<>());
 
-        ObservableList<String> items = FXCollections.observableArrayList(labels);
-        list_groups.setItems(items);
-        list_users.setItems(items);
+        list_groups.setItems(FXCollections.observableArrayList(new ArrayList<>(groupTorrents.keySet())));
+
         list_groups.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, event -> {
             try {
                 label_file.setVisible(true);
-                list_groups_files.getChildren().remove(0, list_groups_files.getChildren().size());
                 groupSelected = list_groups.getSelectionModel().getSelectedItem();
+                list_users.setItems(FXCollections.observableArrayList(groupUsers.get(groupSelected)));
+                //Limpa os files
+                list_groups_files.getChildren().remove(0, list_groups_files.getChildren().size());
                 this.loadFiles(groupSelected);
+
             } catch (IOException | NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
         });
-        //list_groups_files.setSpacing(8.0);
     }
 
     private void loadFiles(String group) throws IOException, NoSuchAlgorithmException {
@@ -112,13 +113,13 @@ public class AppController implements MapEvent{
 
         if(groupTorrents.get(group).size() > 0)
             label_file.setVisible(false);
-
+        int i = 0;
         for(Torrent t: groupTorrents.get(group)){
-            panelUI(t);
+            panelUI(t, true);
         }
     }
 
-    void panelUI(Torrent t){
+    void panelUI(Torrent t, boolean bulk){
         Label l = new Label();
         Button accept = new Button();
         Button close = new Button();
@@ -127,7 +128,6 @@ public class AppController implements MapEvent{
         StringBuilder sb = new StringBuilder()
                 .append(t.getCreatedBy() + " wants to share ");
         sb.append(t.getFilenames().get(0) + " ( " + t.getSize()/1024/1024 + " MB) " + " with you");
-
         // update UI thread
         Platform.runLater(() -> {
             notifications.add(pane);
@@ -171,8 +171,13 @@ public class AppController implements MapEvent{
             //TODO close button close.setUserdata(pane);
 
             TranslateTransition down = new TranslateTransition();
-            down.setFromY(94 * (notifications.size() - 1));
-            down.setToY(94 * notifications.size());
+            if(bulk) {
+                down.setFromY(94 * (notifications.size() - 1));
+                down.setToY(94 * notifications.size());
+            }else{
+                down.setFromY(0);
+                down.setToY(94);
+            }
 
             down.setDuration(Duration.seconds(1));
             down.setNode(pane);
@@ -193,10 +198,10 @@ public class AppController implements MapEvent{
         close.setOnMouseClicked(mouseEvent -> {
             AnchorPane selectedPane = (AnchorPane) close.getUserData();
             list_groups_files.getChildren().remove(selectedPane);
-            int index = notifications.indexOf(selectedPane);
+            int indexNot = notifications.indexOf(selectedPane);
             notifications.remove(selectedPane);
             for(Pane p : notifications){
-                if(notifications.indexOf(p) >= index){
+                if(notifications.indexOf(p) >= indexNot){
                     System.out.println("go up");
                     TranslateTransition up = new TranslateTransition();
                     up.setDuration(Duration.seconds(1));
@@ -228,7 +233,10 @@ public class AppController implements MapEvent{
             a.setContentText("No group selected");
             a.showAndWait().filter(response -> response == ButtonType.OK);
         }else{
-            ServerOperations.sendTorrent((event.getDragboard().getFiles().get(0).getAbsolutePath()), groupSelected);
+            String path = event.getDragboard().getFiles().get(0).getAbsolutePath();
+            new Thread(()->
+                ServerOperations.sendTorrent(path, groupSelected)
+            ).start();
         }
         event.setDropCompleted(true);
         event.consume();
@@ -241,12 +249,63 @@ public class AppController implements MapEvent{
         dragEvent.consume();
     }
 
+    public void handleClickJoin(MouseEvent e){
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Join group");
+        dialog.setHeaderText("Name of group");
+        dialog.setContentText("Name:");
+
+        // Traditional way to get the response value.
+        Optional<String> result = dialog.showAndWait();
+        // The Java 8 way to get the response value (with lambda expression).
+        result.ifPresent(name -> {
+            if(ServerOperations.joinGroup(name))
+                showAlert("Grupo criado com sucesso");
+            else
+                showAlert("Erro a criar grupo");
+        });
+        e.consume();
+    }
+
+    public void handleClickCreate(MouseEvent e){
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Create group");
+        dialog.setHeaderText("Name of group");
+        dialog.setContentText("Name:");
+
+        // Traditional way to get the response value.
+        Optional<String> result = dialog.showAndWait();
+        // The Java 8 way to get the response value (with lambda expression).
+        result.ifPresent(name -> {
+            if(ServerOperations.createGroup(name))
+                showAlert("Grupo criado com sucesso");
+            else
+                showAlert("Erro a criar grupo");
+        });
+        e.consume();
+    }
+
+    public void showAlert(String info){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Info");
+        alert.setHeaderText(info);
+
+        alert.showAndWait();
+    }
+
     @Override
     public void putEvent(int type, Object key) {
         if(type == 1){
             //Torrent novo;
             String group = String.valueOf(key);
-            panelUI(groupTorrents.get(group).get(0));
+            for(Pane p : notifications){
+                TranslateTransition down = new TranslateTransition();
+                down.setByY(94);
+                down.setDuration(Duration.seconds(1));
+                down.setNode(p);
+                down.play();
+            }
+            panelUI(groupTorrents.get(group).get(0), false);
         }
     }
 

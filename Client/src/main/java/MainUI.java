@@ -32,12 +32,8 @@ public class MainUI extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException, URISyntaxException {
 
-        ArrayList<String> servers = new ArrayList<>();
         FileUtils.initDir();
-
-
         System.out.println("Started client");
-        servers.add("localhost:2000");
 
         FXMLLoader loader = new FXMLLoader();
         // Path to the FXML File

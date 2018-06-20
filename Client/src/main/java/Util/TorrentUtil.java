@@ -207,10 +207,7 @@ public class TorrentUtil {
 
     public static Client upload(Torrent t, String path, Connector channel, String username, String group) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
         File dest = new File(path);
-        URL whatismyip = new URL("http://checkip.amazonaws.com");
-        BufferedReader in = new BufferedReader(new InputStreamReader(
-                whatismyip.openStream()));
-        String ip = in.readLine(); //you get the IP as a String
+        String ip = TorrentUtil.getIp();
 
         //Creates a protobuf to send file inf
 
@@ -223,11 +220,10 @@ public class TorrentUtil {
                 .setTorrentWrapper(sw).build();
 
         //Escreve e espera pela escrita no socket
-        if(!channel.send(wrapper)){
-            //Nao conseguiu enviar //TODO:cenas
-        }
-        //Após iniciada a intenção, iniciamos o cliente.
+        if(!channel.send(wrapper))
+            return null;
 
+        //Após iniciada a intenção, iniciamos o cliente.
         SharedTorrent st = new SharedTorrent(t, dest.getParentFile());
         Client c = new Client(
                 InetAddress.getByName(ip),
@@ -244,11 +240,7 @@ public class TorrentUtil {
         String ip;
         try {
             if(online){
-                //Seeding starts.
-                URL whatismyip = new URL("http://checkip.amazonaws.com");
-                BufferedReader in = new BufferedReader(new InputStreamReader(
-                        whatismyip.openStream()));
-                ip = in.readLine(); //you get the IP as a String
+                ip = TorrentUtil.getIp();
             }else{
                 ip = Offline.findLocalAddresses().get(0).getIpv4();
             }
@@ -281,11 +273,7 @@ public class TorrentUtil {
         String ip;
         try {
             if(online){
-                //Seeding starts.
-                URL whatismyip = new URL("http://checkip.amazonaws.com");
-                BufferedReader in = new BufferedReader(new InputStreamReader(
-                        whatismyip.openStream()));
-                ip = in.readLine(); //you get the IP as a String
+                ip = TorrentUtil.getIp();
             }else{
                 ip = Offline.findLocalAddresses().get(0).getIpv4();
             }
@@ -321,5 +309,12 @@ public class TorrentUtil {
         } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String getIp() throws IOException {
+        URL whatismyip = new URL("http://checkip.amazonaws.com");
+        BufferedReader in = new BufferedReader(new InputStreamReader(
+                whatismyip.openStream()));
+        return in.readLine(); //you get the IP as a String
     }
 }

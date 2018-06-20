@@ -265,12 +265,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
             ObservableList<String> items = FXCollections.observableArrayList(users);
 
             // update UI thread
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    list_users.setItems(items);
-                }
-            });
+            Platform.runLater(() -> list_users.setItems(items));
         }
 
         catch (NullPointerException e){
@@ -321,62 +316,59 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
 
         // update UI thread
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
+        Platform.runLater(() -> {
 
-                pane.getChildren().add(l);
-                pane.getChildren().add(accept);
-                pane.getChildren().add(close);
-                mainPane.getChildren().add(pane);
+            pane.getChildren().add(l);
+            pane.getChildren().add(accept);
+            pane.getChildren().add(close);
+            mainPane.getChildren().add(pane);
 
-                pane.setLayoutX(244.0);
-                pane.setLayoutY(-56.0);
-                pane.setPrefHeight(56.0);
-                pane.setPrefWidth(556.0);
-                pane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
-                pane.setBorder(new Border(
-                        new BorderStroke(Color.DARKGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)
-                ));
+            pane.setLayoutX(244.0);
+            pane.setLayoutY(-56.0);
+            pane.setPrefHeight(56.0);
+            pane.setPrefWidth(556.0);
+            pane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+            pane.setBorder(new Border(
+                    new BorderStroke(Color.DARKGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)
+            ));
 
-                l.setText(sb.toString());
-                l.setLayoutX(14.0);
-                l.setLayoutY(20.0);
-                l.setPrefHeight(16.0);
-                l.setPrefWidth(314.0);
+            l.setText(sb.toString());
+            l.setLayoutX(14.0);
+            l.setLayoutY(20.0);
+            l.setPrefHeight(16.0);
+            l.setPrefWidth(314.0);
 
-                accept.setAlignment(Pos.CENTER);
-                accept.setLayoutX(378);
-                accept.setLayoutY(15.0);
-                accept.setBackground(new Background(new BackgroundFill(Color.LIGHTGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
-                accept.setText("Accept");
-                accept.setUserData(l);
+            accept.setAlignment(Pos.CENTER);
+            accept.setLayoutX(378);
+            accept.setLayoutY(15.0);
+            accept.setBackground(new Background(new BackgroundFill(Color.LIGHTGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+            accept.setText("Accept");
+            accept.setUserData(l);
 
-                close.setAlignment(Pos.CENTER);
-                close.setLayoutX(466);
-                close.setLayoutY(15.0);
-                close.setBackground(new Background(new BackgroundFill(Color.INDIANRED, CornerRadii.EMPTY, Insets.EMPTY)));
-                close.setText("Close");
-                close.setUserData(pane);
+            close.setAlignment(Pos.CENTER);
+            close.setLayoutX(466);
+            close.setLayoutY(15.0);
+            close.setBackground(new Background(new BackgroundFill(Color.INDIANRED, CornerRadii.EMPTY, Insets.EMPTY)));
+            close.setText("Close");
+            close.setUserData(pane);
 
-                TranslateTransition down = new TranslateTransition();
-                down.setFromY(0);
-                down.setToY(56);
+            TranslateTransition down = new TranslateTransition();
+            down.setFromY(0);
+            down.setToY(56);
+            down.setDuration(Duration.seconds(1));
+            down.setNode(pane);
+            down.play();
+
+            for(AnchorPane p : notifications){
+
+                down = new TranslateTransition();
+                down.setByY(56);
                 down.setDuration(Duration.seconds(1));
-                down.setNode(pane);
+                down.setNode(p);
                 down.play();
-
-                for(AnchorPane p : notifications){
-
-                    down = new TranslateTransition();
-                    down.setByY(56);
-                    down.setDuration(Duration.seconds(1));
-                    down.setNode(p);
-                    down.play();
-                }
-
-                notifications.add(pane);
             }
+
+            notifications.add(pane);
         });
 
         accept.setOnMouseClicked(new EventHandler<MouseEvent>() {

@@ -8,8 +8,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
+import java.security.Timestamp;
+import java.util.*;
 
 public class FileUtils {
 
@@ -34,12 +34,15 @@ public class FileUtils {
 
         File parent = new File(System.getProperty("user.home") + "/.fps/" + group);
         if(parent.exists()) {
-            for (File f : parent.listFiles()) {
+            File[] files = parent.listFiles();
+            Arrays.sort(files, (f1, f2) -> Long.valueOf(f2.lastModified()).compareTo(f1.lastModified()));
+            for (File f : files) {
                 if (!f.isDirectory()) {
                     ret.add(Torrent.load(f));
                 }
             }
         }
+
         return ret;
     }
 }
