@@ -23,6 +23,12 @@ public class ConcurrentHashMapEvent<K,V> extends ConcurrentHashMap<K,V> {
         return ret;
     }
 
+    public V putUsers(K key, V value){
+        V ret = super.put(key,value);
+        mapEvent.putEvent(2, key);
+        return ret;
+    }
+
     @Override
     public V remove(Object key){
         V ret = super.remove(key);
