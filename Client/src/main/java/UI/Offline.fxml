@@ -6,16 +6,28 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 
 <AnchorPane fx:id="mainPane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.OfflineUI">
 
     <children>
-        <SplitPane dividerPositions="0.298" prefHeight="600.0" prefWidth="800.0" fx:id="splitPane1">
+        <SplitPane fx:id="splitPane1" dividerPositions="0.298" prefHeight="600.0" prefWidth="800.0">
             <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                     <children>
-                        <ListView fx:id="list_users" layoutY="40.0" prefHeight="558.0" prefWidth="234.0" />
                         <Label layoutX="14.0" layoutY="14.0" text="Users on Local Network" />
+                  <VBox layoutY="43.0" prefHeight="558.0" prefWidth="234.0">
+                     <children>
+                         <ListView fx:id="list_users" prefHeight="235.0" prefWidth="234.0" />
+                        <AnchorPane prefHeight="38.0" prefWidth="234.0">
+                           <children>
+                              <Label layoutX="14.0" layoutY="11.0" text="Groups" />
+                              <Button fx:id="createGroupButton" layoutX="158.0" layoutY="6.0" mnemonicParsing="false" onMouseClicked="#handleCreateGroup" text="Create" />
+                           </children>
+                        </AnchorPane>
+                         <ListView fx:id="groupsList" prefHeight="283.0" prefWidth="234.0" />
+                     </children>
+                  </VBox>
                     </children>
                 </AnchorPane>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">

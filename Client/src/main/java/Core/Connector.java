@@ -4,6 +4,8 @@ import Network.ClientWrapper;
 import UI.AppController;
 import Util.FileUtils;
 import Util.ServerOperations;
+import com.google.protobuf.CodedInputStream;
+import com.google.protobuf.CodedOutputStream;
 import com.turn.ttorrent.common.Torrent;
 import javafx.fxml.FXMLLoader;
 
@@ -13,6 +15,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -20,7 +23,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Connector extends Thread{
 
     private OutputStream out;
-    private InputStream in;
+    private CodedInputStream in;
     private Socket socket;
     private LinkedBlockingQueue<Boolean> responses;
     private boolean connected;
@@ -34,7 +37,7 @@ public class Connector extends Thread{
             try {
                 socket = new Socket(uri.getHost(), uri.getPort());
                 out = socket.getOutputStream();
-                in = socket.getInputStream();
+                in = CodedInputStream.newInstance(socket.getInputStream());
             } catch (Exception e) {
                 System.out.println("\u001B[31mError opening socket\u001B[0m");
                 this.connected = false;
@@ -49,7 +52,11 @@ public class Connector extends Thread{
     public void run() {
         while (!stop){
             try {
-                ClientWrapper.ClientMessage cm = ClientWrapper.ClientMessage.parseDelimitedFrom(in);
+                byte[] length_b = in.readRawBytes(4);
+                int l = ByteBuffer.wrap(length_b).getInt();
+                byte[] data = in.readRawBytes(l);
+
+                ClientWrapper.ClientMessage cm = ClientWrapper.ClientMessage.parseFrom(data);
                 boolean torrent =
                         cm.getMsgCase().equals(ClientWrapper.ClientMessage.MsgCase.TORRENTWRAPPER);
 
@@ -81,7 +88,8 @@ public class Connector extends Thread{
         if(!this.connected)
             return false;
         try {
-            out.write(msg.getSerializedSize());
+            byte[] size = ByteBuffer.allocate(4).putInt(msg.getSerializedSize()).array();
+            out.write(size);
             msg.writeTo(out);
         } catch (IOException e) {
             e.printStackTrace();
@@ -102,8 +110,6 @@ public class Connector extends Thread{
             this.connected = false;
             this.stop = true;
             out.flush();
-            out.close();
-            in.close();
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();

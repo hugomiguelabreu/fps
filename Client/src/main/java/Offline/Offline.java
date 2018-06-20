@@ -1,10 +1,12 @@
 package Offline;
 
 import Event.ArrayListEvent;
+import Event.ConcurrentHashMapEvent;
 import Offline.LocalTorrent.TorrentListener;
 import Offline.Utils.LocalAddresses;
 import Offline.Probes.Broadcast;
 import Offline.Probes.Listener;
+import Offline.Utils.User;
 import UI.OfflineUI;
 import com.turn.ttorrent.common.Torrent;
 
@@ -44,12 +46,12 @@ public class Offline {
      * Inicia os Probes e o Torrentlistner para a UI
      * @param username nome do dude loged
      */
-    public static void startProbes(String username, ArrayListEvent<Torrent> availableParam, OfflineUI ui){
+    public static void startProbes(String username, ArrayListEvent<Torrent> availableParam, ConcurrentHashMapEvent<String,User> peers ){
 
         ArrayList<LocalAddresses> ownAddresses =  findLocalAddresses();
 
         //Starts listening for .torrents in the network
-        listener = new Listener(username, ownAddresses, ui);
+        listener = new Listener(username, ownAddresses, peers);
         listener.start();
         //Start broadcasting address and info
         broadcast = new Broadcast(username, ownAddresses);
