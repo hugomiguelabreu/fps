@@ -7,6 +7,13 @@
 
 -define(client_wrapper_gpb_version, "4.1.1").
 
+-ifndef('GROUPUSERS_PB_H').
+-define('GROUPUSERS_PB_H', true).
+-record('GroupUsers',
+        {groupUsers = <<>>      :: iodata() | undefined % = 1
+        }).
+-endif.
+
 -ifndef('JOINGROUP_PB_H').
 -define('JOINGROUP_PB_H', true).
 -record('JoinGroup',
@@ -20,14 +27,6 @@
         {username = <<>>        :: iodata() | undefined, % = 1
          password = <<>>        :: iodata() | undefined, % = 2
          name = <<>>            :: iodata() | undefined % = 3
-        }).
--endif.
-
--ifndef('LOGIN_PB_H').
--define('LOGIN_PB_H', true).
--record('Login',
-        {username = <<>>        :: iodata() | undefined, % = 1
-         password = <<>>        :: iodata() | undefined % = 2
         }).
 -endif.
 
@@ -54,10 +53,25 @@
         }).
 -endif.
 
+-ifndef('LOGIN_PB_H').
+-define('LOGIN_PB_H', true).
+-record('Login',
+        {username = <<>>        :: iodata() | undefined, % = 1
+         password = <<>>        :: iodata() | undefined % = 2
+        }).
+-endif.
+
 -ifndef('CLIENTMESSAGE_PB_H').
 -define('CLIENTMESSAGE_PB_H', true).
 -record('ClientMessage',
         {msg                    :: {login, #'Login'{}} | {register, #'Register'{}} | {response, #'Response'{}} | {createGroup, #'CreateGroup'{}} | {joinGroup, #'JoinGroup'{}} | {torrentWrapper, #'TorrentWrapper'{}} | undefined % oneof
+        }).
+-endif.
+
+-ifndef('ONLINEUSERS_PB_H').
+-define('ONLINEUSERS_PB_H', true).
+-record('OnlineUsers',
+        {onlineUsers = <<>>     :: iodata() | undefined % = 1
         }).
 -endif.
 

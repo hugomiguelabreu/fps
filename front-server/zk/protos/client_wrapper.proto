@@ -30,6 +30,14 @@ message TorrentWrapper{
     string id = 3;
 }
 
+message OnlineUsers{
+    string onlineUsers = 1;
+}
+
+message GroupUsers {
+    string groupUsers = 1;
+}
+
 message ClientMessage {
     oneof msg {
         Login login = 1;

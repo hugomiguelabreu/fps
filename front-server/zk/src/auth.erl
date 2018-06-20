@@ -46,6 +46,65 @@ auth(Socket, ID) ->
 
 	end.
 
+msgDecriptor(Data, User, Socket, ID) ->
+	{_, {T, D}} =  client_wrapper:decode_msg(Data, 'ClientMessage'),
+	case T of
+		login ->
+			{'Login',U,P}=D,
+			login(binary_to_list(U),binary_to_list(P),ID, Socket);
+		register ->
+			{'Register',U,P,N}=D,
+			register(binary_to_list(U),binary_to_list(P),binary_to_list(N),Socket);
+		createGroup ->
+			{'CreateGroup', G} = D,
+			createGroup(User, binary_to_list(G), Socket);
+		joinGroup ->
+			{'JoinGroup', G} = D,
+			joinGroup(User, binary_to_list(G), Socket);
+		torrentWrapper ->
+			redirect(D, integer_to_list(ID), User)
+	end.
+
+loggedLoop(Socket, Username, ID) ->
+
+	receive
+		{tcp, Socket, Data} ->
+			msgDecriptor(Data, Username, Socket, ID),
+			loggedLoop(Socket, Username, ID);
+		
+		{tcp_closed, Socket} ->
+		 	zk:setOffline(Username),
+		 	data:delete_pid(Username),
+		 	io:format("> client " ++ Username ++ " closed connection\n"),
+		 	gen_tcp:close(Socket);
+
+		{tcp_error, Socket, Reason} ->
+		 	zk:setOffline(Username),
+		 	data:delete_pid(Username),
+		 	io:format("> client " ++ Username ++ " timed out: " ++ Reason ++ "\n"),
+		 	gen_tcp:close(Socket);
+
+		{Username, packed_torrent, Data} ->
+			io:format("> received and redirected\n"),
+			T = client_wrapper:encode_msg(#'ClientMessage'{msg = {torrentWrapper, Data}}),
+			gen_tcp:send(Socket, T),
+			{'TorrentWrapper', Group, _ , TID} = Data,
+			
+			case zk:setReceivedTorrent(binary_to_list(TID), Username, binary_to_list(Group)) of
+				{ok, remove} ->
+					file:delete("./torrents/" ++ binary_to_list(TID)),
+					loggedLoop(Socket, Username, ID);
+				_->
+					loggedLoop(Socket, Username, ID)
+			end;
+
+		{Username, unpacked_torrent, Group, Data, TID} ->
+			io:format("> received from another server and redirected\n"),
+			Wrapped = client_wrapper:encode_msg(#'ClientMessage'{msg = {torrentWrapper,#'TorrentWrapper'{group=Group, content=Data, id=TID}}}),
+			gen_tcp:send(Socket, Wrapped),
+			loggedLoop(Socket, Username, ID)
+	end.
+
 %%====================================================================
 %% Available features
 %%====================================================================
@@ -76,44 +135,13 @@ login(Username, Password, ID, Socket) ->
 			MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {response,#'Response'{rep=true}}}),
 			gen_tcp:send(Socket, MsgContainer),
 			io:format("> Client " ++ Username ++ " logged in.\n"),
-			%checkNewContent(Username),
+			checkNewContent(Username),
 			loggedLoop(Socket, Username, ID);
 		false ->
 			MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {response,#'Response'{rep=false}}}),
 			gen_tcp:send(Socket, MsgContainer)
 	end.
 
-loggedLoop(Socket, Username, ID) ->
-
-	receive
-		{tcp, Socket, Data} ->
-			msgDecriptor(Data, Username, Socket, ID),
-			loggedLoop(Socket, Username, ID);
-		
-		{tcp_closed, Socket} ->
-		 	zk:setOffline(Username),
-		 	data:delete_pid(Username),
-		 	io:format("> client " ++ Username ++ " closed connection\n"),
-		 	gen_tcp:close(Socket);
-
-		{tcp_error, Socket, Reason} ->
-		 	zk:setOffline(Username),
-		 	data:delete_pid(Username),
-		 	io:format("> client " ++ Username ++ " timed out: " ++ Reason ++ "\n"),
-		 	gen_tcp:close(Socket);
-
-		{Username, packed_torrent, Data} ->
-			io:format("> received and redirected\n"),
-			T = client_wrapper:encode_msg(#'ClientMessage'{msg = {torrentWrapper, Data}}),
-			gen_tcp:send(Socket, T),
-			loggedLoop(Socket, Username, ID);
-
-		{Username, unpacked_torrent, Group, Data, TID} ->
-			io:format("> received from another server and redirected\n"),
-			Wrapped = client_wrapper:encode_msg(#'ClientMessage'{msg = {torrentWrapper,#'TorrentWrapper'{group=Group, content=Data, id=TID}}}),
-			gen_tcp:send(Socket, Wrapped),
-			loggedLoop(Socket, Username, ID)
-	end.
 
 createGroup(User, GroupName, Socket) ->
 	case zk:createGroup(GroupName,User) of
@@ -129,7 +157,7 @@ createGroup(User, GroupName, Socket) ->
 	end.
 
 joinGroup(User, GroupName, Socket) ->
-	case zk:createGroup(GroupName,User) of
+	case zk:joinGroup(GroupName,User) of
 		ok ->
 			MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {response,#'Response'{rep=true}}}),
 			gen_tcp:send(Socket, MsgContainer);
@@ -137,41 +165,22 @@ joinGroup(User, GroupName, Socket) ->
 			MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {response,#'Response'{rep=false}}}),
 			gen_tcp:send(Socket, MsgContainer);
 		error -> 
-			createGroup(User,GroupName,Socket)
+			joinGroup(User,GroupName,Socket)
 	end.
 
-
-msgDecriptor(Data, User, Socket, ID) ->
-	io:format("decriptor\n"),
-	{_, {T, D}} =  client_wrapper:decode_msg(Data, 'ClientMessage'),
-	case T of
-		login ->
-			io:format("drcrypt_login\n"),
-			{'Login',U,P}=D,
-			login(binary_to_list(U),binary_to_list(P),ID, Socket);
-		register ->
-			{'Register',U,P,N}=D,
-			register(binary_to_list(U),binary_to_list(P),binary_to_list(N),Socket);
-		createGroup ->
-			{G} = D,
-			createGroup(User, G, Socket);
-		joinGroup ->
-			{G} = D,
-			joinGroup(User, G, Socket);
-		torrentWrapper ->
-			io:format("decrtpytor_torrent \n"),
-			redirect(D, integer_to_list(ID), User)
-	end.
+%%====================================================================
+%% Private functions
+%%====================================================================
 
 redirect(ProtoTorrent, ID, CurrentUser) ->
 	io:format("> starting to redirect to group " ++ binary_to_list(ProtoTorrent#'TorrentWrapper'.group) ++ "\n"),
 	%sendTracker(ID,ProtoTorrent#'TorrentWrapper'.content),
-	%file:write_file("./torrents/" ++ TID, ProtoTorrent),
 	
 	case zk:getGroupUsers(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
 		{ok, UsersMap, Length} ->
 			{'TorrentWrapper', _, Content , TID} = ProtoTorrent,
 			zk:newTorrent(binary_to_list(TID), CurrentUser, binary_to_list(ProtoTorrent#'TorrentWrapper'.group), Length),
+			file:write_file("./torrents/" ++ TID, ProtoTorrent),
 			lists:foreach(fun(ServerID) ->
 							case ServerID of
 								offline ->
@@ -211,7 +220,7 @@ sendTracker(ID, Data) ->
 			[T_IP,T_PORT] = string:split(TrackerLOC,":"),
 
 			Msg = server_wrapper:encode_msg(#'ServerMessage'{msg = {trackerTorrent, #'TrackerTorrent'{content=Data}}}),
-			case gen_tcp:connect(T_IP, list_to_integer(T_PORT), [binary, {reuseaddr, true}, {packet, 1}]) of
+			case gen_tcp:connect(T_IP, list_to_integer(T_PORT), [binary, {reuseaddr, true}, {packet, 4}]) of
 				{ok, TrackerSocket} ->
 		    		gen_tcp:send(TrackerSocket, Msg),
 		    		gen_tcp:close(TrackerSocket),
