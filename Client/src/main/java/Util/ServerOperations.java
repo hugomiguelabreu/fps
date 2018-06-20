@@ -134,6 +134,11 @@ public class ServerOperations {
             return false;
         }
 
+        if(ret){
+            groupTorrents.put(groupName, new ArrayList<>());
+            groupUsers.put(groupName, new ArrayList<>());
+        }
+
         return ret;
     }
 
@@ -157,6 +162,11 @@ public class ServerOperations {
         } catch (InterruptedException e) {
             e.printStackTrace();
             return false;
+        }
+
+        if(ret){
+            groupTorrents.put(groupName, new ArrayList<>());
+            groupUsers.put(groupName, new ArrayList<>());
         }
 
         return ret;

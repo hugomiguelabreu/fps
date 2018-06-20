@@ -295,7 +295,11 @@ public class AppController implements MapEvent{
 
     @Override
     public void putEvent(int type, Object key) {
-        if(type == 1){
+        if(type == 0){
+            String group = String.valueOf(key);
+            if(!list_groups.getItems().contains(group))
+                list_groups.getItems().add(0, group);
+        }else if(type == 1){
             //Torrent novo;
             String group = String.valueOf(key);
             for(Pane p : notifications){
