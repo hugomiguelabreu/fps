@@ -7,9 +7,9 @@ import com.turn.ttorrent.tracker.Tracker;
 import org.apache.commons.io.IOUtils;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
@@ -51,6 +51,14 @@ public class FileUtils {
         File fileDownloaded = new File(System.getProperty( "user.home" ) + "/.fps-server/files/" + t.getFilenames().get(0));
         Files.deleteIfExists(torrent.toPath());
         Files.deleteIfExists(fileDownloaded.toPath());
+    }
+
+    public static String getMyIP() throws IOException {
+        URL whatismyip = new URL("http://checkip.amazonaws.com");
+        BufferedReader in = new BufferedReader(new InputStreamReader(
+                whatismyip.openStream()));
+        String ip = in.readLine(); //you get the IP as a String
+        return ip;
     }
 
 }

@@ -1,6 +1,7 @@
 import Core.InterserverListener;
 import Core.MainServerListener;
 import Util.FileUtils;
+import Util.ZooKeeperUtil;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.client.peer.SharingPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
@@ -21,10 +22,13 @@ public class ServerExec {
         int mainPort = Integer.parseInt(args[0]);
         int tckPort = Integer.parseInt(args[1]);
         int interPort = Integer.parseInt(args[2]);
+        String serverId = args[3];
 
         Tracker tck = new Tracker(new InetSocketAddress(tckPort));
         MainServerListener ms = new MainServerListener(mainPort, tck, clients);
         InterserverListener is = new InterserverListener(interPort, tck, clients);
+        ZooKeeperUtil zk = new ZooKeeperUtil("localhost:2184");
+
         //Starts tracker
         tck.start();
         System.out.println("Tracker initiated");
@@ -33,7 +37,10 @@ public class ServerExec {
         System.out.println("Server initiated");
         //Starts interserver protocol;
         is.start();
-        System.out.println("Server initiated");
+        System.out.println("Interservers initiated");
+        //Registers tracker on ZooKeeper
+        zk.registerTracker(serverId, FileUtils.getMyIP() + ":" + mainPort);
+        System.out.println("Server registred");
 
         try {
             if(!FileUtils.loadTorrents(tck, clients))
