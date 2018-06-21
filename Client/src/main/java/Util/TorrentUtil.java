@@ -291,8 +291,8 @@ public class TorrentUtil {
             c.addObserver((o, arg) -> {
                 // update UI thread
                 Platform.runLater(() -> {
-                    pb.setProgress(st.getCompletion());
-                    pi.setProgress(st.getCompletion());
+                    pb.setProgress(st.getCompletion()/100);
+                    pi.setProgress(st.getCompletion()/100);
                 });
                 System.out.println(st.getCompletion());
                 System.out.println(arg);

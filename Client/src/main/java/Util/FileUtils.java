@@ -14,7 +14,6 @@ import java.util.*;
 public class FileUtils {
 
     public static void initDir(){
-
         new File(System.getProperty( "user.home" ) + "/.fps").mkdirs();
     }
 
