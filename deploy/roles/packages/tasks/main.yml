@@ -1,0 +1,61 @@
+---
+- name: Install system packages
+  apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - build-essential
+    - python-dev
+    - git
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - unzip
+    - default-jdk
+    - libnotify4
+    - libsctp1
+    - libwxgtk3.0-0v5
+    - libwxbase3.0-0v5
+    - maven
+  tags:
+    - app
+
+- name: Download erl
+  get_url:
+    url: https://packages.erlang-solutions.com/erlang/esl-erlang/FLAVOUR_1_general/esl-erlang_21.0-1~ubuntu~xenial_amd64.deb
+    dest: /root/
+    mode: 0777
+
+- name: Install erl
+  shell: dpkg -i esl-erlang_21.0-1~ubuntu~xenial_amd64.deb
+
+- name: Download rebar3
+  get_url:
+    url: https://s3.amazonaws.com/rebar3/rebar3
+    dest: /root/
+    mode: 0777
+
+- name: Install rebar3
+  shell: chdir=/root/ ./rebar3 local install
+
+- name: Copy sshkey
+  copy:
+    src: deploy
+    dest: /root/.ssh/
+    mode: 0600
+
+- name: Copy sshkey
+  copy:
+    src: deploy.pub
+    dest: /root/.ssh/
+    mode: 0600
+
+- name: Clone a private repository into /opt.
+  git:
+    repo: git@github.com:hugomiguelabreu/fps.git
+    version: master
+    dest: /root/fps
+    key_file: /root/.ssh/deploy
+    force: yes
+    accept_hostkey: yes
+

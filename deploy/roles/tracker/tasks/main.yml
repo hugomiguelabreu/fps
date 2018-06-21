@@ -1,0 +1,19 @@
+---
+
+- name: Clone a ttorrent
+  git:
+    repo: git@github.com:hugomiguelabreu/ttorrent.git
+    version: master
+    dest: /root/ttorrent
+    key_file: /root/.ssh/deploy
+    force: yes
+    accept_hostkey: yes
+
+- name: Install ttorrent
+  shell: chdir=/root/ttorrent mvn install
+
+- name: Compile Tracker
+  shell: chdir=/root/fps/Server mvn clean compile assembly:single
+
+- name: Move binaries
+  shell: mv /root/fps/Server/target/Server-1.0-SNAPSHOT-jar-with-dependencies.jar /root/
