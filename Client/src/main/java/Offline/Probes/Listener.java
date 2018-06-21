@@ -32,9 +32,6 @@ public class Listener extends Thread {
             User p = new User(username, addr.getIpv6(), addr.getIpv4(), new Timestamp(System.currentTimeMillis()));
             peers.put(addr.getIpv6(),p);
         }
-
-        //User p = new User(ip,5555);
-        //peers.put(ip, p);
     }
 
     public ConcurrentHashMap<String, User> getUsers() {

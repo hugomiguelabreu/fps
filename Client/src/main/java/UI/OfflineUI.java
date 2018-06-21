@@ -4,7 +4,9 @@ import Event.*;
 import Offline.Offline;
 import Offline.OfflineUploadThread;
 import Offline.Utils.User;
+import Util.FileUtils;
 import Util.TorrentUtil;
+import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.Tracker;
@@ -43,7 +45,6 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     public Label slider_label;
     public Button slider_button;
     public Button button_send;
-    public Button button_broadcast;
     public Button createGroupButton;
     public ListView groupsList;
     @FXML
@@ -54,9 +55,11 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     private String username;
     private ArrayList<AnchorPane> notifications;
     private HashMap<String, ArrayList<String>> groups;
+    private HashMap<String,Client> torrentClients;
 
     @FXML
     void initialize(){
+
         final double pos = splitPane1.getDividers().get(0).getPosition();
         splitPane1.getDividers().get(0).positionProperty().addListener(
                 (observable, oldValue, newValue) -> splitPane1.getDividers().get(0).setPosition(pos)
@@ -65,6 +68,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         notifications = new ArrayList<>();
         usersOn = new HashMap<>();
         groups = new HashMap<>();
+        torrentClients = new HashMap<>();
     }
 
     public void initLocal(String username){
@@ -125,9 +129,6 @@ public class OfflineUI implements MapEvent, ArrayEvent {
             label_send.setVisible(true);
             label_send.setText("Select user to send");
 
-            button_broadcast.setUserData(path);
-            button_broadcast.setVisible(true);
-
             if (list_users.getSelectionModel().getSelectedItem() != null){
 
                 String value = (String) list_users.getSelectionModel().getSelectedItem();
@@ -143,7 +144,6 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                         db.clear();
                         paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
                         button_send.setVisible(false);
-                        button_broadcast.setVisible(false);
 
                         System.out.println("clicked on user, init local send process");
                         sendLocal(path, username, value);
@@ -170,7 +170,6 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
                             paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
                             button_send.setVisible(false);
-                            button_broadcast.setVisible(false);
 
                             System.out.println("Sending to all menbers of the group");
 
@@ -198,7 +197,6 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
                             paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
                             button_send.setVisible(false);
-                            button_broadcast.setVisible(false);
 
                             System.out.println("clicked on user, init local send process");
                             sendLocal(path, username, newValue);
@@ -219,9 +217,10 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
         //if(!username.equals(userToSend)){
 
-            OfflineUploadThread uploadThread = new OfflineUploadThread();
-            uploadThread.newUpload(path,username, offlineTck, userToSend);
-            uploadThread.start();
+        OfflineUploadThread uploadThread = new OfflineUploadThread();
+        uploadThread.newUpload(path,username, offlineTck, userToSend);
+        uploadThread.start();
+
         //}
     }
 
@@ -229,17 +228,6 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     public void handleDragExited(DragEvent dragEvent) {
 
         paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-
-    }
-
-    //broadcast do file para a rede
-    public void handleBroadcastClicked(MouseEvent mouseEvent) {
-
-        String path = (String) button_broadcast.getUserData();
-        sendLocal(path, username, null);
-        button_send.setVisible(false);
-        button_broadcast.setVisible(false);
-        label_send.setVisible(false);
 
     }
 
@@ -253,12 +241,12 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
             Collection<String> users = new ArrayList<>();
 
-            for(Map.Entry<String, User> entry : Offline.listener.getUsers().entrySet()){
+            for(User u : Offline.listener.getUsers().values()){
 
-                if(!entry.getValue().equals(username)){
+                if(!u.getUsername().equals(username)){
 
-                    usersOn.put(entry.getKey(), entry.getValue());
-                    users.add(entry.getValue().getUsername());
+                    usersOn.put(u.getUsername(), u);
+                    users.add(u.getUsername());
                 }
             }
 
@@ -375,19 +363,26 @@ public class OfflineUI implements MapEvent, ArrayEvent {
             @Override
             public void handle(MouseEvent mouseEvent) {
 
+                pane.getChildren().remove(accept);
+
                 //TODO mudar para a diretoria certa
-                File dest = new File("/tmp/");
+                File dest = new File(FileUtils.saveFilesPath);
+
                 ProgressBar pb = new ProgressBar(0);
                 ProgressIndicator pi = new ProgressIndicator(0);
-                pb.setPrefWidth(250);
+
+                pb.setPrefWidth(70);
                 pb.setLayoutY(15);
                 pb.setLayoutX(378);
-                pi.setLayoutX(398);
-                pi.setLayoutY(5);
+
+                pi.setLayoutX(363);
+                pi.setLayoutY(8);
+
                 pane.getChildren().remove(accept);
-                pane.getChildren().remove(close);
                 pane.getChildren().add(pb);
                 pane.getChildren().add(pi);
+
+
                 try {
                     SharedTorrent st = new SharedTorrent(t, dest);
                     TorrentUtil.download(st, false, username, pb, pi);
@@ -401,10 +396,9 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         });
 
         close.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
             @Override
             public void handle(MouseEvent mouseEvent) {
-
-                //System.out.println("accept torrent " + t.toString());
 
                 AnchorPane selectedPane = (AnchorPane) close.getUserData();
                 mainPane.getChildren().remove(selectedPane);
@@ -419,10 +413,22 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                         up.setByY(-56);
                         up.setNode(p);
                         up.play();
-
                     }
-
                 }
+
+                // remove o torrent do tracker e para o cliente a ele associado
+
+                try{
+                    offlineTck.remove(t);
+                    System.out.println("remove torrent");
+                    torrentClients.get(t.getHexInfoHash()).stop();
+                    System.out.println("remove cliente");
+                    torrentClients.remove(t.getHexInfoHash());
+                    System.out.println("remove do hashmap");
+                }catch (Exception e){
+                    // o cliente pode ainda nao ter iniciado
+                }
+
             }
         });
     }

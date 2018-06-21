@@ -187,7 +187,8 @@ public class AppController implements MapEvent{
 
         accept.setOnMouseClicked(mouseEvent -> {
             //TODO mudar para a diretoria certa
-            File dest = new File("/tmp/");
+            File dest = new File(FileUtils.saveFilesPath);
+
             try {
                 SharedTorrent st = new SharedTorrent(t, dest);
                 ProgressBar pb = new ProgressBar(0);

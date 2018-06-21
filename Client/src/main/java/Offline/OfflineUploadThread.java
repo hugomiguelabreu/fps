@@ -1,6 +1,7 @@
 package Offline;
 
 import Util.TorrentUtil;
+import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.Tracker;
 import org.xml.sax.SAXException;
@@ -12,6 +13,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class OfflineUploadThread extends Thread {
 
@@ -56,9 +58,5 @@ public class OfflineUploadThread extends Thread {
         } catch (SAXException | IOException | InterruptedException | NoSuchAlgorithmException | ParserConfigurationException e) {
             e.printStackTrace();
         }
-
-
     }
-
-
 }

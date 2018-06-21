@@ -55,8 +55,8 @@ public class MainController implements Initializable{
         type = false;
 
         servers = new ArrayList<>();
-        servers.add("localhost:2000");
-        servers.add("localhost:2001");
+        servers.add("165.227.142.239:2001");
+        servers.add("178.62.56.41:2000");
 
         try {
             channel = new Connector(servers);

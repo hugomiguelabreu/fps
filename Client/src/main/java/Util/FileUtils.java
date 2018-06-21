@@ -13,9 +13,18 @@ import java.util.*;
 
 public class FileUtils {
 
+    public static String saveFilesPath;
+
     public static void initDir(){
 
         new File(System.getProperty( "user.home" ) + "/.fps").mkdirs();
+        saveFilesPath = "/tmp";
+    }
+
+    public static void initDir(String path){
+
+        new File(System.getProperty( "user.home" ) + "/.fps").mkdirs();
+        saveFilesPath = path;
     }
 
     public static void addTorrent(Torrent t, String group){
