@@ -377,12 +377,20 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
                 //TODO mudar para a diretoria certa
                 File dest = new File("/tmp/");
-
+                ProgressBar pb = new ProgressBar(0.05);
+                ProgressIndicator pi = new ProgressIndicator(0.05);
+                pb.setPrefWidth(250);
+                pb.setLayoutY(55);
+                pb.setLayoutX(50);
+                pi.setLayoutX(310);
+                pi.setLayoutY(55);
+                pane.getChildren().remove(accept);
+                pane.getChildren().remove(close);
+                pane.getChildren().add(pb);
+                pane.getChildren().add(pi);
                 try {
-
                     SharedTorrent st = new SharedTorrent(t, dest);
-                    TorrentUtil.download(st, false, username, (Label)accept.getUserData());
-
+                    TorrentUtil.download(st, false, username, pb, pi);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (NoSuchAlgorithmException e) {

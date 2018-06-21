@@ -14,6 +14,9 @@ import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.layout.Pane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -268,7 +271,7 @@ public class TorrentUtil {
         }
     }
 
-    public static void download(SharedTorrent st, boolean online, String username, Label l)
+    public static void download(SharedTorrent st, boolean online, String username, ProgressBar pb, ProgressIndicator pi)
     {
         String ip;
         try {
@@ -286,17 +289,11 @@ public class TorrentUtil {
 
             //Download and seed
             c.addObserver((o, arg) -> {
-
-            // update UI thread
-            Platform.runLater(new Runnable() {
-
-                @Override
-                public void run() {
-
-                    l.setText(arg + " -> " +  st.getCompletion());
-                }
-            });
-
+                // update UI thread
+                Platform.runLater(() -> {
+                    pb.setProgress(st.getCompletion());
+                    pi.setProgress(st.getCompletion());
+                });
                 System.out.println(st.getCompletion());
                 System.out.println(arg);
             });

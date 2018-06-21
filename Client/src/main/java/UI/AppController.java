@@ -4,6 +4,7 @@ import Event.ConcurrentHashMapEvent;
 import Event.MapEvent;
 import Util.FileUtils;
 import Util.ServerOperations;
+import Util.TorrentUtil;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
 import javafx.animation.TranslateTransition;
@@ -189,7 +190,20 @@ public class AppController implements MapEvent{
             File dest = new File("/tmp/");
             try {
                 SharedTorrent st = new SharedTorrent(t, dest);
-                //TorrentUtil.download(st, false, username, (Label)accept.getUserData());
+                ProgressBar pb = new ProgressBar(0);
+                ProgressIndicator pi = new ProgressIndicator(0);
+                pb.setPrefWidth(250);
+                pb.setLayoutY(55);
+                pb.setLayoutX(50);
+                pi.setLayoutX(310);
+                pi.setLayoutY(45);
+                pane.getChildren().remove(accept);
+                pane.getChildren().remove(close);
+                pane.getChildren().add(pb);
+                pane.getChildren().add(pi);
+                new Thread(() -> {
+                    TorrentUtil.download(st, true, ServerOperations.username, pb, pi);
+                }).start();
             } catch (IOException | NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }

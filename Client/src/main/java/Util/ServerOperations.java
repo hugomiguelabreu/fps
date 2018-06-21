@@ -19,7 +19,7 @@ public class ServerOperations {
     private static Connector channel;
     private static ConcurrentHashMapEvent<String, ArrayList<Torrent>> groupTorrents;
     private static ConcurrentHashMapEvent<String, ArrayList<String>> groupUsers;
-    private static String username;
+    public static String username;
     private static ArrayList<Client> activeClients = new ArrayList<>();
 
     public static void setGroupTorrents(ConcurrentHashMapEvent<String, ArrayList<Torrent>> groupTorrents) { ServerOperations.groupTorrents = groupTorrents; }
