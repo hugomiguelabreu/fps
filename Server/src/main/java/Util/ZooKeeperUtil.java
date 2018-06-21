@@ -35,7 +35,7 @@ public class ZooKeeperUtil {
                         zk.exists(path.toString(),true).getVersion());
             }else{
                 zk.create(path, serverHost.getBytes(),
-                        ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
+                        ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
             }
         } catch (Exception e) { return false; }
 
