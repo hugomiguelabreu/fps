@@ -377,13 +377,13 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
                 //TODO mudar para a diretoria certa
                 File dest = new File("/tmp/");
-                ProgressBar pb = new ProgressBar(0.05);
-                ProgressIndicator pi = new ProgressIndicator(0.05);
+                ProgressBar pb = new ProgressBar(0);
+                ProgressIndicator pi = new ProgressIndicator(0);
                 pb.setPrefWidth(250);
-                pb.setLayoutY(55);
-                pb.setLayoutX(50);
-                pi.setLayoutX(310);
-                pi.setLayoutY(55);
+                pb.setLayoutY(15);
+                pb.setLayoutX(378);
+                pi.setLayoutX(398);
+                pi.setLayoutY(5);
                 pane.getChildren().remove(accept);
                 pane.getChildren().remove(close);
                 pane.getChildren().add(pb);
@@ -407,19 +407,13 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                 //System.out.println("accept torrent " + t.toString());
 
                 AnchorPane selectedPane = (AnchorPane) close.getUserData();
-
                 mainPane.getChildren().remove(selectedPane);
-
                 int index = notifications.indexOf(selectedPane);
-
                 notifications.remove(selectedPane);
 
                 for(AnchorPane p : notifications){
-
                     if(notifications.indexOf(p) < index){
-
                         System.out.println("go up");
-
                         TranslateTransition up = new TranslateTransition();
                         up.setDuration(Duration.seconds(1));
                         up.setByY(-56);
