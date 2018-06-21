@@ -38,6 +38,7 @@ public class Connector extends Thread{
                 socket = new Socket(uri.getHost(), uri.getPort());
                 out = socket.getOutputStream();
                 in = CodedInputStream.newInstance(socket.getInputStream());
+                break;
             } catch (Exception e) {
                 System.out.println("\u001B[31mError opening socket\u001B[0m");
                 this.connected = false;
@@ -64,6 +65,7 @@ public class Connector extends Thread{
                 if(torrent){
                     byte[] byteTorrent = cm.getTorrentWrapper().getContent().toByteArray();
                     String group = cm.getTorrentWrapper().getGroup();
+                    //TODO: TROCAR A CENA DO TRACKER
                     Torrent t = new Torrent(
                             byteTorrent,
                             true);
@@ -72,7 +74,7 @@ public class Connector extends Thread{
                     boolean response = cm.getResponse().getRep();
                     this.responses.offer(response);
                 }
-                //TODO: check if not null
+
             } catch (Exception e) {
                 e.printStackTrace();
                 this.close();

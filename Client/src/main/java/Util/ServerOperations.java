@@ -33,8 +33,8 @@ public class ServerOperations {
     public static void sendTorrent(String path, String group){
         ArrayList<String> trc = new ArrayList<>();
         //TODO: This IP must be dynamic
-        trc.add("http://localhost:6969/announce");
-        trc.add("http://localhost:7070/announce");
+        trc.add("http://178.62.56.41:6969/announce");
+        trc.add("http://165.227.142.239:6969/announce");
 
         Torrent t;
         try {
