@@ -1,9 +1,7 @@
 package Handlers;
 
 import Network.Interserver;
-import com.google.protobuf.ByteString;
 import com.turn.ttorrent.client.Client;
-import com.turn.ttorrent.common.Peer;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
@@ -12,15 +10,18 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.InterServerMessage> {
 
     private Tracker tck;
     private Map<String, Client> openClients;
+    private Map<String, ArrayList<TrackedPeer>> injectionsWaiting;
 
-    public InterserverHandler(Tracker trackedTorrentsParam, Map<String, Client> openClientsParam) {
+    public InterserverHandler(Tracker trackedTorrentsParam, Map<String, Client> openClientsParam, Map<String, ArrayList<TrackedPeer>> injectionsWaitingParam) {
         this.openClients = openClientsParam;
+        this.injectionsWaiting = injectionsWaitingParam;
         this.tck = trackedTorrentsParam;
     }
 
@@ -36,12 +37,19 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
         if(type){
             if(openClients.containsKey(torrentId)){
                 //We're handling that torrent.
-                Peer localCli = openClients.get(torrentId).getPeerSpec();
                 TrackedTorrent tt =  tck.getTrackedTorrents().stream().peek(x -> x.getHexInfoHash().equals(torrentId)).findFirst().get();
                 //PEERS SUPER NODOS
                 tt.injectPeer(new TrackedPeer(tt, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING))));
+            }else{
+                //Ainda não temos esse torrent, mas supostamente vamos receber.
+                if(injectionsWaiting.get(torrentId) == null)
+                    injectionsWaiting.put(torrentId, new ArrayList<>());
+                //Novo server que também vai querer e tem o ficheiro
+                injectionsWaiting.get(torrentId).add(new TrackedPeer(null, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING))));
             }
         }else{
+            TrackedTorrent tt =  tck.getTrackedTorrents().stream().peek(x -> x.getHexInfoHash().equals(torrentId)).findFirst().get();
+            tt.removeInjectedPeer(peerId);
             //Um servidor eliminou o ficheiro.
             //TODO: DELETE
         }

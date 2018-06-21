@@ -16,7 +16,6 @@ public class FileUtils {
     public static String saveFilesPath;
 
     public static void initDir(){
-
         new File(System.getProperty( "user.home" ) + "/.fps").mkdirs();
         saveFilesPath = "/tmp";
     }

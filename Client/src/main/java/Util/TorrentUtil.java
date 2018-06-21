@@ -201,6 +201,7 @@ public class TorrentUtil {
         ClientWrapper.TorrentWrapper sw = ClientWrapper.TorrentWrapper.newBuilder()
                 .setContent(ByteString.copyFrom(t.getEncoded()))
                 .setGroup(group)
+                .setId(t.getHexInfoHash())
                 .build();
 
         ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()

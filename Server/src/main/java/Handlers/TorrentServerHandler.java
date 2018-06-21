@@ -8,6 +8,7 @@ import com.google.protobuf.ByteString;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.common.Peer;
 import com.turn.ttorrent.common.Torrent;
+import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.channel.ChannelHandlerContext;
@@ -19,16 +20,20 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrapper.ServerMessage> {
 
     private Tracker tck;
     private Map<String, Client> openClients;
+    private ConcurrentHashMap<String, ArrayList<TrackedPeer>> injectionsWaiting;
 
-    public TorrentServerHandler(Tracker trackedTorrentsParam, Map<String, Client> openClientsParam) {
+    public TorrentServerHandler(Tracker trackedTorrentsParam, Map<String, Client> openClientsParam, ConcurrentHashMap<String, ArrayList<TrackedPeer>> injectionsWaitingParam) {
         this.openClients = openClientsParam;
         this.tck = trackedTorrentsParam;
+        this.injectionsWaiting = injectionsWaitingParam;
     }
 
     @Override
@@ -36,10 +41,8 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrap
         Torrent t = new Torrent(request.getTrackerTorrent().getContent().toByteArray(), false);
         //Verificar o nosso local na lista de trackers e colocar
         //o próprio em primeiro lugar
-        URL whatismyip = new URL("http://checkip.amazonaws.com");
-        BufferedReader in = new BufferedReader(new InputStreamReader(
-                whatismyip.openStream()));
-        String ip = in.readLine(); //you get the IP as a String
+        String ip = FileUtils.getMyIP();
+        //Vamos colocar o nosso IP em primeiro lugar;
         int iteration = 0;
         URI uri = null;
         for(URI uriIt: t.getAnnounceList().get(0)){
@@ -56,7 +59,6 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrap
         t.newAnnounceEncode();
 
         //Save torrent for fault sake
-        FileUtils.initDir();
         FileUtils.saveTorrent(t);
         //Init a client, so server can get the file
         Client serverCli = TorrentUtil.initClient(t, FileUtils.fileDir);
@@ -68,6 +70,10 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrap
         Peer cli = serverCli.getPeerSpec();
         tt.setlocalInjectPeerID(cli.getHexPeerId());
         injectionRequest(cli, tt);
+        //Injetar os servers que já me tinham pedido.
+        if(injectionsWaiting.containsKey(t.getHexInfoHash()))
+            for (TrackedPeer tp : injectionsWaiting.get(t.getHexInfoHash()))
+                tt.injectPeer(tp);
     }
 
     @Override

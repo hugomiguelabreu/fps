@@ -2885,6 +2885,16 @@ public final class ClientWrapper {
      * <code>bytes content = 2;</code>
      */
     com.google.protobuf.ByteString getContent();
+
+    /**
+     * <code>string id = 3;</code>
+     */
+    java.lang.String getId();
+    /**
+     * <code>string id = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getIdBytes();
   }
   /**
    * Protobuf type {@code Network.TorrentWrapper}
@@ -2900,6 +2910,7 @@ public final class ClientWrapper {
     private TorrentWrapper() {
       group_ = "";
       content_ = com.google.protobuf.ByteString.EMPTY;
+      id_ = "";
     }
 
     @java.lang.Override
@@ -2936,6 +2947,12 @@ public final class ClientWrapper {
             case 18: {
 
               content_ = input.readBytes();
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              id_ = s;
               break;
             }
           }
@@ -3004,6 +3021,40 @@ public final class ClientWrapper {
       return content_;
     }
 
+    public static final int ID_FIELD_NUMBER = 3;
+    private volatile java.lang.Object id_;
+    /**
+     * <code>string id = 3;</code>
+     */
+    public java.lang.String getId() {
+      java.lang.Object ref = id_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        id_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string id = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getIdBytes() {
+      java.lang.Object ref = id_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        id_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -3022,6 +3073,9 @@ public final class ClientWrapper {
       if (!content_.isEmpty()) {
         output.writeBytes(2, content_);
       }
+      if (!getIdBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, id_);
+      }
     }
 
     public int getSerializedSize() {
@@ -3035,6 +3089,9 @@ public final class ClientWrapper {
       if (!content_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(2, content_);
+      }
+      if (!getIdBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, id_);
       }
       memoizedSize = size;
       return size;
@@ -3056,6 +3113,8 @@ public final class ClientWrapper {
           .equals(other.getGroup());
       result = result && getContent()
           .equals(other.getContent());
+      result = result && getId()
+          .equals(other.getId());
       return result;
     }
 
@@ -3070,6 +3129,8 @@ public final class ClientWrapper {
       hash = (53 * hash) + getGroup().hashCode();
       hash = (37 * hash) + CONTENT_FIELD_NUMBER;
       hash = (53 * hash) + getContent().hashCode();
+      hash = (37 * hash) + ID_FIELD_NUMBER;
+      hash = (53 * hash) + getId().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3192,6 +3253,8 @@ public final class ClientWrapper {
 
         content_ = com.google.protobuf.ByteString.EMPTY;
 
+        id_ = "";
+
         return this;
       }
 
@@ -3216,6 +3279,7 @@ public final class ClientWrapper {
         Network.ClientWrapper.TorrentWrapper result = new Network.ClientWrapper.TorrentWrapper(this);
         result.group_ = group_;
         result.content_ = content_;
+        result.id_ = id_;
         onBuilt();
         return result;
       }
@@ -3263,6 +3327,10 @@ public final class ClientWrapper {
         }
         if (other.getContent() != com.google.protobuf.ByteString.EMPTY) {
           setContent(other.getContent());
+        }
+        if (!other.getId().isEmpty()) {
+          id_ = other.id_;
+          onChanged();
         }
         onChanged();
         return this;
@@ -3384,6 +3452,75 @@ public final class ClientWrapper {
       public Builder clearContent() {
         
         content_ = getDefaultInstance().getContent();
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object id_ = "";
+      /**
+       * <code>string id = 3;</code>
+       */
+      public java.lang.String getId() {
+        java.lang.Object ref = id_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          id_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string id = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getIdBytes() {
+        java.lang.Object ref = id_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          id_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string id = 3;</code>
+       */
+      public Builder setId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        id_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string id = 3;</code>
+       */
+      public Builder clearId() {
+        
+        id_ = getDefaultInstance().getId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string id = 3;</code>
+       */
+      public Builder setIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        id_ = value;
         onChanged();
         return this;
       }
@@ -5127,15 +5264,16 @@ public final class ClientWrapper {
       "Register\022\020\n\010username\030\001 \001(\t\022\020\n\010password\030\002" +
       " \001(\t\022\014\n\004name\030\003 \001(\t\"\027\n\010Response\022\013\n\003rep\030\001 " +
       "\001(\010\"\034\n\013CreateGroup\022\r\n\005group\030\001 \001(\t\"\032\n\tJoi" +
-      "nGroup\022\r\n\005group\030\001 \001(\t\"0\n\016TorrentWrapper\022" +
-      "\r\n\005group\030\001 \001(\t\022\017\n\007content\030\002 \001(\014\"\216\002\n\rClie" +
-      "ntMessage\022\037\n\005login\030\001 \001(\0132\016.Network.Login" +
-      "H\000\022%\n\010register\030\002 \001(\0132\021.Network.RegisterH" +
-      "\000\022%\n\010response\030\003 \001(\0132\021.Network.ResponseH\000",
-      "\022+\n\013createGroup\030\004 \001(\0132\024.Network.CreateGr" +
-      "oupH\000\022\'\n\tjoinGroup\030\005 \001(\0132\022.Network.JoinG" +
-      "roupH\000\0221\n\016torrentWrapper\030\006 \001(\0132\027.Network" +
-      ".TorrentWrapperH\000B\005\n\003msgb\006proto3"
+      "nGroup\022\r\n\005group\030\001 \001(\t\"<\n\016TorrentWrapper\022" +
+      "\r\n\005group\030\001 \001(\t\022\017\n\007content\030\002 \001(\014\022\n\n\002id\030\003 " +
+      "\001(\t\"\216\002\n\rClientMessage\022\037\n\005login\030\001 \001(\0132\016.N" +
+      "etwork.LoginH\000\022%\n\010register\030\002 \001(\0132\021.Netwo" +
+      "rk.RegisterH\000\022%\n\010response\030\003 \001(\0132\021.Networ",
+      "k.ResponseH\000\022+\n\013createGroup\030\004 \001(\0132\024.Netw" +
+      "ork.CreateGroupH\000\022\'\n\tjoinGroup\030\005 \001(\0132\022.N" +
+      "etwork.JoinGroupH\000\0221\n\016torrentWrapper\030\006 \001" +
+      "(\0132\027.Network.TorrentWrapperH\000B\005\n\003msgb\006pr" +
+      "oto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -5184,7 +5322,7 @@ public final class ClientWrapper {
     internal_static_Network_TorrentWrapper_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Network_TorrentWrapper_descriptor,
-        new java.lang.String[] { "Group", "Content", });
+        new java.lang.String[] { "Group", "Content", "Id", });
     internal_static_Network_ClientMessage_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_Network_ClientMessage_fieldAccessorTable = new

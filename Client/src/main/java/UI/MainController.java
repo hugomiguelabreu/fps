@@ -55,6 +55,7 @@ public class MainController implements Initializable{
         type = false;
 
         servers = new ArrayList<>();
+
         servers.add("165.227.142.239:2001");
         servers.add("178.62.56.41:2000");
 
