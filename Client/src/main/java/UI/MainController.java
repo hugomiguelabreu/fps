@@ -58,10 +58,10 @@ public class MainController implements Initializable{
         servers = new ArrayList<>();
         trackers = new ArrayList<>();
 
-        servers.add("165.227.142.239:2001");
-        servers.add("178.62.56.41:2000");
-        trackers.add("http://165.227.142.239:6969/announce");
-        trackers.add("http://178.62.56.41:6969/announce");
+        servers.add("159.65.48.36:2001");
+        servers.add("188.166.165.159:2000");
+        trackers.add("http://159.65.48.36:6969/announce");
+        trackers.add("http://188.166.165.159:6969/announce");
 
         try {
             channel = new Connector(servers);
@@ -107,7 +107,7 @@ public class MainController implements Initializable{
     @FXML
     void loginHandle(ActionEvent event) throws IOException {
         if(type){
-            if(ServerOperations.login(login_username.getText(), login_password.getText())){
+            if(ServerOperations.login(login_username.getText().substring(0, 11), login_password.getText())){
                 FXMLLoader loader = new FXMLLoader();
                 String fxmlDocPath = "src/main/java/UI/app.fxml";
                 FileInputStream fxmlStream = new FileInputStream(fxmlDocPath);
@@ -130,7 +130,7 @@ public class MainController implements Initializable{
             Parent root = loader.load(fxmlStream);
 
             OfflineUI controller = loader.getController();
-            controller.initLocal(login_username_offline.getText());
+            controller.initLocal(login_username_offline.getText().substring(0, 11));
 
             Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
