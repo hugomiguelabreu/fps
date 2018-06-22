@@ -107,7 +107,7 @@ public class TorrentUtil {
 
         Client c = new Client(
                 InetAddress.getByName(ownAddresses.get(0).getIpv4()),
-                st, username);
+                st);
 
         c.share(-1);
 
@@ -122,9 +122,12 @@ public class TorrentUtil {
 
                 if(p.getLeft() == 0 && p.getState() != TrackedPeer.PeerState.UNKNOWN && p.getState() != TrackedPeer.PeerState.STOPPED){
 
-                    torrentPeers.get(tr.getHexInfoHash()).remove(p.getPeerId());
-                    System.out.println("peer " + p.getPeerId() +" completed");
-                    //System.out.println("ARRAY = "  + torrentPeers.get(tr.getHexInfoHash()));
+                    byte[] b = p.getPeerId().array();
+                    String tmp = new String(b);
+                    String id = tmp.replaceAll("-TO0042-", "");
+
+                    torrentPeers.get(tr.getHexInfoHash()).remove(id);
+                    System.out.println("peer " + id +" completed");
 
                     if(torrentPeers.get(tr.getHexInfoHash()).size() == 0){
 
@@ -176,12 +179,7 @@ public class TorrentUtil {
 
             if(entry.getValue().getUsername().equals(userToSend)){
 
-                byte[] peerId = userToSend.getBytes();
-                ByteBuffer kappa =  ByteBuffer.wrap(peerId);
-
-                String hexPeerId = Utils.bytesToHex(kappa.array());
-
-                torrentPeers.get(tr.getHexInfoHash()).add(hexPeerId);
+                torrentPeers.get(tr.getHexInfoHash()).add(entry.getValue().getUsername());
 
                 System.out.println("Sending to: " + entry.getKey());
                 Socket s = new Socket(entry.getValue().getIpv4(), 5558);
