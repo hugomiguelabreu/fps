@@ -267,7 +267,8 @@ public class TorrentUtil {
 
             Client c = new Client(
                     InetAddress.getByName(ip),
-                    st);
+                    st,
+                    username);
 
             c.setMaxDownloadRate(0.0);
             c.setMaxUploadRate(0.0);
@@ -283,17 +284,19 @@ public class TorrentUtil {
                 System.out.println(st.getCompletion());
                 System.out.println(arg);
 
-                if(st.getCompletion() == 100){
-
+                if(st.getLeft() == 0){
                     System.out.println("done download");
-                    c.stop(true); // quando acaba de sacar o cliente termina
-
+                    try {
+                        st.finish();
+                        c.waitForCompletion();
+                        c.stop(true); // quando acaba de sacar o cliente termina
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-
-
             });
 
-            c.share(-1);
+            c.download();
 
             if (com.turn.ttorrent.client.Client.ClientState.ERROR.equals(c.getState())) {
                 System.exit(1);

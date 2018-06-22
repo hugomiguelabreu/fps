@@ -1,0 +1,23 @@
+---
+
+- name: Copy ZooKeeper
+  copy:
+    src: Core.zip
+    dest: "/root/Core.zip"
+
+- name: Unzip ZooKeeper
+  shell: unzip Core.zip
+
+- name: Copy ZK conf files
+  vars:
+    name: "zk1"
+  template:
+    src: "zoo.j2"
+    dest: "/root/Core/zk-server-1/conf/zoo.cfg"
+
+- name: Copy ZK conf files
+  vars:
+    name: "zk2"
+  template:
+    src: "zoo.j2"
+    dest: "/root/Core/zk-server-2/conf/zoo.cfg"
