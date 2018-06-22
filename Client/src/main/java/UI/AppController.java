@@ -37,10 +37,6 @@ import java.util.*;
 public class AppController implements MapEvent{
 
     @FXML
-    private ResourceBundle resources;
-    @FXML
-    private URL location;
-    @FXML
     private ListView<String> list_groups;
     @FXML
     private ListView<String> list_users;
@@ -54,10 +50,6 @@ public class AppController implements MapEvent{
     private SplitPane splitPane2;
     @FXML
     private Label label_file;
-    @FXML
-    private Button join_button;
-    @FXML
-    private Button create_button;
 
     private ArrayList<Pane> notifications;
     private String groupSelected;
@@ -169,8 +161,6 @@ public class AppController implements MapEvent{
             close.setText("Delete");
             close.setUserData(pane);
 
-            //TODO close button close.setUserdata(pane);
-
             TranslateTransition down = new TranslateTransition();
             if(bulk) {
                 down.setFromY(94 * (notifications.size() - 1));
@@ -186,7 +176,6 @@ public class AppController implements MapEvent{
         });
 
         accept.setOnMouseClicked(mouseEvent -> {
-            //TODO mudar para a diretoria certa
             File dest = new File(FileUtils.saveFilesPath);
 
             try {
@@ -203,7 +192,7 @@ public class AppController implements MapEvent{
                 pane.getChildren().add(pb);
                 pane.getChildren().add(pi);
                 new Thread(() -> {
-                    TorrentUtil.download(st, true, ServerOperations.username, pb, pi);
+                    TorrentUtil.download(st, true, ServerOperations.username, groupSelected, pb, pi);
                 }).start();
             } catch (IOException | NoSuchAlgorithmException e) {
                 e.printStackTrace();
@@ -211,6 +200,8 @@ public class AppController implements MapEvent{
         });
 
         close.setOnMouseClicked(mouseEvent -> {
+            ServerOperations.removeTorrent(t, groupSelected);
+            ServerOperations.removeClient(t);
             AnchorPane selectedPane = (AnchorPane) close.getUserData();
             list_groups_files.getChildren().remove(selectedPane);
             int indexNot = notifications.indexOf(selectedPane);

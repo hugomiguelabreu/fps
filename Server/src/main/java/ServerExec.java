@@ -30,7 +30,7 @@ public class ServerExec {
         Tracker tck = new Tracker(new InetSocketAddress(tckPort));
         MainServerListener ms = new MainServerListener(mainPort, tck, clients, injectionsWaiting);
         InterserverListener is = new InterserverListener(interPort, tck, clients, injectionsWaiting);
-        ZooKeeperUtil zk = new ZooKeeperUtil("localhost:2184");
+        ZooKeeperUtil zk = new ZooKeeperUtil(FileUtils.getMyIP() + ":2182");
 
         FileUtils.initDir();
         //Starts tracker

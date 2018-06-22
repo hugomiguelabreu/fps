@@ -385,51 +385,45 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
                 try {
                     SharedTorrent st = new SharedTorrent(t, dest);
-                    TorrentUtil.download(st, false, username, pb, pi);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (NoSuchAlgorithmException e) {
+                    TorrentUtil.download(st, false, username, "", pb, pi);
+                } catch (IOException | NoSuchAlgorithmException e) {
                     e.printStackTrace();
                 }
 
             }
         });
 
-        close.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        close.setOnMouseClicked(mouseEvent -> {
 
-            @Override
-            public void handle(MouseEvent mouseEvent) {
+            AnchorPane selectedPane = (AnchorPane) close.getUserData();
+            mainPane.getChildren().remove(selectedPane);
+            int index = notifications.indexOf(selectedPane);
+            notifications.remove(selectedPane);
 
-                AnchorPane selectedPane = (AnchorPane) close.getUserData();
-                mainPane.getChildren().remove(selectedPane);
-                int index = notifications.indexOf(selectedPane);
-                notifications.remove(selectedPane);
-
-                for(AnchorPane p : notifications){
-                    if(notifications.indexOf(p) < index){
-                        System.out.println("go up");
-                        TranslateTransition up = new TranslateTransition();
-                        up.setDuration(Duration.seconds(1));
-                        up.setByY(-56);
-                        up.setNode(p);
-                        up.play();
-                    }
+            for(AnchorPane p : notifications){
+                if(notifications.indexOf(p) < index){
+                    System.out.println("go up");
+                    TranslateTransition up = new TranslateTransition();
+                    up.setDuration(Duration.seconds(1));
+                    up.setByY(-56);
+                    up.setNode(p);
+                    up.play();
                 }
-
-                // remove o torrent do tracker e para o cliente a ele associado
-
-                try{
-                    offlineTck.remove(t);
-                    System.out.println("remove torrent");
-                    torrentClients.get(t.getHexInfoHash()).stop();
-                    System.out.println("remove cliente");
-                    torrentClients.remove(t.getHexInfoHash());
-                    System.out.println("remove do hashmap");
-                }catch (Exception e){
-                    // o cliente pode ainda nao ter iniciado
-                }
-
             }
+
+            // remove o torrent do tracker e para o cliente a ele associado
+
+            try{
+                offlineTck.remove(t);
+                System.out.println("remove torrent");
+                torrentClients.get(t.getHexInfoHash()).stop();
+                System.out.println("remove cliente");
+                torrentClients.remove(t.getHexInfoHash());
+                System.out.println("remove do hashmap");
+            }catch (Exception e){
+                // o cliente pode ainda nao ter iniciado
+            }
+
         });
     }
 

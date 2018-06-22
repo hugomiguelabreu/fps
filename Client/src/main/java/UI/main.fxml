@@ -30,14 +30,9 @@
                   <Font size="32.0" />
                </font>
             </Label>
-            <Label fx:id="error_login" text="Wrong username or password" visible="false">
-               <font>
-                  <Font name="System Bold" size="14.0" />
-               </font>
-            </Label>
             <TextField fx:id="register_username" layoutX="453.0" layoutY="238.0" prefHeight="46.0" prefWidth="313.0" promptText="Username" />
             <PasswordField fx:id="register_password" layoutX="453.0" layoutY="293.0" prefHeight="46.0" prefWidth="313.0" promptText="Password" />
-            <Button fx:id="registerButton" layoutX="555.0" layoutY="358.0" mnemonicParsing="false" onAction="#loginHandle" prefHeight="46.0" prefWidth="109.0" text="Register" />
+            <Button fx:id="registerButton" layoutX="555.0" layoutY="358.0" mnemonicParsing="false" onAction="#registerHandle" prefHeight="46.0" prefWidth="109.0" text="Register" />
          </children>
       </Pane>
       <AnchorPane fx:id="slider" layoutY="-40.0" prefHeight="40.0" prefWidth="810.0">
