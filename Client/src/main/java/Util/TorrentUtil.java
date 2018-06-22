@@ -250,9 +250,9 @@ public class TorrentUtil {
             });
             c.download();
 
-            if (com.turn.ttorrent.client.Client.ClientState.ERROR.equals(c.getState())) {
+            if (com.turn.ttorrent.client.Client.ClientState.ERROR.equals(c.getState()))
                 System.exit(1);
-            }
+
         } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
             e.printStackTrace();
         }
@@ -283,7 +283,6 @@ public class TorrentUtil {
 
             //Download and seed
             c.addObserver((o, arg) -> {
-
                 System.out.println(st.getCompletion());
                 System.out.println(arg);
             });

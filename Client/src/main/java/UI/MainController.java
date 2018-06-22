@@ -11,10 +11,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -33,11 +30,13 @@ public class MainController implements Initializable{
     public AnchorPane slider;
     public Label status;
     @FXML
-    private Label error_login;
-    @FXML
     private PasswordField login_password;
     @FXML
     private TextField login_username;
+    @FXML
+    private PasswordField register_password;
+    @FXML
+    private TextField register_username;
     @FXML
     private TextField login_username_offline;
     @FXML
@@ -107,7 +106,9 @@ public class MainController implements Initializable{
     @FXML
     void loginHandle(ActionEvent event) throws IOException {
         if(type){
-            if(ServerOperations.login(login_username.getText().substring(0, 11), login_password.getText())){
+            if(login_username.getText().length() > 12) {
+                showError("Username too long", "The username should be lower than 12 chars.");
+            }else if(ServerOperations.login(login_username.getText(), login_password.getText())){
                 FXMLLoader loader = new FXMLLoader();
                 String fxmlDocPath = "src/main/java/UI/app.fxml";
                 FileInputStream fxmlStream = new FileInputStream(fxmlDocPath);
@@ -118,8 +119,7 @@ public class MainController implements Initializable{
                 Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
             } else{
-                error_login.setTextFill(Color.web("#ff0000"));
-                error_login.setVisible(true);
+                showError("Error on login", "Username or Password wrong");
             }
         } else {
             paneOff.setVisible(true);
@@ -136,4 +136,36 @@ public class MainController implements Initializable{
             stage.setScene(new Scene(root));
         }
     }
+
+    @FXML
+    void registerHandle(ActionEvent event) throws IOException {
+        if (type) {
+            if (register_username.getText().length() > 12) {
+                showError("Username too long", "The username should be lower than 12 chars.");
+            } else if (ServerOperations.register(register_username.getText(), register_password.getText(), register_username.getText())) {
+                showSuccess("Account created", "Account successfully created");
+            } else {
+                showError("Error on register", "Something went wrong, please check username");
+            }
+        }
+    }
+
+    public void showError(String header, String info){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(header);
+        alert.setContentText(info);
+
+        alert.showAndWait();
+    }
+
+    public void showSuccess(String header, String info){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
+        alert.setHeaderText(header);
+        alert.setContentText(info);
+
+        alert.showAndWait();
+    }
+
 }

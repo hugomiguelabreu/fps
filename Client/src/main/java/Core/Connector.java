@@ -1,23 +1,17 @@
 package Core;
 
 import Network.ClientWrapper;
-import UI.AppController;
-import Util.FileUtils;
 import Util.ServerOperations;
 import com.google.protobuf.CodedInputStream;
-import com.google.protobuf.CodedOutputStream;
 import com.turn.ttorrent.common.Torrent;
-import javafx.fxml.FXMLLoader;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.Collection;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Connector extends Thread{
@@ -65,19 +59,19 @@ public class Connector extends Thread{
                 if(torrent){
                     byte[] byteTorrent = cm.getTorrentWrapper().getContent().toByteArray();
                     String group = cm.getTorrentWrapper().getGroup();
-                    //TODO: TROCAR A CENA DO TRACKER
                     Torrent t = new Torrent(
                             byteTorrent,
                             true);
                     ServerOperations.addTorrent(t, group);
                 }else{
                     boolean response = cm.getResponse().getRep();
+                    System.out.println(response);
                     this.responses.offer(response);
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
                 this.close();
+                e.printStackTrace();
             }
         }
     }

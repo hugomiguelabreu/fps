@@ -104,7 +104,7 @@ public class ServerOperations {
         return ret;
     }
 
-    public static boolean register(String username, String password, String name) throws IOException, URISyntaxException {
+    public static boolean register(String username, String password, String name) {
         if(channel == null)
             return false;
         boolean ret;
