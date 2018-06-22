@@ -221,6 +221,50 @@ public class TorrentUtil {
         return c;
     }
 
+    public static void download(SharedTorrent st, boolean online, String username, ProgressBar pb, ProgressIndicator pi) {
+
+        String ip;
+
+        try {
+            if(online){
+                ip = TorrentUtil.getIp();
+            }else{
+                ip = Offline.findLocalAddresses().get(0).getIpv4();
+            }
+
+            Client c = new Client(
+                    InetAddress.getByName(ip),
+                    st,
+                    username);
+
+            c.setMaxDownloadRate(0.0);
+            c.setMaxUploadRate(0.0);
+
+            //Download and seed
+            c.addObserver((o, arg) -> {
+                // update UI thread
+                Platform.runLater(() -> {
+                    pb.setProgress(st.getCompletion()/100);
+                    pi.setProgress(st.getCompletion()/100);
+                });
+            });
+            c.download();
+
+            if (com.turn.ttorrent.client.Client.ClientState.ERROR.equals(c.getState())) {
+                System.exit(1);
+            }
+        } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String getIp() throws IOException {
+        URL whatismyip = new URL("http://checkip.amazonaws.com");
+        BufferedReader in = new BufferedReader(new InputStreamReader(
+                whatismyip.openStream()));
+        return in.readLine(); //you get the IP as a String
+    }
+
     public static void download(SharedTorrent st, boolean online, String username)
     {
         String ip;
@@ -252,57 +296,5 @@ public class TorrentUtil {
         } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void download(SharedTorrent st, boolean online, String username, ProgressBar pb, ProgressIndicator pi) {
-
-        String ip;
-
-        try {
-            if(online){
-                ip = TorrentUtil.getIp();
-            }else{
-                ip = Offline.findLocalAddresses().get(0).getIpv4();
-            }
-
-            Client c = new Client(
-                    InetAddress.getByName(ip),
-                    st,
-                    username);
-
-            c.setMaxDownloadRate(0.0);
-            c.setMaxUploadRate(0.0);
-
-            //Download and seed
-            c.addObserver((o, arg) -> {
-                // update UI thread
-                Platform.runLater(() -> {
-                    pb.setProgress(st.getCompletion()/100);
-                    pi.setProgress(st.getCompletion()/100);
-                });
-
-                System.out.println(st.getCompletion());
-                System.out.println(arg);
-
-                if(st.getLeft() == 0){
-                    System.out.println("done download");
-                }
-            });
-
-            c.download();
-
-            if (com.turn.ttorrent.client.Client.ClientState.ERROR.equals(c.getState())) {
-                System.exit(1);
-            }
-        } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static String getIp() throws IOException {
-        URL whatismyip = new URL("http://checkip.amazonaws.com");
-        BufferedReader in = new BufferedReader(new InputStreamReader(
-                whatismyip.openStream()));
-        return in.readLine(); //you get the IP as a String
     }
 }
