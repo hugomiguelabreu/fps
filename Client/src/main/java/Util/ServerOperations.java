@@ -49,6 +49,20 @@ public class ServerOperations {
         }
     }
 
+    public static void removeClient(Torrent c){
+        for(Client cl: activeClients){
+            if(cl.getTorrent().getHexInfoHash().equals(c.getHexInfoHash()))
+                cl.stop();
+        }
+        activeClients.removeIf(x -> x.getTorrent().getHexInfoHash().equals(c.getHexInfoHash()));
+    }
+
+    public static void removeTorrent(Torrent t, String group) {
+        ArrayList<Torrent> gt = groupTorrents.get(group);
+        gt.removeIf(x -> x.getHexInfoHash().equals(t.getHexInfoHash()));
+        FileUtils.deleteTorrent(t, group);
+    }
+
     public static void addTorrent(Torrent t, String group) throws InterruptedException, NoSuchAlgorithmException, IOException {
         //Temos de colocar o tracker do torrent o nosso primário
         int iteration = 0;

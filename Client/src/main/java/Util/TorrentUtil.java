@@ -221,7 +221,7 @@ public class TorrentUtil {
         return c;
     }
 
-    public static void download(SharedTorrent st, boolean online, String username, ProgressBar pb, ProgressIndicator pi) {
+    public static void download(SharedTorrent st, boolean online, String username, String group, ProgressBar pb, ProgressIndicator pi) {
 
         String ip;
 
@@ -243,6 +243,16 @@ public class TorrentUtil {
             //Download and seed
             c.addObserver((o, arg) -> {
                 // update UI thread
+
+                if(st.isComplete()){
+                    System.out.println("Completou");
+                    if(online){
+                        //É online por isso persiste, logo vamos remover o torrent
+                        ServerOperations.removeTorrent(st, group);
+                        ServerOperations.removeClient(st);
+                    }
+                }
+
                 Platform.runLater(() -> {
                     pb.setProgress(st.getCompletion()/100);
                     pi.setProgress(st.getCompletion()/100);
