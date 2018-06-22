@@ -58,10 +58,10 @@ public class MainController implements Initializable{
         servers = new ArrayList<>();
         trackers = new ArrayList<>();
 
-        servers.add("159.65.48.36:2001");
-        servers.add("188.166.165.159:2000");
-        trackers.add("http://159.65.48.36:6969/announce");
-        trackers.add("http://188.166.165.159:6969/announce");
+        servers.add("localhost:2001");
+        servers.add("localhost:2000");
+        trackers.add("http://localhost:6969/announce");
+        trackers.add("http://localhost:6969/announce");
 
         try {
             channel = new Connector(servers);
