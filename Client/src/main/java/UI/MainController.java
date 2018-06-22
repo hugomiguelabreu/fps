@@ -47,6 +47,7 @@ public class MainController implements Initializable{
 
     private Connector channel;
     private ArrayList<String> servers;
+    private ArrayList<String> trackers;
     private boolean type; // true -> online | false -> offline
 
 
@@ -55,17 +56,20 @@ public class MainController implements Initializable{
         type = false;
 
         servers = new ArrayList<>();
+        trackers = new ArrayList<>();
 
         servers.add("165.227.142.239:2001");
         servers.add("178.62.56.41:2000");
+        trackers.add("http://165.227.142.239:6969/announce");
+        trackers.add("http://178.62.56.41:6969/announce");
 
         try {
             channel = new Connector(servers);
-
             if(channel.isConnected()){
                 paneOn.setVisible(true);
                 channel.start();
                 ServerOperations.setChannel(channel);
+                ServerOperations.setTrackersOnline(trackers);
 
                 type = true;
                 slider.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -109,7 +113,7 @@ public class MainController implements Initializable{
                 FileInputStream fxmlStream = new FileInputStream(fxmlDocPath);
 
                 Parent root = loader.load(fxmlStream);
-                AppController controller = loader.<AppController>getController();
+                AppController controller = loader.getController();
 
                 Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
@@ -125,7 +129,7 @@ public class MainController implements Initializable{
             FileInputStream fxmlStream = new FileInputStream(fxmlDocPath);
             Parent root = loader.load(fxmlStream);
 
-            OfflineUI controller = loader.<OfflineUI>getController();
+            OfflineUI controller = loader.getController();
             controller.initLocal(login_username_offline.getText());
 
             Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
