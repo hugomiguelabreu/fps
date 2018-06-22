@@ -115,11 +115,9 @@ public class TorrentUtil {
         tck.announce(tr);
 
         tr.addObserver((o,arg) -> {
-
             try{
 
                 TrackedPeer p = (TrackedPeer) arg;
-
                 if(p.getLeft() == 0 && p.getState() != TrackedPeer.PeerState.UNKNOWN && p.getState() != TrackedPeer.PeerState.STOPPED){
 
                     byte[] b = p.getPeerId().array();
@@ -286,13 +284,6 @@ public class TorrentUtil {
 
                 if(st.getLeft() == 0){
                     System.out.println("done download");
-                    try {
-                        st.finish();
-                        c.waitForCompletion();
-                        c.stop(true); // quando acaba de sacar o cliente termina
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                 }
             });
 
