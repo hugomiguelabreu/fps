@@ -84,7 +84,6 @@ logged_loop(Socket, Username, ID) ->
 			logged_loop(Socket, Username, ID)
 	end.
 
-
 set_received(TID, Username, Group) ->
 	case zk:received_torrent(binary_to_list(TID), Username, binary_to_list(Group)) of
 					{ok, remove} ->

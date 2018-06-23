@@ -42,7 +42,7 @@ msg_decrypt(Data) ->
 					{ok, Pid} ->
 						Pid ! {User, unpacked_torrent, binary_to_list(Group), Content, TID};
 					_ ->
-						zk:setUnreceivedTorrent(binary_to_list(TID), User, binary_to_list(Group))
+						zk:unreceived_torrent(binary_to_list(TID), User, binary_to_list(Group))
 				end
 			end, string:tokens(binary_to_list(UserList),";"));
 		trackerTorrent ->
