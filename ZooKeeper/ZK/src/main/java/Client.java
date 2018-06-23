@@ -27,9 +27,9 @@ public class Client implements Runnable{
         Socket socket = null;
         try {
             if(username.equals("jib") || username.equals("cr7"))
-                socket = new Socket("localhost"  , 2000);
-            else
                 socket = new Socket("localhost"  , 2001);
+            else
+                socket = new Socket("localhost"  , 2002);
 
             CodedInputStream in = CodedInputStream.newInstance(socket.getInputStream());
 
@@ -54,7 +54,7 @@ public class Client implements Runnable{
 
             Thread.sleep(2000);
 
-
+            /*
             ClientWrapper.OnlineUsers cg = ClientWrapper.OnlineUsers.newBuilder()
                                             .setOnlineUsers("leddit")
                                             .build();
@@ -74,33 +74,14 @@ public class Client implements Runnable{
 
             System.out.println(ClientWrapper.ClientMessage.parseFrom(data));
 
-
-            /*
-
-
-            if (username.equals("divisao")){
-                CodedInputStream in = CodedInputStream.newInstance(socket.getInputStream());
+           */
 
 
-                byte[] length_b = in.readRawBytes(4);
-                int l = ByteBuffer.wrap(length_b).getInt();
-
-                byte[] data = in.readRawBytes(l);
-
-                System.out.println(ClientWrapper.ClientMessage.parseFrom(data).getTorrentWrapper());
-                socket.close();
-                return;
-            }
-
-
-            String uniqueId = UUID.randomUUID().toString().split("-")[4];
-
-            StringBuilder sb = new StringBuilder();
 
             if (username.equals("jib")){
                 ClientWrapper.TorrentWrapper torr = ClientWrapper.TorrentWrapper.newBuilder()
                         .setGroup("leddit")
-                        .setId(uniqueId)
+                        .setId("asdlasdlasdl")
                         .setContent(ByteString.copyFromUtf8("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffasdasdasdasdaaaaaaaaaaaaaaaaaaaaaakc.xmqdslllllllllllllllllcccccccccccccccccccccccwooooooooooooooooooooooouuuuuuuuuuuuuuhhhhhhhhhhhhhhhhhhhhhhhhhffffffffffffffffffffvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv            wwwwwwwwwqqqqqqqqqqqrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"))
                         .build();
 
@@ -125,8 +106,6 @@ public class Client implements Runnable{
             System.out.println(ClientWrapper.ClientMessage.parseFrom(data).getTorrentWrapper());
             socket.close();
 
-            */
-
 
 
         } catch (Exception e) { e.printStackTrace();}
@@ -135,7 +114,7 @@ public class Client implements Runnable{
     public static void main(String[] args) {
 
         (new Thread(new Client("jib", "asd"))).start();
-        (new Thread(new Client("merda", "123"))).start();
-        //(new Thread(new Client("cr7", "123"))).start();
+        (new Thread(new Client("divisao", "123"))).start();
+        (new Thread(new Client("cr7", "123"))).start();
     }
 }

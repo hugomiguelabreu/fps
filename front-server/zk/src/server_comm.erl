@@ -9,7 +9,7 @@
 
 init(Port, ID) ->
 	{ok, LSock} = gen_tcp:listen(Port + ID, [binary, {reuseaddr, true}, {packet, 4}]),
-	io:format("> Listening for server communication\n"),
+	io:format("> Listening for server communication on port " ++ integer_to_list(Port + ID) ++ "\n"),
 	acceptor(LSock, ID),
 	receive 
 		keep_me_alive->
@@ -24,6 +24,7 @@ acceptor(LSock, ID) ->
 msg_listener(Socket, ID) ->
 	receive 
 		{tcp, Socket, Data} ->
+			io:format("OlaaaaaaaDASD\n"),
 			msg_decrypt(Data);
 		{error, _} ->
 			io:format("closed\n");
@@ -57,6 +58,7 @@ msg_decrypt(Data) ->
 
 send_front_server(Loc, User, Group, TID, Data) ->
 	IP_PORT = binary_to_list(zk:get_frontsv(Loc)),
+	io:format(IP_PORT),
 	case IP_PORT of
 		error ->
 			error_sending;

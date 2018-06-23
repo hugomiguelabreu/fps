@@ -13,9 +13,9 @@
 
 init(ID,Port) ->
 	{ok, LSock} = gen_tcp:listen(Port + ID, [binary, {reuseaddr, true}, {packet, 4}]),
-	zk:register_current(integer_to_list(ID), "localhost:" ++ integer_to_list(Port + ID)),
+	zk:register_current(integer_to_list(ID), "localhost:" ++ integer_to_list(3000 + ID)),
 	%TODO: meter ip dinamico
-	io:format("> autentication started\n"),
+	io:format("> autentication started listening on port "  ++ integer_to_list(Port + ID) ++ "\n"),
 	acceptor(LSock, ID),
 	receive 
 		keep_me_alive->
@@ -149,7 +149,7 @@ login(Username, Password, ID, Socket) ->
 			gen_tcp:send(Socket, MsgContainer),
 			io:format("> Client " ++ Username ++ " logged in.\n"),
 			
-			check_new_content(Username, ID),
+			%check_new_content(Username, ID),
 			logged_loop(Socket, Username, ID);
 		false ->
 			MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {response,#'Response'{rep=false}}}),
@@ -198,7 +198,7 @@ get_user_groups(User, Socket) ->
 
 redirect(ProtoTorrent, ID, CurrentUser) ->
 	io:format("> starting to redirect to group " ++ binary_to_list(ProtoTorrent#'TorrentWrapper'.group) ++ "\n"),
-	server_comm:send_tracker(ID, ProtoTorrent#'TorrentWrapper'.content, ProtoTorrent#'TorrentWrapper'.group),
+	%server_comm:send_tracker(ID, ProtoTorrent#'TorrentWrapper'.content, ProtoTorrent#'TorrentWrapper'.group),
 	
 	case zk:get_group_location(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
 		{ok, UsersMap, Length} ->
