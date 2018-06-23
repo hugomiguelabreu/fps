@@ -196,7 +196,7 @@ get_user_groups(User, Socket) ->
 
 redirect(ProtoTorrent, ID, CurrentUser) ->
 	io:format("> starting to redirect to group " ++ binary_to_list(ProtoTorrent#'TorrentWrapper'.group) ++ "\n"),
-	%send_tracker(ID,ProtoTorrent#'TorrentWrapper'.content),
+	%server_comm:send_tracker(ID, ProtoTorrent#'TorrentWrapper'.content, ProtoTorrent#'TorrentWrapper'.group),
 	
 	case zk:getGroupUsers(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
 		{ok, UsersMap, Length} ->
@@ -230,29 +230,6 @@ redirect(ProtoTorrent, ID, CurrentUser) ->
 		_ ->
 			io:format("list error\n")
 	end.
-
-
-send_tracker(ID, Data) ->
-	TrackerLOC = zk:getTracker(ID),
-	io:format(TrackerLOC),
-	case TrackerLOC of 
-		error ->
-			io:format(">>> error: getting tracker\n");
-		_ ->
-			[T_IP,T_PORT] = string:split(TrackerLOC,":"),
-
-			Msg = server_wrapper:encode_msg(#'ServerMessage'{msg = {trackerTorrent, #'TrackerTorrent'{content=Data}}}),
-			case gen_tcp:connect(T_IP, list_to_integer(T_PORT), [binary, {reuseaddr, true}, {packet, 4}]) of
-				{ok, TrackerSocket} ->
-		    		gen_tcp:send(TrackerSocket, Msg),
-		    		gen_tcp:close(TrackerSocket),
-		    		io:format("> Sent to Tracker\n");
-		    	{error, Reason} ->
-		    		Reason
-	    	end
-	end.
-
-
 
 get_content(File, ID) ->
 	case file:read_file_info(File) of 

@@ -73,7 +73,7 @@ send_front_server(Loc, User, Group, TID, Data) ->
 	end.
 
 
-send_tracker(ID, Data) ->
+send_tracker(ID, Data, Group) ->
 	TrackerLOC = zk:getTracker(ID),
 
 	case TrackerLOC of 
@@ -82,7 +82,7 @@ send_tracker(ID, Data) ->
 		_ ->
 			[T_IP,T_PORT] = string:split(TrackerLOC,":"),
 
-			Msg = server_wrapper:encode_msg(#'ServerMessage'{msg = {trackerTorrent, #'TrackerTorrent'{content=Data}}}),
+			Msg = server_wrapper:encode_msg(#'ServerMessage'{msg = {trackerTorrent, #'TrackerTorrent'{content=Data, group = Group}}}),
 			case gen_tcp:connect(T_IP, list_to_integer(T_PORT), [binary, {reuseaddr, true}, {packet, 4}]) of
 				{ok, TrackerSocket} ->
 		    		gen_tcp:send(TrackerSocket, Msg),

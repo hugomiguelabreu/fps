@@ -1,8 +1,5 @@
 
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,17 +44,16 @@ public class Zook implements Runnable{
         return children;
     }
 
-    public void incrementReceived(String group, String torrentId) throws KeeperException, InterruptedException {
-        String path = "/groups/" + group + "/torrents/" + torrentId + "/file" ;
+    public void incrementReceived(String group, String torrentId, String user) throws KeeperException, InterruptedException {
+        String path = "/groups/" + group + "/torrents/" + torrentId;
+        zk.create(path + "/file" + user, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
 
-        byte[] data_current = zk.getData(path + "/current", false, null);
-        int current = Integer.parseInt(Arrays.toString(data_current));
-
-        byte[] data_total = zk.getData(path + "/total", false, null);
+        List<String> children = zk.getChildren(path, false);
+        byte[] data_total = zk.getData(path + "/file/total", false, null);
         int total = Integer.parseInt(Arrays.toString(data_total));
 
-        if (current == total - 1)
-            return;
+        if (children.size() == total - 1)
+            ZKUtil.deleteRecursive(zk, path);
     }
 
 
