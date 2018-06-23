@@ -56,7 +56,7 @@ msg_decrypt(Data) ->
 % ----------------------------------------
 
 send_front_server(Loc, User, Group, TID, Data) ->
-	IP_PORT = binary_to_list(zk:get_tracker_list(Loc)),
+	IP_PORT = binary_to_list(zk:get_frontsv(Loc)),
 	case IP_PORT of
 		error ->
 			error_sending;
