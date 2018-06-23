@@ -88,7 +88,7 @@ set_received(TID, Username, Group) ->
 					{ok, remove} ->
 						file:delete("./torrents/" ++ binary_to_list(TID));
 					_ ->
-						io:format(">> torrent "  ++ TID ++ "removido.\n")
+						io:format(">> torrent "  ++ binary_to_list(TID) ++ "removido.\n")
 	end.
 
 msg_decrypt(Data, User, Socket, ID) ->
