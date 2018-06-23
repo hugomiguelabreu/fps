@@ -58,6 +58,7 @@ public class TorrentUtil {
                             tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
                             tck.remove(t);
                             try {
+                                FileUtils.deleteTorrent(tt);
                                 removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
                             } catch (IOException e) {
                                 e.printStackTrace();
