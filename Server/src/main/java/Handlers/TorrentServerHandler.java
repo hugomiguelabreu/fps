@@ -65,15 +65,13 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrap
         openClients.put(t.getHexInfoHash(), serverCli);
         //Get a tracked torrent with observables;
         TrackedTorrent tt =  TorrentUtil.announceTrackedTorrentWithObservers(tck, t, openClients);
+
         //Obtem o peer local e define-o para
         //recebermos os updates de users normais também
         Peer cli = serverCli.getPeerSpec();
         tt.setlocalInjectPeerID(cli.getHexPeerId());
-        injectionRequest(cli, tt);
-        //Injetar os servers que já me tinham pedido.
-        if(injectionsWaiting.containsKey(t.getHexInfoHash()))
-            for (TrackedPeer tp : injectionsWaiting.get(t.getHexInfoHash()))
-                tt.injectPeer(tp);
+        //Efetuar o pedido de injeção aos outros servers e injetar os pendentes
+        TorrentUtil.injectionRequest(cli, injectionsWaiting, tt);
     }
 
     @Override
@@ -87,21 +85,4 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrap
         ctx.close();
     }
 
-    private void injectionRequest(Peer peer, TrackedTorrent tt) throws IOException {
-        //Inject peer in each of the trackers
-        for(URI tracker: tt.getAnnounceList().get(0)) {
-            Socket s = new Socket(tracker.getHost(), 6000);
-            Interserver.InterServerMessage im = Interserver.InterServerMessage.newBuilder()
-                    .setTypeOp(true)
-                    .setServerIp(ByteString.copyFromUtf8(peer.getIp()))
-                    .setServerCliPort(peer.getPort())
-                    .setTorrentHexId(ByteString.copyFromUtf8(tt.getHexInfoHash()))
-                    .setPeerId(ByteString.copyFromUtf8(new String(peer.getPeerId().array())))
-                    .build();
-            im.writeDelimitedTo(s.getOutputStream());
-            s.getOutputStream().flush();
-            s.getOutputStream().close();
-            s.close();
-        }
-    }
 }
