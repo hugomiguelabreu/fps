@@ -13,14 +13,16 @@ import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.simpleframework.transport.Server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.Socket;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,6 +41,7 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrap
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, ServerWrapper.ServerMessage request) throws Exception {
         Torrent t = new Torrent(request.getTrackerTorrent().getContent().toByteArray(), false);
+        String group = request.getTrackerTorrent().getGroup();
         //Verificar o nosso local na lista de trackers e colocar
         //o próprio em primeiro lugar
         String ip = FileUtils.getMyIP();
@@ -53,10 +56,17 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrap
             }
             iteration++;
         }
-        t.getAnnounceList().get(0).remove(iteration);
-        t.getAnnounceList().get(0).add(0, uri);
-        //Volta a codificar novamente o torrent
-        t.newAnnounceEncode();
+        //Redirecionar o torrent para os outros trackers se eu
+        //sou o principal
+        if(iteration == 0) {
+            redirect(t, group);
+        }else {
+            //Recodificiar se não sou o principal
+            t.getAnnounceList().get(0).remove(iteration);
+            t.getAnnounceList().get(0).add(0, uri);
+            //Volta a codificar novamente o torrent
+            t.newAnnounceEncode();
+        }
 
         //Save torrent for fault sake
         FileUtils.saveTorrent(t);
@@ -83,6 +93,27 @@ public class TorrentServerHandler extends SimpleChannelInboundHandler<ServerWrap
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         cause.printStackTrace();
         ctx.close();
+    }
+
+    private void redirect(Torrent t, String group) throws IOException {
+        List<URI> trackers = t.getAnnounceList().get(0);
+        //Remover-me
+        trackers.remove(0);
+        //Redirecionar
+        for(URI tracker: trackers) {
+            Socket s = new Socket(tracker.getHost(), 5000);
+            ServerWrapper.TrackerTorrent tt = ServerWrapper.TrackerTorrent.newBuilder()
+                    .setContent(ByteString.copyFrom(t.getEncoded()))
+                    .setGroup(group)
+                    .build();
+            ServerWrapper.ServerMessage im = ServerWrapper.ServerMessage.newBuilder()
+                    .setTrackerTorrent(tt)
+                    .build();
+            im.writeDelimitedTo(s.getOutputStream());
+            s.getOutputStream().flush();
+            s.getOutputStream().close();
+            s.close();
+        }
     }
 
 }
