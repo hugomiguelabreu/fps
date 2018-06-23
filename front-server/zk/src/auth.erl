@@ -72,7 +72,7 @@ logged_loop(Socket, Username, ID) ->
 			T = client_wrapper:encode_msg(#'ClientMessage'{msg = {torrentWrapper, Data}}),
 			gen_tcp:send(Socket, T),
 			{'TorrentWrapper', Group, _ , TID} = Data,
-			set_received(TID, Username, Group),
+			set_received(TID, Username, binary_to_list(Group)),
 			logged_loop(Socket, Username, ID);
 
 		{Username, unpacked_torrent, Group, Data, TID} ->
