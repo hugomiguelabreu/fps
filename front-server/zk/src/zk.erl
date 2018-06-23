@@ -94,6 +94,7 @@ register(Pid, Username, Password, Name) ->
 	NamePath = "/users/" ++ Username ++ "/name",
 	OnPath   = "/users/" ++ Username ++ "/online",
 	Missing  = "/users/" ++ Username ++ "/missing",
+	Groups  = "/users/" ++ Username ++ "/groups",
 
 	case erlzk:create(Pid, UserPath, list_to_binary(Password)) of
 		{error, _} -> error;
@@ -102,8 +103,9 @@ register(Pid, Username, Password, Name) ->
 			erlzk:create(Pid, SvPath, list_to_binary("")),
 			erlzk:create(Pid, OnPath, list_to_binary("false")),
 			erlzk:create(Pid, Missing, list_to_binary("")),
+			erlzk:create(Pid, Groups, list_to_binary("")),
 			ok
-	end.
+	end.	
 
 login(U,P) -> rpc({login,U,P}).
 login(PID,Username,Password) ->

@@ -37,7 +37,7 @@ acceptor(LSock,ID) ->
 auth(Socket, ID) ->
 	receive 
 		{tcp, Socket, Data} ->
-			msgDecriptor(Data, "" ,Socket, ID),
+			msg_decrypt(Data, "" ,Socket, ID),
 			auth(Socket, ID);
 		{tcp_closed, Socket} ->
 			io:format("closed\n"),
@@ -140,10 +140,12 @@ login(Username, Password, ID, Socket) ->
 		true ->
 			zk:setOnline(Username, ID),
 			data:register_pid(Username,self()),
+			
 			MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {response,#'Response'{rep=true}}}),
 			gen_tcp:send(Socket, MsgContainer),
 			io:format("> Client " ++ Username ++ " logged in.\n"),
-			check_new_content(Username),
+			
+			check_new_content(Username, ID),
 			logged_loop(Socket, Username, ID);
 		false ->
 			MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {response,#'Response'{rep=false}}}),
@@ -187,7 +189,7 @@ get_user_groups(User, Socket) ->
 	gen_tcp:send(Socket, MsgContainer).		
 
 %%====================================================================
-%% Private functions
+%% Local functions
 %%====================================================================
 
 redirect(ProtoTorrent, ID, CurrentUser) ->
@@ -217,7 +219,7 @@ redirect(ProtoTorrent, ID, CurrentUser) ->
 									 end, maps:get(ID, UsersMap));
 								_ ->
 									UsersSv = lists:concat(lists:join(";",maps:get(ServerID,UsersMap))),
-									server_comm:sendFrontServer(ServerID, UsersSv, binary_to_list(ProtoTorrent#'TorrentWrapper'.group), TID, Content)
+									server_comm:send_front_server(ServerID, UsersSv, binary_to_list(ProtoTorrent#'TorrentWrapper'.group), TID, Content)
 							end
 						  end, maps:keys(UsersMap));
 		no_group ->
@@ -249,11 +251,21 @@ send_tracker(ID, Data) ->
 	end.
 
 
-check_new_content(User) ->
+
+get_content(File, ID) ->
+	case file:read_file_info(File) of 
+		{error, _} ->
+			server_comm:req_file(ID, File);
+		_ ->
+			file:read_file("./torrents/" ++ File)
+	end.
+			
+
+check_new_content(User, ID) ->
 	case zk:getNewContent(User) of
 		{ok, L} ->
 			lists:foreach(fun(Filename) ->
-					ProtoTorrent = file:read_file("./torrents/" ++ Filename),
+					ProtoTorrent = get_content(Filename, ID),
 					self() ! {User, packed_torrent, ProtoTorrent}
 				end, L);
 		_ ->

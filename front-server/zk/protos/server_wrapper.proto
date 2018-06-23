@@ -13,10 +13,15 @@ message TrackerTorrent{
     bytes content = 2;
 }
 
+message RequestTorrent {
+    string id = 1; 
+}
+
 message ServerMessage {
     oneof msg {
         FrontEndTorrent frontEndTorrent = 1;
         TrackerTorrent trackerTorrent = 2;
+        RequestTorrent requestTorrent = 3;
     }   
 }
 
