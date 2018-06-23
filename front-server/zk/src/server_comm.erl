@@ -8,7 +8,7 @@
 % ----------------------------------------
 
 init(Port, ID) ->
-	{ok, LSock} = gen_tcp:listen(Port, [binary, {reuseaddr, true}, {packet, 4}]),
+	{ok, LSock} = gen_tcp:listen(Port + ID, [binary, {reuseaddr, true}, {packet, 4}]),
 	io:format("> Listening for server communication\n"),
 	acceptor(LSock, ID),
 	receive 

@@ -12,7 +12,9 @@
 %%====================================================================
 
 init(ID,Port) ->
-	{ok, LSock} = gen_tcp:listen(Port, [binary, {reuseaddr, true}, {packet, 4}]),
+	{ok, LSock} = gen_tcp:listen(Port + ID, [binary, {reuseaddr, true}, {packet, 4}]),
+	zk:register_current(integer_to_list(ID), "localhost:" ++ integer_to_list(Port + ID)),
+	%TODO: meter ip dinamico
 	io:format("> autentication started\n"),
 	acceptor(LSock, ID),
 	receive 

@@ -1,5 +1,5 @@
 -module(zk).
--export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/2, setOffline/1, getGroupUsers/1, getTrackerList/0, getFrontSv/1, newTorrent/4, setUnreceivedTorrent/3, setReceivedTorrent/3, getTracker/1, getNewContent/1, getGroups/1, getGroupOnline/1]).
+-export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/2, setOffline/1, getGroupUsers/1, getTrackerList/0, getFrontSv/1, newTorrent/4, setUnreceivedTorrent/3, setReceivedTorrent/3, getTracker/1, getNewContent/1, getGroups/1, getGroupOnline/1, register_current/2]).
 
 
 init(Host, Port) ->
@@ -73,6 +73,10 @@ loop(Pid) ->
     		loop(Pid);
 		{{groups_user, U}, From} ->
     		V = getGroups(U, Pid),
+			From ! {?MODULE, V},
+    		loop(Pid);
+		{{register_current, ID, IP}, From} ->
+    		V = register_current(ID, IP, Pid),
 			From ! {?MODULE, V},
     		loop(Pid)
 
@@ -293,7 +297,7 @@ setReceivedTorrent(TID, User, Group, PID) ->
 		 	R = erlzk:get_children(PID, "/groups/" ++ Group ++ "/torrents/" ++ TID ++ "/torrent"),
 			case R of
 				{ok, L} ->
-					case Total - 1 == R of 
+					case Total - 1 == length(L) of 
 						true -> {ok, remove};
 						false -> {ok, success}
 					end;
@@ -342,6 +346,14 @@ getGroups(User, PID) ->
 		_ ->
 			[]
 	end.
+
+register_current(ID, IP) -> rpc({register_current, ID, IP}).
+register_current(ID, IP, PID) ->
+	case erlzk:create(PID, "/front-servers/" ++ ID, list_to_binary(IP), ephemeral) of
+		{ok, _} -> ok;
+		{error, _} -> error
+	end.
+
 
 
 
