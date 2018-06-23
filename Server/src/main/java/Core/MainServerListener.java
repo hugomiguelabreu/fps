@@ -124,6 +124,7 @@ public class MainServerListener extends Thread{
         Peer cli = serverCli.getPeerSpec();
         tt.setlocalInjectPeerID(cli.getHexPeerId());
         //Efetuar o pedido de injeção aos outros servers e injetar os pendentes
+        tt.injectPeer(new TrackedPeer(tt, cli.getIp(), cli.getPort(), cli.getPeerId()));
         TorrentUtil.injectionRequest(cli, injectionsWaiting, tt);
     }
 
