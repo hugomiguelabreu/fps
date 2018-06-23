@@ -1,5 +1,5 @@
 -module(server_comm).
--export([init/2, send_front_server/5, send_tracker/3]).
+-export([init/2, send_front_server/5, send_tracker/3, req_file/2]).
 -include("server_wrapper.hrl").
 
 
