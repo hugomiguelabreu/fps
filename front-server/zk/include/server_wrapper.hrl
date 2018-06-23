@@ -15,6 +15,13 @@
         }).
 -endif.
 
+-ifndef('REQUESTTORRENT_PB_H').
+-define('REQUESTTORRENT_PB_H', true).
+-record('RequestTorrent',
+        {id = <<>>              :: iodata() | undefined % = 1
+        }).
+-endif.
+
 -ifndef('FRONTENDTORRENT_PB_H').
 -define('FRONTENDTORRENT_PB_H', true).
 -record('FrontEndTorrent',
@@ -28,7 +35,7 @@
 -ifndef('SERVERMESSAGE_PB_H').
 -define('SERVERMESSAGE_PB_H', true).
 -record('ServerMessage',
-        {msg                    :: {frontEndTorrent, #'FrontEndTorrent'{}} | {trackerTorrent, #'TrackerTorrent'{}} | undefined % oneof
+        {msg                    :: {frontEndTorrent, #'FrontEndTorrent'{}} | {trackerTorrent, #'TrackerTorrent'{}} | {requestTorrent, #'RequestTorrent'{}} | undefined % oneof
         }).
 -endif.
 

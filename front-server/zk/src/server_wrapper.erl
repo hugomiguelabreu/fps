@@ -31,15 +31,16 @@
 
 %% message types
 -type 'TrackerTorrent'() :: #'TrackerTorrent'{}.
+-type 'RequestTorrent'() :: #'RequestTorrent'{}.
 -type 'FrontEndTorrent'() :: #'FrontEndTorrent'{}.
 -type 'ServerMessage'() :: #'ServerMessage'{}.
--export_type(['TrackerTorrent'/0, 'FrontEndTorrent'/0, 'ServerMessage'/0]).
+-export_type(['TrackerTorrent'/0, 'RequestTorrent'/0, 'FrontEndTorrent'/0, 'ServerMessage'/0]).
 
--spec encode_msg(#'TrackerTorrent'{} | #'FrontEndTorrent'{} | #'ServerMessage'{}) -> binary().
+-spec encode_msg(#'TrackerTorrent'{} | #'RequestTorrent'{} | #'FrontEndTorrent'{} | #'ServerMessage'{}) -> binary().
 encode_msg(Msg) -> encode_msg(Msg, []).
 
 
--spec encode_msg(#'TrackerTorrent'{} | #'FrontEndTorrent'{} | #'ServerMessage'{}, list()) -> binary().
+-spec encode_msg(#'TrackerTorrent'{} | #'RequestTorrent'{} | #'FrontEndTorrent'{} | #'ServerMessage'{}, list()) -> binary().
 encode_msg(Msg, Opts) ->
     case proplists:get_bool(verify, Opts) of
       true -> verify_msg(Msg, Opts);
@@ -49,6 +50,8 @@ encode_msg(Msg, Opts) ->
     case Msg of
       #'TrackerTorrent'{} ->
 	  e_msg_TrackerTorrent(Msg, TrUserData);
+      #'RequestTorrent'{} ->
+	  e_msg_RequestTorrent(Msg, TrUserData);
       #'FrontEndTorrent'{} ->
 	  e_msg_FrontEndTorrent(Msg, TrUserData);
       #'ServerMessage'{} ->
@@ -81,6 +84,23 @@ e_msg_TrackerTorrent(#'TrackerTorrent'{group = F1,
 	     case iolist_size(TrF2) of
 	       0 -> B1;
 	       _ -> e_type_bytes(TrF2, <<B1/binary, 18>>)
+	     end
+	   end
+    end.
+
+e_msg_RequestTorrent(Msg, TrUserData) ->
+    e_msg_RequestTorrent(Msg, <<>>, TrUserData).
+
+
+e_msg_RequestTorrent(#'RequestTorrent'{id = F1}, Bin,
+		     TrUserData) ->
+    if F1 == undefined -> Bin;
+       true ->
+	   begin
+	     TrF1 = id(F1, TrUserData),
+	     case is_empty_string(TrF1) of
+	       true -> Bin;
+	       false -> e_type_string(TrF1, <<Bin/binary, 10>>)
 	     end
 	   end
     end.
@@ -154,6 +174,13 @@ e_msg_ServerMessage(#'ServerMessage'{msg = F1}, Bin,
 	    e_mfield_ServerMessage_trackerTorrent(TrOF1,
 						  <<Bin/binary, 18>>,
 						  TrUserData)
+	  end;
+      {requestTorrent, OF1} ->
+	  begin
+	    TrOF1 = id(OF1, TrUserData),
+	    e_mfield_ServerMessage_requestTorrent(TrOF1,
+						  <<Bin/binary, 26>>,
+						  TrUserData)
 	  end
     end.
 
@@ -166,6 +193,12 @@ e_mfield_ServerMessage_frontEndTorrent(Msg, Bin,
 e_mfield_ServerMessage_trackerTorrent(Msg, Bin,
 				      TrUserData) ->
     SubBin = e_msg_TrackerTorrent(Msg, <<>>, TrUserData),
+    Bin2 = e_varint(byte_size(SubBin), Bin),
+    <<Bin2/binary, SubBin/binary>>.
+
+e_mfield_ServerMessage_requestTorrent(Msg, Bin,
+				      TrUserData) ->
+    SubBin = e_msg_RequestTorrent(Msg, <<>>, TrUserData),
     Bin2 = e_varint(byte_size(SubBin), Bin),
     <<Bin2/binary, SubBin/binary>>.
 
@@ -220,6 +253,14 @@ decode_msg(Bin, MsgName, Opts) when is_binary(Bin) ->
 		error({gpb_error,
 		       {decoding_failure,
 			{Bin, 'TrackerTorrent', {Class, Reason, StackTrace}}}})
+	  end;
+      'RequestTorrent' ->
+	  try d_msg_RequestTorrent(Bin, TrUserData) catch
+	    Class:Reason ->
+		StackTrace = erlang:get_stacktrace(),
+		error({gpb_error,
+		       {decoding_failure,
+			{Bin, 'RequestTorrent', {Class, Reason, StackTrace}}}})
 	  end;
       'FrontEndTorrent' ->
 	  try d_msg_FrontEndTorrent(Bin, TrUserData) catch
@@ -372,6 +413,109 @@ skip_64_TrackerTorrent(<<_:64, Rest/binary>>, Z1, Z2,
 		       F@_1, F@_2, TrUserData) ->
     dfp_read_field_def_TrackerTorrent(Rest, Z1, Z2, F@_1,
 				      F@_2, TrUserData).
+
+d_msg_RequestTorrent(Bin, TrUserData) ->
+    dfp_read_field_def_RequestTorrent(Bin, 0, 0,
+				      id(<<>>, TrUserData), TrUserData).
+
+dfp_read_field_def_RequestTorrent(<<10, Rest/binary>>,
+				  Z1, Z2, F@_1, TrUserData) ->
+    d_field_RequestTorrent_id(Rest, Z1, Z2, F@_1,
+			      TrUserData);
+dfp_read_field_def_RequestTorrent(<<>>, 0, 0, F@_1,
+				  _) ->
+    #'RequestTorrent'{id = F@_1};
+dfp_read_field_def_RequestTorrent(Other, Z1, Z2, F@_1,
+				  TrUserData) ->
+    dg_read_field_def_RequestTorrent(Other, Z1, Z2, F@_1,
+				     TrUserData).
+
+dg_read_field_def_RequestTorrent(<<1:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, F@_1, TrUserData)
+    when N < 32 - 7 ->
+    dg_read_field_def_RequestTorrent(Rest, N + 7,
+				     X bsl N + Acc, F@_1, TrUserData);
+dg_read_field_def_RequestTorrent(<<0:1, X:7,
+				   Rest/binary>>,
+				 N, Acc, F@_1, TrUserData) ->
+    Key = X bsl N + Acc,
+    case Key of
+      10 ->
+	  d_field_RequestTorrent_id(Rest, 0, 0, F@_1, TrUserData);
+      _ ->
+	  case Key band 7 of
+	    0 ->
+		skip_varint_RequestTorrent(Rest, 0, 0, F@_1,
+					   TrUserData);
+	    1 ->
+		skip_64_RequestTorrent(Rest, 0, 0, F@_1, TrUserData);
+	    2 ->
+		skip_length_delimited_RequestTorrent(Rest, 0, 0, F@_1,
+						     TrUserData);
+	    3 ->
+		skip_group_RequestTorrent(Rest, Key bsr 3, 0, F@_1,
+					  TrUserData);
+	    5 ->
+		skip_32_RequestTorrent(Rest, 0, 0, F@_1, TrUserData)
+	  end
+    end;
+dg_read_field_def_RequestTorrent(<<>>, 0, 0, F@_1, _) ->
+    #'RequestTorrent'{id = F@_1}.
+
+d_field_RequestTorrent_id(<<1:1, X:7, Rest/binary>>, N,
+			  Acc, F@_1, TrUserData)
+    when N < 57 ->
+    d_field_RequestTorrent_id(Rest, N + 7, X bsl N + Acc,
+			      F@_1, TrUserData);
+d_field_RequestTorrent_id(<<0:1, X:7, Rest/binary>>, N,
+			  Acc, _, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bytes:Len/binary, Rest2/binary>> = Rest,
+			   {binary:copy(Bytes), Rest2}
+			 end,
+    dfp_read_field_def_RequestTorrent(RestF, 0, 0,
+				      NewFValue, TrUserData).
+
+skip_varint_RequestTorrent(<<1:1, _:7, Rest/binary>>,
+			   Z1, Z2, F@_1, TrUserData) ->
+    skip_varint_RequestTorrent(Rest, Z1, Z2, F@_1,
+			       TrUserData);
+skip_varint_RequestTorrent(<<0:1, _:7, Rest/binary>>,
+			   Z1, Z2, F@_1, TrUserData) ->
+    dfp_read_field_def_RequestTorrent(Rest, Z1, Z2, F@_1,
+				      TrUserData).
+
+skip_length_delimited_RequestTorrent(<<1:1, X:7,
+				       Rest/binary>>,
+				     N, Acc, F@_1, TrUserData)
+    when N < 57 ->
+    skip_length_delimited_RequestTorrent(Rest, N + 7,
+					 X bsl N + Acc, F@_1, TrUserData);
+skip_length_delimited_RequestTorrent(<<0:1, X:7,
+				       Rest/binary>>,
+				     N, Acc, F@_1, TrUserData) ->
+    Length = X bsl N + Acc,
+    <<_:Length/binary, Rest2/binary>> = Rest,
+    dfp_read_field_def_RequestTorrent(Rest2, 0, 0, F@_1,
+				      TrUserData).
+
+skip_group_RequestTorrent(Bin, FNum, Z2, F@_1,
+			  TrUserData) ->
+    {_, Rest} = read_group(Bin, FNum),
+    dfp_read_field_def_RequestTorrent(Rest, 0, Z2, F@_1,
+				      TrUserData).
+
+skip_32_RequestTorrent(<<_:32, Rest/binary>>, Z1, Z2,
+		       F@_1, TrUserData) ->
+    dfp_read_field_def_RequestTorrent(Rest, Z1, Z2, F@_1,
+				      TrUserData).
+
+skip_64_RequestTorrent(<<_:64, Rest/binary>>, Z1, Z2,
+		       F@_1, TrUserData) ->
+    dfp_read_field_def_RequestTorrent(Rest, Z1, Z2, F@_1,
+				      TrUserData).
 
 d_msg_FrontEndTorrent(Bin, TrUserData) ->
     dfp_read_field_def_FrontEndTorrent(Bin, 0, 0,
@@ -576,6 +720,10 @@ dfp_read_field_def_ServerMessage(<<18, Rest/binary>>,
 				 Z1, Z2, F@_1, TrUserData) ->
     d_field_ServerMessage_trackerTorrent(Rest, Z1, Z2, F@_1,
 					 TrUserData);
+dfp_read_field_def_ServerMessage(<<26, Rest/binary>>,
+				 Z1, Z2, F@_1, TrUserData) ->
+    d_field_ServerMessage_requestTorrent(Rest, Z1, Z2, F@_1,
+					 TrUserData);
 dfp_read_field_def_ServerMessage(<<>>, 0, 0, F@_1, _) ->
     #'ServerMessage'{msg = F@_1};
 dfp_read_field_def_ServerMessage(Other, Z1, Z2, F@_1,
@@ -599,6 +747,9 @@ dg_read_field_def_ServerMessage(<<0:1, X:7,
 						TrUserData);
       18 ->
 	  d_field_ServerMessage_trackerTorrent(Rest, 0, 0, F@_1,
+					       TrUserData);
+      26 ->
+	  d_field_ServerMessage_requestTorrent(Rest, 0, 0, F@_1,
 					       TrUserData);
       _ ->
 	  case Key band 7 of
@@ -672,6 +823,34 @@ d_field_ServerMessage_trackerTorrent(<<0:1, X:7,
 								     NewFValue,
 								     TrUserData)};
 				       _ -> {trackerTorrent, NewFValue}
+				     end,
+				     TrUserData).
+
+d_field_ServerMessage_requestTorrent(<<1:1, X:7,
+				       Rest/binary>>,
+				     N, Acc, F@_1, TrUserData)
+    when N < 57 ->
+    d_field_ServerMessage_requestTorrent(Rest, N + 7,
+					 X bsl N + Acc, F@_1, TrUserData);
+d_field_ServerMessage_requestTorrent(<<0:1, X:7,
+				       Rest/binary>>,
+				     N, Acc, Prev, TrUserData) ->
+    {NewFValue, RestF} = begin
+			   Len = X bsl N + Acc,
+			   <<Bs:Len/binary, Rest2/binary>> = Rest,
+			   {id(d_msg_RequestTorrent(Bs, TrUserData),
+			       TrUserData),
+			    Rest2}
+			 end,
+    dfp_read_field_def_ServerMessage(RestF, 0, 0,
+				     case Prev of
+				       undefined -> {requestTorrent, NewFValue};
+				       {requestTorrent, MVPrev} ->
+					   {requestTorrent,
+					    merge_msg_RequestTorrent(MVPrev,
+								     NewFValue,
+								     TrUserData)};
+				       _ -> {requestTorrent, NewFValue}
 				     end,
 				     TrUserData).
 
@@ -780,6 +959,8 @@ merge_msgs(Prev, New, Opts)
     case Prev of
       #'TrackerTorrent'{} ->
 	  merge_msg_TrackerTorrent(Prev, New, TrUserData);
+      #'RequestTorrent'{} ->
+	  merge_msg_RequestTorrent(Prev, New, TrUserData);
       #'FrontEndTorrent'{} ->
 	  merge_msg_FrontEndTorrent(Prev, New, TrUserData);
       #'ServerMessage'{} ->
@@ -799,6 +980,13 @@ merge_msg_TrackerTorrent(#'TrackerTorrent'{group =
 		      content =
 			  if NFcontent =:= undefined -> PFcontent;
 			     true -> NFcontent
+			  end}.
+
+merge_msg_RequestTorrent(#'RequestTorrent'{id = PFid},
+			 #'RequestTorrent'{id = NFid}, _) ->
+    #'RequestTorrent'{id =
+			  if NFid =:= undefined -> PFid;
+			     true -> NFid
 			  end}.
 
 merge_msg_FrontEndTorrent(#'FrontEndTorrent'{id = PFid,
@@ -839,6 +1027,11 @@ merge_msg_ServerMessage(#'ServerMessage'{msg = PFmsg},
 			       {trackerTorrent,
 				merge_msg_TrackerTorrent(OPFmsg, ONFmsg,
 							 TrUserData)};
+			   {{requestTorrent, OPFmsg},
+			    {requestTorrent, ONFmsg}} ->
+			       {requestTorrent,
+				merge_msg_RequestTorrent(OPFmsg, ONFmsg,
+							 TrUserData)};
 			   {_, undefined} -> PFmsg;
 			   _ -> NFmsg
 			 end}.
@@ -851,6 +1044,9 @@ verify_msg(Msg, Opts) ->
     case Msg of
       #'TrackerTorrent'{} ->
 	  v_msg_TrackerTorrent(Msg, ['TrackerTorrent'],
+			       TrUserData);
+      #'RequestTorrent'{} ->
+	  v_msg_RequestTorrent(Msg, ['RequestTorrent'],
 			       TrUserData);
       #'FrontEndTorrent'{} ->
 	  v_msg_FrontEndTorrent(Msg, ['FrontEndTorrent'],
@@ -874,6 +1070,17 @@ v_msg_TrackerTorrent(#'TrackerTorrent'{group = F1,
     ok;
 v_msg_TrackerTorrent(X, Path, _TrUserData) ->
     mk_type_error({expected_msg, 'TrackerTorrent'}, X,
+		  Path).
+
+-dialyzer({nowarn_function,v_msg_RequestTorrent/3}).
+v_msg_RequestTorrent(#'RequestTorrent'{id = F1}, Path,
+		     _) ->
+    if F1 == undefined -> ok;
+       true -> v_type_string(F1, [id | Path])
+    end,
+    ok;
+v_msg_RequestTorrent(X, Path, _TrUserData) ->
+    mk_type_error({expected_msg, 'RequestTorrent'}, X,
 		  Path).
 
 -dialyzer({nowarn_function,v_msg_FrontEndTorrent/3}).
@@ -907,6 +1114,9 @@ v_msg_ServerMessage(#'ServerMessage'{msg = F1}, Path,
 				[frontEndTorrent, msg | Path], TrUserData);
       {trackerTorrent, OF1} ->
 	  v_msg_TrackerTorrent(OF1, [trackerTorrent, msg | Path],
+			       TrUserData);
+      {requestTorrent, OF1} ->
+	  v_msg_RequestTorrent(OF1, [requestTorrent, msg | Path],
 			       TrUserData);
       _ -> mk_type_error(invalid_oneof, F1, [msg | Path])
     end,
@@ -955,6 +1165,9 @@ get_msg_defs() ->
 	      occurrence = optional, opts = []},
        #field{name = content, fnum = 2, rnum = 3, type = bytes,
 	      occurrence = optional, opts = []}]},
+     {{msg, 'RequestTorrent'},
+      [#field{name = id, fnum = 1, rnum = 2, type = string,
+	      occurrence = optional, opts = []}]},
      {{msg, 'FrontEndTorrent'},
       [#field{name = id, fnum = 1, rnum = 2, type = string,
 	      occurrence = optional, opts = []},
@@ -972,18 +1185,23 @@ get_msg_defs() ->
 			      occurrence = optional, opts = []},
 		       #field{name = trackerTorrent, fnum = 2, rnum = 2,
 			      type = {msg, 'TrackerTorrent'},
+			      occurrence = optional, opts = []},
+		       #field{name = requestTorrent, fnum = 3, rnum = 2,
+			      type = {msg, 'RequestTorrent'},
 			      occurrence = optional, opts = []}]}]}].
 
 
 get_msg_names() ->
-    ['TrackerTorrent', 'FrontEndTorrent', 'ServerMessage'].
+    ['TrackerTorrent', 'RequestTorrent', 'FrontEndTorrent',
+     'ServerMessage'].
 
 
 get_group_names() -> [].
 
 
 get_msg_or_group_names() ->
-    ['TrackerTorrent', 'FrontEndTorrent', 'ServerMessage'].
+    ['TrackerTorrent', 'RequestTorrent', 'FrontEndTorrent',
+     'ServerMessage'].
 
 
 get_enum_names() -> [].
@@ -1006,6 +1224,9 @@ find_msg_def('TrackerTorrent') ->
 	    occurrence = optional, opts = []},
      #field{name = content, fnum = 2, rnum = 3, type = bytes,
 	    occurrence = optional, opts = []}];
+find_msg_def('RequestTorrent') ->
+    [#field{name = id, fnum = 1, rnum = 2, type = string,
+	    occurrence = optional, opts = []}];
 find_msg_def('FrontEndTorrent') ->
     [#field{name = id, fnum = 1, rnum = 2, type = string,
 	    occurrence = optional, opts = []},
@@ -1023,6 +1244,9 @@ find_msg_def('ServerMessage') ->
 			    occurrence = optional, opts = []},
 		     #field{name = trackerTorrent, fnum = 2, rnum = 2,
 			    type = {msg, 'TrackerTorrent'},
+			    occurrence = optional, opts = []},
+		     #field{name = requestTorrent, fnum = 3, rnum = 2,
+			    type = {msg, 'RequestTorrent'},
 			    occurrence = optional, opts = []}]}];
 find_msg_def(_) -> error.
 
