@@ -3,7 +3,7 @@
 
 %falta tirar hard-code do ip ZK
 start(ID) ->
- 	spawn(zk, init, ["localhost", 2182 + ID]),
+ 	spawn(zk, init, ["localhost", 2182]),
 	timer:sleep(500),
 	spawn(data, start, []),
 	spawn(server_comm, init, [3000, ID]),

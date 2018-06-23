@@ -27,7 +27,6 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Interserver.InterServerMessage message) throws Exception {
-        System.out.println("Handle peer injection or Deletion");
         boolean type = message.getTypeOp();
         String ip = message.getServerIp().toStringUtf8();
         int port = message.getServerCliPort();
@@ -35,6 +34,7 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
         String peerId = message.getPeerId().toStringUtf8();
 
         if(type){
+            System.out.println("Handle peer injection");
             if(openClients.containsKey(torrentId)){
                 //We're handling that torrent.
                 TrackedTorrent tt =  tck.getTrackedTorrents().stream().peek(x -> x.getHexInfoHash().equals(torrentId)).findFirst().get();
@@ -42,12 +42,13 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
                 tt.injectPeer(new TrackedPeer(tt, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING))));
             }else{
                 //Ainda não temos esse torrent, mas supostamente vamos receber.
-                if(injectionsWaiting.get(torrentId) == null)
+                if(!injectionsWaiting.containsKey(torrentId) || injectionsWaiting.get(torrentId) == null)
                     injectionsWaiting.put(torrentId, new ArrayList<>());
                 //Novo server que também vai querer e tem o ficheiro
                 injectionsWaiting.get(torrentId).add(new TrackedPeer(null, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING))));
             }
         }else{
+            System.out.println("Handle peer deletion");
             TrackedTorrent tt =  tck.getTrackedTorrents().stream().peek(x -> x.getHexInfoHash().equals(torrentId)).findFirst().get();
             tt.removeInjectedPeer(peerId);
             //Um servidor eliminou o ficheiro.

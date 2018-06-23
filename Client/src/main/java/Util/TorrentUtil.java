@@ -243,7 +243,10 @@ public class TorrentUtil {
             //Download and seed
             c.addObserver((o, arg) -> {
                 // update UI thread
-
+                Platform.runLater(() -> {
+                    pb.setProgress(st.getCompletion()/100);
+                    pi.setProgress(st.getCompletion()/100);
+                });
                 if(st.isComplete()){
                     System.out.println("Completou");
                     if(online){
@@ -252,11 +255,6 @@ public class TorrentUtil {
                         ServerOperations.removeClient(st);
                     }
                 }
-
-                Platform.runLater(() -> {
-                    pb.setProgress(st.getCompletion()/100);
-                    pi.setProgress(st.getCompletion()/100);
-                });
             });
             c.download();
 
