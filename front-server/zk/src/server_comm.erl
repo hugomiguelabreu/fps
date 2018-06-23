@@ -1,5 +1,5 @@
 -module(server_comm).
--export([init/2, send_front_server/5, send_tracker/2]).
+-export([init/2, send_front_server/5, send_tracker/3]).
 -include("server_wrapper.hrl").
 
 
@@ -56,7 +56,7 @@ msg_decrypt(Data) ->
 % ----------------------------------------
 
 send_front_server(Loc, User, Group, TID, Data) ->
-	IP_PORT = binary_to_list(zk:getFrontSv(Loc)),
+	IP_PORT = binary_to_list(zk:get_tracker_list(Loc)),
 	case IP_PORT of
 		error ->
 			error_sending;
@@ -74,7 +74,7 @@ send_front_server(Loc, User, Group, TID, Data) ->
 
 
 send_tracker(ID, Data, Group) ->
-	TrackerLOC = zk:getTracker(ID),
+	TrackerLOC = zk:get_tracker(ID),
 
 	case TrackerLOC of 
 		error ->

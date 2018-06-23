@@ -1,5 +1,5 @@
 -module(zk).
--export([init/2,register/3, login/2, createGroup/2, joinGroup/2, setOnline/2, setOffline/1, getGroupUsers/1, getTrackerList/0, getFrontSv/1, newTorrent/4, setUnreceivedTorrent/3, setReceivedTorrent/3, getTracker/1, getNewContent/1, getGroups/1, getGroupOnline/1, register_current/2]).
+-export([init/2,register/3, login/2, create_group/2, join_group/2, set_online/2, set_offline/1, get_group_location/1, get_tracker_list/0, get_frontsv/1, new_torrent/4, unreceived_torrent/3, received_torrent/3, get_tracker/1, get_new_content/1, get_groups/1, users_online_group/1, register_current/2]).
 
 
 init(Host, Port) ->
@@ -20,59 +20,59 @@ loop(Pid) ->
 			From ! {?MODULE, V},
     		loop(Pid);
     	{{create_group, N, U}, From} ->
-			V = createGroup(Pid, N, U),
+			V = create_group(Pid, N, U),
 			From ! {?MODULE, V},
     		loop(Pid);
 		{{join_group, N, U}, From} ->
-			V = joinGroup(N, U, Pid),
+			V = join_group(N, U, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
 		{{set_online, U, SID}, From} ->
-			V = setOnline(U, SID, Pid),
+			V = set_online(U, SID, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
     	{{set_offline, U}, From} ->
-			V = setOffline(U, Pid),
+			V = set_offline(U, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
     	{{group_users, N}, From} ->
-			V = getGroupUsers(N, Pid),
+			V = get_group_location(N, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
     	{{tracker_list}, From} ->
-			V = getTrackerList(Pid),
+			V = get_tracker_list(Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
     	{{front_sv, ID}, From} ->
-			V = getFrontSv(ID, Pid),
+			V = get_frontsv(ID, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
     	{{tracker, ID}, From} ->
-			V = getTracker(ID, Pid),
+			V = get_tracker(ID, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);	
     	{{new_torrent, TID, U, G, L}, From} ->
-    		V = newTorrent(TID, U, G, L, Pid),
+    		V = new_torrent(TID, U, G, L, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
     	{{new_content, U}, From} ->
-    		V = getNewContent(U, Pid),
+    		V = get_new_content(U, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);	
     	{{unreceived_torrent, TID, U, G}, From} ->
-    		V = setUnreceivedTorrent(TID, U, G, Pid),
+    		V = unreceived_torrent(TID, U, G, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
     	{{received_torrent, TID, U, G}, From} ->
-    		V = setReceivedTorrent(TID, U, G, Pid),
+    		V = received_torrent(TID, U, G, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
 		{{group_online, G}, From} ->
-    		V = getGroupOnline(G, Pid),
+    		V = users_online_group(G, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
 		{{groups_user, U}, From} ->
-    		V = getGroups(U, Pid),
+    		V = get_groups(U, Pid),
 			From ! {?MODULE, V},
     		loop(Pid);
 		{{register_current, ID, IP}, From} ->
@@ -87,7 +87,7 @@ rpc(Request) ->
 	receive {?MODULE, Res} -> Res end.
 
 % ---------------------------------------------------
-% client 
+% client requests
 % ---------------------------------------------------
 
 
@@ -128,8 +128,8 @@ login(PID,Username,Password) ->
 			end
 	end.
 
-createGroup(N,U) -> rpc({create_group,N,U}).
-createGroup(PID,Name,User) -> 
+create_group(N,U) -> rpc({create_group,N,U}).
+create_group(PID,Name,User) -> 
 	GroupPath = "/groups/" ++ Name,
 	case erlzk:exists(PID,GroupPath) of
 		{error, no_node} ->
@@ -147,8 +147,8 @@ createGroup(PID,Name,User) ->
 			error
 	end.
 
-joinGroup(N,U) -> rpc({join_group,N,U}).
-joinGroup(Name, Username, PID) ->
+join_group(N,U) -> rpc({join_group,N,U}).
+join_group(Name, Username, PID) ->
 	GroupPath = "/groups/" ++ Name,
 	case erlzk:exists(PID,GroupPath) of
 		{error, no_node} ->
@@ -161,8 +161,8 @@ joinGroup(Name, Username, PID) ->
 			error
 	end.
 
-setOnline(U,SID) -> rpc({set_online, U, SID}).
-setOnline(Username,SID,PID) ->
+set_online(U,SID) -> rpc({set_online, U, SID}).
+set_online(Username,SID,PID) ->
 	UserPath = "/users/" ++ Username ++ "/online",
 	case erlzk:set_data(PID,UserPath,list_to_binary("true")) of
 		{error, _} ->
@@ -177,8 +177,8 @@ setOnline(Username,SID,PID) ->
 			end
 	end.
 
-setOffline(U) -> rpc({set_offline, U}).
-setOffline(Username,PID) ->
+set_offline(U) -> rpc({set_offline, U}).
+set_offline(Username,PID) ->
 	UserPath = "/users/" ++ Username ++ "/online",
 	case erlzk:set_data(PID,UserPath,list_to_binary("false")) of
 		{error, _} ->
@@ -187,105 +187,23 @@ setOffline(Username,PID) ->
 			ok
 	end.
 
-getGroupUsers(N)-> rpc({group_users, N}).
-getGroupUsers(Name, PID) ->
-	GroupPath = "/groups/" ++ Name ++ "/users",
-	R = erlzk:get_children(PID,GroupPath),
-	case R of
-		{ok, L} ->
-			{ok, getLoc(L, #{}, PID), length(L)};
-		{error, no_node} ->
-			no_group;
-		_ ->
-			error
-	end.
 
-getLoc([], Map, _) -> Map;
-getLoc(Users, Map, PID) ->	
-	[User | Tail] = Users,
-	case erlzk:get_data(PID, "/users/" ++ User ++ "/online") of
-		{error, _} ->
-		 	error;
-		{ok,{RP,_}} ->
-		 	case binary_to_list(RP) of
-		 		"true" -> 
-		 			case erlzk:get_data(PID, "/users/" ++ User ++ "/sv") of 
-		 				{error, _} ->
-		 					error;
-						{ok,{LOC,_}} ->
-							case maps:is_key(binary_to_list(LOC), Map) of
-								false ->
-									getLoc(Tail,maps:put(binary_to_list(LOC),[User],Map),PID);
-								true ->
-									L = lists:merge(maps:get(binary_to_list(LOC), Map), [User]),
-									getLoc(Tail,maps:put(binary_to_list(LOC),L,Map),PID)
-							end
-					end;
-				"false" ->
-					case maps:is_key(offline, Map) of
-						false ->
-							getLoc(Tail,maps:put(offline,[User],Map),PID);
-						true ->
-							L = lists:merge(maps:get(offline, Map), [User]),
-							getLoc(Tail,maps:put(offline,L,Map),PID)
-					end
-			end
-
- 	end.
-
-
-% ---------------------------------------------------
-% server
-% ---------------------------------------------------
-
-getTrackerList() -> rpc({tracker_list}).
-getTrackerList(PID) ->
-	TrackersPath = "/trackers",
-	case erlzk:get_children(PID,TrackersPath) of
-		{error, no_node} ->
-			io:format("> tracker list empty\n");
-		{ok, L} ->
-			{ok,L};
-		_ ->
-			error
-	end.
-
-getFrontSv(ID) -> rpc({front_sv, ID}).
-getFrontSv(ID, PID) ->
-	FEpath = "/front-servers/" ++ ID, 
-	case erlzk:get_data(PID, FEpath) of
-		{error, _} ->
-		 	error;
-		{ok,{RP,_}} ->
-		 	RP
-	 	end.
-
-
-getTracker(ID) -> rpc({tracker, ID}).
-getTracker(ID, PID) ->
-	case erlzk:get_data(PID, "/trackers/" ++ ID) of
-		{error, _} ->
-		 	error;
-		{ok,{RP,_}} ->
-		 	binary_to_list(RP)
-	 	end.
-
-newTorrent(TID, U, G, L) -> rpc({new_torrent, TID, U, G, L}). 
-newTorrent(TID, User, Group, Length, PID) ->
+new_torrent(TID, U, G, L) -> rpc({new_torrent, TID, U, G, L}). 
+new_torrent(TID, User, Group, Length, PID) ->
 	GroupPath = "/groups/" ++ Group ++ "/torrents/" ++ TID,
 	erlzk:create(PID, GroupPath, list_to_binary(User)),
 	erlzk:create(PID, GroupPath ++ "/file", list_to_binary(integer_to_list(Length))),
 	erlzk:create(PID, GroupPath ++ "/torrent", list_to_binary(integer_to_list(Length))),
 	ok.	
 
-setUnreceivedTorrent(TID, U, G) -> rpc({unreceived_torrent, TID, U, G}). 
-setUnreceivedTorrent(TID, User, Group, PID) -> 
+unreceived_torrent(TID, U, G) -> rpc({unreceived_torrent, TID, U, G}). 
+unreceived_torrent(TID, User, Group, PID) -> 
 	Path = "/users/" ++ User ++ "/missing/" ++ TID,
 	erlzk:create(PID, Path, list_to_binary(Group)),
 	ok.	
 
-setReceivedTorrent(TID, U, G) -> rpc({received_torrent, TID, U ,G}).
-setReceivedTorrent(TID, User, Group, PID) ->
+received_torrent(TID, U, G) -> rpc({received_torrent, TID, U ,G}).
+received_torrent(TID, User, Group, PID) ->
 	erlzk:delete(PID, "/users/" ++ User ++ "/missing/" ++ TID),
 	erlzk:create(PID, "/groups/" ++ Group ++ "/torrents/" ++ TID ++ "/torrent/" ++ User, list_to_binary("")),
 
@@ -307,8 +225,8 @@ setReceivedTorrent(TID, User, Group, PID) ->
  	end.
 
 
-getNewContent(U) -> rpc({new_content, U}).
-getNewContent(User, PID) ->
+get_new_content(U) -> rpc({new_content, U}).
+get_new_content(User, PID) ->
 	Path = "/users/" ++ User ++ "/missing",
 	R = erlzk:get_children(PID, Path),
 	case R of
@@ -320,16 +238,16 @@ getNewContent(User, PID) ->
 			error
 	end.
 
-getGroupOnline(G) -> rpc({group_online, G}).
-getGroupOnline(Group, PID) ->
+users_online_group(G) -> rpc({group_online, G}).
+users_online_group(Group, PID) ->
 	case erlzk:get_children(PID,"/groups/" ++ Group  ++ "/users") of 
 		{ok, L} ->
-			lists:filter(fun(X) -> isUserOnline(X,PID)== true end, L);
+			lists:filter(fun(X) -> is_online_user(X,PID)== true end, L);
 		_ ->
 			[]
 	end.
 	
-isUserOnline(User, PID) ->
+is_online_user(User, PID) ->
 	case erlzk:get_data(PID, "/users/" ++ User ++ "/online") of
 		{error, _} ->
 			false;
@@ -337,8 +255,8 @@ isUserOnline(User, PID) ->
 			string:equal(binary_to_list(R), "true")
 	end.
 
-getGroups(U) -> rpc({groups_user, U}).
-getGroups(User, PID) ->
+get_groups(U) -> rpc({groups_user, U}).
+get_groups(User, PID) ->
 	GroupPath = "/users/" ++ User ++ "/groups",
 	case erlzk:get_children(PID,GroupPath) of 
 		{ok, L} ->
@@ -346,6 +264,95 @@ getGroups(User, PID) ->
 		_ ->
 			[]
 	end.
+
+% ---------------------------------------------------
+% server
+% ---------------------------------------------------
+
+
+get_group_location(N)-> rpc({group_users, N}).
+get_group_location(Name, PID) ->
+	GroupPath = "/groups/" ++ Name ++ "/users",
+	R = erlzk:get_children(PID,GroupPath),
+	case R of
+		{ok, L} ->
+			{ok, get_user_location(L, #{}, PID), length(L)};
+		{error, no_node} ->
+			no_group;
+		_ ->
+			error
+	end.
+
+get_user_location([], Map, _) -> Map;
+get_user_location(Users, Map, PID) ->	
+	[User | Tail] = Users,
+	case erlzk:get_data(PID, "/users/" ++ User ++ "/online") of
+		{error, _} ->
+		 	error;
+		{ok,{RP,_}} ->
+		 	case binary_to_list(RP) of
+		 		"true" -> 
+		 			case erlzk:get_data(PID, "/users/" ++ User ++ "/sv") of 
+		 				{error, _} ->
+		 					error;
+						{ok,{LOC,_}} ->
+							case maps:is_key(binary_to_list(LOC), Map) of
+								false ->
+									get_user_location(Tail,maps:put(binary_to_list(LOC),[User],Map),PID);
+								true ->
+									L = lists:merge(maps:get(binary_to_list(LOC), Map), [User]),
+									get_user_location(Tail,maps:put(binary_to_list(LOC),L,Map),PID)
+							end
+					end;
+				"false" ->
+					case maps:is_key(offline, Map) of
+						false ->
+							get_user_location(Tail,maps:put(offline,[User],Map),PID);
+						true ->
+							L = lists:merge(maps:get(offline, Map), [User]),
+							get_user_location(Tail,maps:put(offline,L,Map),PID)
+					end
+			end
+
+ 	end.
+
+
+
+
+
+get_tracker_list() -> rpc({tracker_list}).
+get_tracker_list(PID) ->
+	TrackersPath = "/trackers",
+	case erlzk:get_children(PID,TrackersPath) of
+		{error, no_node} ->
+			io:format("> tracker list empty\n");
+		{ok, L} ->
+			{ok,L};
+		_ ->
+			error
+	end.
+
+get_frontsv(ID) -> rpc({front_sv, ID}).
+get_frontsv(ID, PID) ->
+	FEpath = "/front-servers/" ++ ID, 
+	case erlzk:get_data(PID, FEpath) of
+		{error, _} ->
+		 	error;
+		{ok,{RP,_}} ->
+		 	RP
+	 	end.
+
+
+get_tracker(ID) -> rpc({tracker, ID}).
+get_tracker(ID, PID) ->
+	case erlzk:get_data(PID, "/trackers/" ++ ID) of
+		{error, _} ->
+		 	error;
+		{ok,{RP,_}} ->
+		 	binary_to_list(RP)
+	 	end.
+
+
 
 register_current(ID, IP) -> rpc({register_current, ID, IP}).
 register_current(ID, IP, PID) ->
