@@ -37,7 +37,8 @@ acceptor(LSock,ID) ->
 auth(Socket, ID) ->
 	receive 
 		{tcp, Socket, Data} ->
-			msg_decrypt(Data, "" ,Socket, ID);
+			msgDecriptor(Data, "" ,Socket, ID),
+			auth(Socket, ID);
 		{tcp_closed, Socket} ->
 			io:format("closed\n"),
 			gen_tcp:close(Socket);

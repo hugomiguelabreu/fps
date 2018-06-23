@@ -1,5 +1,5 @@
 syntax = "proto3";
-package client_network;
+package Network;
 
 message Login {
 	string username = 1;

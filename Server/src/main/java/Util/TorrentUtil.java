@@ -48,9 +48,10 @@ public class TorrentUtil {
                             tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0)) {
                         System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
                         synchronized (clients) {
+                            //TODO:TESTAR FALSE
                             clients.get(tt.getHexInfoHash()).stop(false);
+                            clients.remove(tt.getHexInfoHash());
                         }
-                        clients.remove(tt.getHexInfoHash());
                         /*tck.remove(tt);
                         new Thread(() -> {
                             try {

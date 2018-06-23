@@ -1,23 +1,17 @@
 package Core;
 
 import Network.ClientWrapper;
-import UI.AppController;
-import Util.FileUtils;
 import Util.ServerOperations;
 import com.google.protobuf.CodedInputStream;
-import com.google.protobuf.CodedOutputStream;
 import com.turn.ttorrent.common.Torrent;
-import javafx.fxml.FXMLLoader;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.Collection;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Connector extends Thread{
@@ -38,6 +32,7 @@ public class Connector extends Thread{
                 socket = new Socket(uri.getHost(), uri.getPort());
                 out = socket.getOutputStream();
                 in = CodedInputStream.newInstance(socket.getInputStream());
+                break;
             } catch (Exception e) {
                 System.out.println("\u001B[31mError opening socket\u001B[0m");
                 this.connected = false;
@@ -70,12 +65,13 @@ public class Connector extends Thread{
                     ServerOperations.addTorrent(t, group);
                 }else{
                     boolean response = cm.getResponse().getRep();
+                    System.out.println(response);
                     this.responses.offer(response);
                 }
-                //TODO: check if not null
+
             } catch (Exception e) {
-                e.printStackTrace();
                 this.close();
+                e.printStackTrace();
             }
         }
     }

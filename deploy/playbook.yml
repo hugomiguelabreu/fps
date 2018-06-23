@@ -1,0 +1,11 @@
+---
+  - hosts: app_servers
+    vars:
+      server_1: "{{ server_1_do }}"
+      server_2: "{{ server_2_do }}"
+    roles:
+      - packages
+      - zookeeper
+      - tracker
+      - frontend
+    gather_facts: yes

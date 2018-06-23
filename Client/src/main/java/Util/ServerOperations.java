@@ -9,6 +9,7 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -19,26 +20,25 @@ public class ServerOperations {
     private static Connector channel;
     private static ConcurrentHashMapEvent<String, ArrayList<Torrent>> groupTorrents;
     private static ConcurrentHashMapEvent<String, ArrayList<String>> groupUsers;
-    private static String username;
+    public static String username;
     private static ArrayList<Client> activeClients = new ArrayList<>();
+    private static ArrayList<String> trackersOnline = new ArrayList<>();
 
     public static void setGroupTorrents(ConcurrentHashMapEvent<String, ArrayList<Torrent>> groupTorrents) { ServerOperations.groupTorrents = groupTorrents; }
 
     public static void setGroupUsers(ConcurrentHashMapEvent<String, ArrayList<String>> groupUsers) { ServerOperations.groupUsers = groupUsers; }
+
+    public static void setTrackersOnline(ArrayList<String> trackersParam){ ServerOperations.trackersOnline = trackersParam; }
 
     public static void setChannel(Connector channel){
         ServerOperations.channel = channel;
     }
 
     public static void sendTorrent(String path, String group){
-        ArrayList<String> trc = new ArrayList<>();
-        //TODO: This IP must be dynamic
-        trc.add("http://localhost:6969/announce");
-        trc.add("http://localhost:7070/announce");
 
         Torrent t;
         try {
-            t = TorrentUtil.createTorrent(path, username, trc);
+            t = TorrentUtil.createTorrent(path, username, trackersOnline);
             Client c = TorrentUtil.upload(t, path, channel, username, group);
             if(c!=null)
                 activeClients.add(c);
@@ -49,7 +49,38 @@ public class ServerOperations {
         }
     }
 
-    public static void addTorrent(Torrent t, String group){
+    public static void removeClient(Torrent c){
+        for(Client cl: activeClients){
+            if(cl.getTorrent().getHexInfoHash().equals(c.getHexInfoHash()))
+                cl.stop();
+        }
+        activeClients.removeIf(x -> x.getTorrent().getHexInfoHash().equals(c.getHexInfoHash()));
+    }
+
+    public static void removeTorrent(Torrent t, String group) {
+        ArrayList<Torrent> gt = groupTorrents.get(group);
+        gt.removeIf(x -> x.getHexInfoHash().equals(t.getHexInfoHash()));
+        FileUtils.deleteTorrent(t, group);
+    }
+
+    public static void addTorrent(Torrent t, String group) throws InterruptedException, NoSuchAlgorithmException, IOException {
+        //Temos de colocar o tracker do torrent o nosso primário
+        int iteration = 0;
+        URI uri = null;
+        for(URI uriIt: t.getAnnounceList().get(0)){
+            //Verificar qual deles é o nosso primario
+            if(uriIt.toString().equals(trackersOnline.get(0))){
+                uri = uriIt;
+                break;
+            }
+            iteration++;
+        }
+        //Remover o nosso primario do indice onde esta e coloca-lo em primeiro
+        t.getAnnounceList().get(0).remove(iteration);
+        t.getAnnounceList().get(0).add(0, uri);
+        //Volta a codificar novamente o torrent
+        t.newAnnounceEncode();
+        //Guarda o torrent
         FileUtils.addTorrent(t, group);
         ArrayList<Torrent> gt = groupTorrents.get(group);
         gt.add(0, t);
@@ -87,7 +118,7 @@ public class ServerOperations {
         return ret;
     }
 
-    public static boolean register(String username, String password, String name) throws IOException, URISyntaxException {
+    public static boolean register(String username, String password, String name) {
         if(channel == null)
             return false;
         boolean ret;

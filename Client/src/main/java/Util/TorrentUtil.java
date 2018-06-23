@@ -9,11 +9,13 @@ import com.google.protobuf.ByteString;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.client.SharedTorrent;
 import com.turn.ttorrent.common.Torrent;
+import com.turn.ttorrent.common.Utils;
 import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import javafx.application.Platform;
-import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -24,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -112,44 +115,22 @@ public class TorrentUtil {
         tck.announce(tr);
 
         tr.addObserver((o,arg) -> {
-
             try{
 
                 TrackedPeer p = (TrackedPeer) arg;
-
                 if(p.getLeft() == 0 && p.getState() != TrackedPeer.PeerState.UNKNOWN && p.getState() != TrackedPeer.PeerState.STOPPED){
 
-
-
-                    byte[] b = p.getPeerId().array();
-                    String tmp = new String(b);
-                    String id = tmp.replaceAll("-TO0042-", "");
-
-//                    p.getPeerId().get(b, 0,p.getPeerId().capacity());
-//                    String tmp = new String(b);
-//                    String id = tmp.replaceAll("-TO0042-", "");
-
-                    //System.out.println("id: " + id);
-                    //System.out.println("size = " + torrentPeers.get(tr.getHexInfoHash()).size() );
-
-                    torrentPeers.get(tr.getHexInfoHash()).remove(id);
-                    System.out.println("peer " + id +" completed");
+                    torrentPeers.get(tr.getHexInfoHash()).remove(p.getPeerId());
+                    System.out.println("peer " + p.getPeerId() +" completed");
                     //System.out.println("ARRAY = "  + torrentPeers.get(tr.getHexInfoHash()));
 
                     if(torrentPeers.get(tr.getHexInfoHash()).size() == 0){
 
-                        //System.out.println("Tirar torrent do tracker");
+                        System.out.println("Tirar torrent do tracker");
                         tck.remove(t);
                         System.out.println("Stop Client");
                         c.stop();
 
-                        if(tck.getTrackedTorrents().isEmpty()){
-
-                            tck.stop();
-                            System.out.println("stop tracker");
-                                                    }
-
-                        //System.out.println("name = " + t.getName());
                     }
                 }
             }catch (Exception e){
@@ -170,38 +151,42 @@ public class TorrentUtil {
         //Offline sends to all users
         ConcurrentHashMap<String, User> foundUsers = Offline.listener.getUsers();
 
-        torrentPeers.put(t.getHexInfoHash(),new ArrayList<String>());
+        torrentPeers.put(t.getHexInfoHash(),new ArrayList<>());
 
-        if(userToSend == null){
+//        if(userToSend == null){
+//
+//            //Broadcast
+//            for (Map.Entry<String, User> entry : foundUsers.entrySet()) {
+//
+//                if(!entry.getValue().getUsername().equals(t.getCreatedBy())){
+//
+//                    torrentPeers.get(tr.getHexInfoHash()).add(entry.getValue().getUsername());
+//
+//                    System.out.println("Sending to: " + entry.getKey());
+//                    Socket s = new Socket(entry.getValue().getIpv4(), 5558);
+//                    wrapper.writeDelimitedTo(s.getOutputStream());
+//                }
+//            }
+//        }
 
-            //Broadcast
-            for (Map.Entry<String, User> entry : foundUsers.entrySet()) {
+        //Manda so para um men
+        for (Map.Entry<String, User> entry : foundUsers.entrySet()) {
 
-                if(!entry.getValue().getUsername().equals(t.getCreatedBy())){
+            if(entry.getValue().getUsername().equals(userToSend)){
 
-                    torrentPeers.get(tr.getHexInfoHash()).add(entry.getValue().getUsername());
+                byte[] peerId = userToSend.getBytes();
+                ByteBuffer kappa =  ByteBuffer.wrap(peerId);
 
-                    System.out.println("Sending to: " + entry.getKey());
-                    Socket s = new Socket(entry.getValue().getIpv4(), 5558);
-                    wrapper.writeDelimitedTo(s.getOutputStream());
-                }
+                String hexPeerId = Utils.bytesToHex(kappa.array());
+
+                torrentPeers.get(tr.getHexInfoHash()).add(hexPeerId);
+
+                System.out.println("Sending to: " + entry.getKey());
+                Socket s = new Socket(entry.getValue().getIpv4(), 5558);
+                wrapper.writeDelimitedTo(s.getOutputStream());
             }
         }
-        else {
 
-            //Manda so para um men
-            for (Map.Entry<String, User> entry : foundUsers.entrySet()) {
-
-                if(entry.getValue().getUsername().equals(userToSend)){
-
-                    torrentPeers.get(tr.getHexInfoHash()).add(entry.getValue().getUsername());
-
-                    System.out.println("Sending to: " + entry.getKey());
-                    Socket s = new Socket(entry.getValue().getIpv4(), 5558);
-                    wrapper.writeDelimitedTo(s.getOutputStream());
-                }
-            }
-        }
         return c;
     }
 
@@ -214,6 +199,7 @@ public class TorrentUtil {
         ClientWrapper.TorrentWrapper sw = ClientWrapper.TorrentWrapper.newBuilder()
                 .setContent(ByteString.copyFrom(t.getEncoded()))
                 .setGroup(group)
+                .setId(t.getHexInfoHash())
                 .build();
 
         ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
@@ -235,6 +221,60 @@ public class TorrentUtil {
         return c;
     }
 
+    public static void download(SharedTorrent st, boolean online, String username, String group, ProgressBar pb, ProgressIndicator pi) {
+
+        String ip;
+
+        try {
+            if(online){
+                ip = TorrentUtil.getIp();
+            }else{
+                ip = Offline.findLocalAddresses().get(0).getIpv4();
+            }
+
+            Client c = new Client(
+                    InetAddress.getByName(ip),
+                    st,
+                    username);
+
+            c.setMaxDownloadRate(0.0);
+            c.setMaxUploadRate(0.0);
+
+            //Download and seed
+            c.addObserver((o, arg) -> {
+                // update UI thread
+
+                if(st.isComplete()){
+                    System.out.println("Completou");
+                    if(online){
+                        //É online por isso persiste, logo vamos remover o torrent
+                        ServerOperations.removeTorrent(st, group);
+                        ServerOperations.removeClient(st);
+                    }
+                }
+
+                Platform.runLater(() -> {
+                    pb.setProgress(st.getCompletion()/100);
+                    pi.setProgress(st.getCompletion()/100);
+                });
+            });
+            c.download();
+
+            if (com.turn.ttorrent.client.Client.ClientState.ERROR.equals(c.getState()))
+                System.exit(1);
+
+        } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String getIp() throws IOException {
+        URL whatismyip = new URL("http://checkip.amazonaws.com");
+        BufferedReader in = new BufferedReader(new InputStreamReader(
+                whatismyip.openStream()));
+        return in.readLine(); //you get the IP as a String
+    }
+
     public static void download(SharedTorrent st, boolean online, String username)
     {
         String ip;
@@ -253,7 +293,6 @@ public class TorrentUtil {
 
             //Download and seed
             c.addObserver((o, arg) -> {
-
                 System.out.println(st.getCompletion());
                 System.out.println(arg);
             });
@@ -266,55 +305,5 @@ public class TorrentUtil {
         } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
             e.printStackTrace();
         }
-    }
-
-    public static void download(SharedTorrent st, boolean online, String username, Label l)
-    {
-        String ip;
-        try {
-            if(online){
-                ip = TorrentUtil.getIp();
-            }else{
-                ip = Offline.findLocalAddresses().get(0).getIpv4();
-            }
-
-            Client c = new Client(
-                    InetAddress.getByName(ip),
-                    st);
-            c.setMaxDownloadRate(0.0);
-            c.setMaxUploadRate(0.0);
-
-            //Download and seed
-            c.addObserver((o, arg) -> {
-
-            // update UI thread
-            Platform.runLater(new Runnable() {
-
-                @Override
-                public void run() {
-
-                    l.setText(arg + " -> " +  st.getCompletion());
-                }
-            });
-
-                System.out.println(st.getCompletion());
-                System.out.println(arg);
-            });
-
-            c.share(-1);
-
-            if (com.turn.ttorrent.client.Client.ClientState.ERROR.equals(c.getState())) {
-                System.exit(1);
-            }
-        } catch (IOException | InterruptedException | ParserConfigurationException | SAXException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static String getIp() throws IOException {
-        URL whatismyip = new URL("http://checkip.amazonaws.com");
-        BufferedReader in = new BufferedReader(new InputStreamReader(
-                whatismyip.openStream()));
-        return in.readLine(); //you get the IP as a String
     }
 }

@@ -11,10 +11,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -33,11 +30,13 @@ public class MainController implements Initializable{
     public AnchorPane slider;
     public Label status;
     @FXML
-    private Label error_login;
-    @FXML
     private PasswordField login_password;
     @FXML
     private TextField login_username;
+    @FXML
+    private PasswordField register_password;
+    @FXML
+    private TextField register_username;
     @FXML
     private TextField login_username_offline;
     @FXML
@@ -47,6 +46,7 @@ public class MainController implements Initializable{
 
     private Connector channel;
     private ArrayList<String> servers;
+    private ArrayList<String> trackers;
     private boolean type; // true -> online | false -> offline
 
 
@@ -55,16 +55,20 @@ public class MainController implements Initializable{
         type = false;
 
         servers = new ArrayList<>();
-        servers.add("localhost:2000");
+        trackers = new ArrayList<>();
+
         servers.add("localhost:2001");
+        servers.add("localhost:2000");
+        trackers.add("http://localhost:6969/announce");
+        trackers.add("http://localhost:6969/announce");
 
         try {
             channel = new Connector(servers);
-
             if(channel.isConnected()){
                 paneOn.setVisible(true);
                 channel.start();
                 ServerOperations.setChannel(channel);
+                ServerOperations.setTrackersOnline(trackers);
 
                 type = true;
                 slider.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -102,19 +106,20 @@ public class MainController implements Initializable{
     @FXML
     void loginHandle(ActionEvent event) throws IOException {
         if(type){
-            if(ServerOperations.login(login_username.getText(), login_password.getText())){
+            if(login_username.getText().length() > 12) {
+                showError("Username too long", "The username should be lower than 12 chars.");
+            }else if(ServerOperations.login(login_username.getText(), login_password.getText())){
                 FXMLLoader loader = new FXMLLoader();
                 String fxmlDocPath = "src/main/java/UI/app.fxml";
                 FileInputStream fxmlStream = new FileInputStream(fxmlDocPath);
 
                 Parent root = loader.load(fxmlStream);
-                AppController controller = loader.<AppController>getController();
+                AppController controller = loader.getController();
 
                 Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
                 stage.setScene(new Scene(root));
             } else{
-                error_login.setTextFill(Color.web("#ff0000"));
-                error_login.setVisible(true);
+                showError("Error on login", "Username or Password wrong");
             }
         } else {
             paneOff.setVisible(true);
@@ -124,11 +129,43 @@ public class MainController implements Initializable{
             FileInputStream fxmlStream = new FileInputStream(fxmlDocPath);
             Parent root = loader.load(fxmlStream);
 
-            OfflineUI controller = loader.<OfflineUI>getController();
-            controller.initLocal(login_username_offline.getText());
+            OfflineUI controller = loader.getController();
+            controller.initLocal(login_username_offline.getText().substring(0, 11));
 
             Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
         }
     }
+
+    @FXML
+    void registerHandle(ActionEvent event) throws IOException {
+        if (type) {
+            if (register_username.getText().length() > 12) {
+                showError("Username too long", "The username should be lower than 12 chars.");
+            } else if (ServerOperations.register(register_username.getText(), register_password.getText(), register_username.getText())) {
+                showSuccess("Account created", "Account successfully created");
+            } else {
+                showError("Error on register", "Something went wrong, please check username");
+            }
+        }
+    }
+
+    public void showError(String header, String info){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(header);
+        alert.setContentText(info);
+
+        alert.showAndWait();
+    }
+
+    public void showSuccess(String header, String info){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
+        alert.setHeaderText(header);
+        alert.setContentText(info);
+
+        alert.showAndWait();
+    }
+
 }

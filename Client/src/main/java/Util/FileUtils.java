@@ -7,15 +7,26 @@ import org.apache.commons.io.IOUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.security.Timestamp;
 import java.util.*;
 
 public class FileUtils {
 
+    public static String saveFilesPath;
+
     public static void initDir(){
+        new File(System.getProperty( "user.home" ) + "/.fps").mkdirs();
+        saveFilesPath = "/tmp";
+    }
+
+    public static void initDir(String path){
 
         new File(System.getProperty( "user.home" ) + "/.fps").mkdirs();
+        saveFilesPath = path;
     }
 
     public static void addTorrent(Torrent t, String group){
@@ -24,6 +35,15 @@ public class FileUtils {
             fos = new FileOutputStream(System.getProperty( "user.home" ) + "/.fps/" + group + "/" + t.getHexInfoHash());
             t.save(fos);
             IOUtils.closeQuietly(fos);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteTorrent(Torrent t, String group){
+        Path path = Paths.get(System.getProperty( "user.home" ) + "/.fps/" + group + "/" + t.getHexInfoHash());
+        try {
+            Files.deleteIfExists(path);
         } catch (IOException e) {
             e.printStackTrace();
         }

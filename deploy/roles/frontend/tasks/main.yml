@@ -1,0 +1,16 @@
+---
+
+- name: Compile Front-end
+  shell: chdir=/root/fps/front-server/zk /root/.cache/rebar3/bin/rebar3 compile
+
+#- name: Initial setup
+#  file:
+#    path: "{{ item }}"
+#    state: directory
+#    owner: deployer
+#    group: deployer
+#    mode: 0775
+#  with_items:
+#    - /srv/apps
+#  tags:
+#    - app
