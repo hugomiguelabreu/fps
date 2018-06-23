@@ -32,6 +32,7 @@ public class FileUtils {
     public static void addTorrent(Torrent t, String group){
         FileOutputStream fos = null;
         try {
+            new File(System.getProperty( "user.home" ) + "/.fps/" + group).mkdirs();
             fos = new FileOutputStream(System.getProperty( "user.home" ) + "/.fps/" + group + "/" + t.getHexInfoHash());
             t.save(fos);
             IOUtils.closeQuietly(fos);

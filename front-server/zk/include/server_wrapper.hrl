@@ -7,6 +7,14 @@
 
 -define(server_wrapper_gpb_version, "4.1.1").
 
+-ifndef('TRACKERTORRENT_PB_H').
+-define('TRACKERTORRENT_PB_H', true).
+-record('TrackerTorrent',
+        {group = <<>>           :: iodata() | undefined, % = 1
+         content = <<>>         :: binary() | undefined % = 2
+        }).
+-endif.
+
 -ifndef('FRONTENDTORRENT_PB_H').
 -define('FRONTENDTORRENT_PB_H', true).
 -record('FrontEndTorrent',
@@ -14,13 +22,6 @@
          user = <<>>            :: iodata() | undefined, % = 2
          group = <<>>           :: iodata() | undefined, % = 3
          content = <<>>         :: binary() | undefined % = 4
-        }).
--endif.
-
--ifndef('TRACKERTORRENT_PB_H').
--define('TRACKERTORRENT_PB_H', true).
--record('TrackerTorrent',
-        {content = <<>>         :: binary() | undefined % = 1
         }).
 -endif.
 

@@ -37,7 +37,7 @@ acceptor(LSock,ID) ->
 auth(Socket, ID) ->
 	receive 
 		{tcp, Socket, Data} ->
-			msgDecriptor(Data, "" ,Socket, ID),
+			msg_decrypt(Data, "" ,Socket, ID),
 			auth(Socket, ID);
 		{tcp_closed, Socket} ->
 			io:format("closed\n"),
@@ -192,7 +192,7 @@ get_user_groups(User, Socket) ->
 
 redirect(ProtoTorrent, ID, CurrentUser) ->
 	io:format("> starting to redirect to group " ++ binary_to_list(ProtoTorrent#'TorrentWrapper'.group) ++ "\n"),
-	%send_tracker(ID,ProtoTorrent#'TorrentWrapper'.content),
+	send_tracker(ID,ProtoTorrent#'TorrentWrapper'.content),
 	
 	case zk:getGroupUsers(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
 		{ok, UsersMap, Length} ->

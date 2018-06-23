@@ -1,5 +1,5 @@
 -module(app).
--export([start/1]).
+-export([start/0]).
 
 %falta tirar hard-code do ip ZK
 start() ->

@@ -46,23 +46,22 @@ public class TorrentUtil {
 
         tt.addObserver((o, arg) -> {
             TrackedPeer tp = (TrackedPeer) arg;
-            System.out.println("\u001B[31m" + tp.getIp() + " changed\u001B[0m");
+            System.out.println("\u001B[31m" + tp.getHexPeerId() + " changed\u001B[0m");
             if (!tp.getState().equals(TrackedPeer.PeerState.STOPPED) && !tp.getState().equals(TrackedPeer.PeerState.UNKNOWN)) {
                 if (tp.getLeft() == 0) {
-                    System.out.println("\u001B[31m" + tp.getIp() + " is over\u001B[0m");
+                    System.out.println("\u001B[31m" + tp.getHexPeerId() + " is over\u001B[0m");
                     if ((clients.containsKey(tt.getHexInfoHash()) &&
                             tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0)) || tt.getPeers().size() == 0) {
                         System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
                         synchronized (clients) {
-                            //TODO:TESTAR FALSE
-                            tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
-                            tck.remove(t);
-                            try {
-                                FileUtils.deleteTorrent(tt);
-                                removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            //tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
+                            //tck.remove(t);
+                            //try {
+                            //    FileUtils.deleteTorrent(tt);
+                            //    removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
+                            //} catch (IOException e) {
+                            //    e.printStackTrace();
+                            //}
                             clients.get(tt.getHexInfoHash()).stop(false);
                             clients.remove(tt.getHexInfoHash());
                         }
@@ -103,6 +102,7 @@ public class TorrentUtil {
     }
 
     public static void injectionRequest(Peer peer, ConcurrentHashMap<String, ArrayList<TrackedPeer>> injectionsWaiting, TrackedTorrent tt) throws IOException {
+        System.out.println("PEDIDO DE INJEÇÃO");
         //Inject peer in each of the trackers
         for(URI tracker: tt.getAnnounceList().get(0)) {
             Socket s = new Socket(tracker.getHost(), 6000);
@@ -111,18 +111,23 @@ public class TorrentUtil {
                     .setServerIp(ByteString.copyFromUtf8(peer.getIp()))
                     .setServerCliPort(peer.getPort())
                     .setTorrentHexId(ByteString.copyFromUtf8(tt.getHexInfoHash()))
-                    .setPeerId(ByteString.copyFromUtf8(new String(peer.getPeerId().array())))
+                    .setPeerId(ByteString.copyFrom(peer.getPeerId()))
                     .build();
             im.writeDelimitedTo(s.getOutputStream());
             s.getOutputStream().flush();
             s.getOutputStream().close();
             s.close();
+            break;
         }
 
         //Injetar os servers que já me tinham pedido.
-        if(injectionsWaiting.containsKey(tt.getHexInfoHash()))
-            for (TrackedPeer tp : injectionsWaiting.get(tt.getHexInfoHash()))
-                tt.injectPeer(tp);
+        if(injectionsWaiting.containsKey(tt.getHexInfoHash())){
+            for (TrackedPeer tp : injectionsWaiting.get(tt.getHexInfoHash())) {
+                System.out.println("INJETEI " + tp.getHexPeerId() + " EM ESPERA");
+                tt.injectPeer(new TrackedPeer(tt, tp.getIp(),  tp.getPort(), tp.getPeerId()));
+            }
+            injectionsWaiting.remove(tt.getHexInfoHash());
+        }
     }
 
 
@@ -141,6 +146,7 @@ public class TorrentUtil {
             s.getOutputStream().flush();
             s.getOutputStream().close();
             s.close();
+            break;
         }
     }
 
