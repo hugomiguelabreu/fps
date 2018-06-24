@@ -53,20 +53,19 @@ public class TorrentUtil {
             if (!tp.getState().equals(TrackedPeer.PeerState.STOPPED) && !tp.getState().equals(TrackedPeer.PeerState.UNKNOWN)) {
                 if (tp.getLeft() == 0) {
                     System.out.println("\u001B[31m" + tp.getHexPeerId() + " is over\u001B[0m");
+                    if(tp.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
+                        try {
+                            removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
                     //Verificar se posso desligar
                     boolean allDownloaded = true;
-                    boolean canProcced = true;
                     if((clients.containsKey(tt.getHexInfoHash()))){
                         Set<SharingPeer> peersConnected = clients.get(tt.getHexInfoHash()).getPeers();
                         for(SharingPeer sp : peersConnected){
                             allDownloaded = allDownloaded && !(sp.isDownloading());
-                        }
-
-                        for(TrackedPeer tpt: tt.getInjectedPeers()){
-                            if(!tpt.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())){
-                                //Se não sou eu
-                                canProcced = canProcced && peersConnected.stream().anyMatch(x -> x.getHexPeerId().equals(tpt.getHexPeerId()));
-                            }
                         }
                     }
 
@@ -76,7 +75,7 @@ public class TorrentUtil {
                     //Se toda a gente terminou e todos os trackers já pediram para terminar.
                     if ((clients.containsKey(tt.getHexInfoHash()) &&
                             allDownloaded &&
-                            canProcced &&
+                            tt.getInjectedPeers().size() <= 1 &&
                             tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0))) {
                         System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
                         synchronized (clients) {
@@ -86,7 +85,6 @@ public class TorrentUtil {
                                     clients.remove(tt.getHexInfoHash());
                                 }else{
                                     tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
-                                    removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
                                     clients.get(tt.getHexInfoHash()).stop(false);
                                     clients.remove(tt.getHexInfoHash());
                                     tck.remove(t);
