@@ -61,6 +61,7 @@ public class TorrentUtil {
                             allDownloaded = allDownloaded && sp.isDownloading();
                         }
                     }
+                    System.out.println(allDownloaded);
                     //Se toda a gente terminou e todos os trackers já pediram para terminar.
                     if ((clients.containsKey(tt.getHexInfoHash()) &&
                             allDownloaded)) {
