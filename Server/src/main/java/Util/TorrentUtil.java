@@ -55,6 +55,7 @@ public class TorrentUtil {
                     System.out.println("\u001B[31m" + tp.getHexPeerId() + " is over\u001B[0m");
                     if(tp.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
                         try {
+                            System.out.println("REMOVAM-ME");
                             removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -70,6 +71,7 @@ public class TorrentUtil {
                     }
 
                     System.out.println(allDownloaded);
+                    System.out.println(tt.getInjectedPeers().size());
 
 
                     //Se toda a gente terminou e todos os trackers já pediram para terminar.
