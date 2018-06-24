@@ -58,7 +58,7 @@ public class TorrentUtil {
                     if((clients.containsKey(tt.getHexInfoHash()))){
                         Set<SharingPeer> peersConnected = clients.get(tt.getHexInfoHash()).getPeers();
                         for(SharingPeer sp : peersConnected){
-                            allDownloaded = allDownloaded && sp.isDownloading();
+                            allDownloaded = allDownloaded && !(sp.isDownloading());
                         }
                     }
                     System.out.println(allDownloaded);
