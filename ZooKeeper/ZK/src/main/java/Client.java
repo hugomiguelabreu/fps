@@ -81,7 +81,7 @@ public class Client implements Runnable{
             if (username.equals("jib")){
                 ClientWrapper.TorrentWrapper torr = ClientWrapper.TorrentWrapper.newBuilder()
                         .setGroup("leddit")
-                        .setId("asdlasdlasdl")
+                        .setId("JIB")
                         .setContent(ByteString.copyFromUtf8("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffasdasdasdasdaaaaaaaaaaaaaaaaaaaaaakc.xmqdslllllllllllllllllcccccccccccccccccccccccwooooooooooooooooooooooouuuuuuuuuuuuuuhhhhhhhhhhhhhhhhhhhhhhhhhffffffffffffffffffffvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv            wwwwwwwwwqqqqqqqqqqqrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"))
                         .build();
 
