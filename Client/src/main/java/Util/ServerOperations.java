@@ -58,6 +58,7 @@ public class ServerOperations {
     }
 
     public static void removeTorrent(Torrent t, String group) {
+        System.out.println(group);
         ArrayList<Torrent> gt = ServerOperations.groupTorrents.get(group);
         gt.removeIf(x -> x.getHexInfoHash().equals(t.getHexInfoHash()));
         FileUtils.deleteTorrent(t, group);
