@@ -55,30 +55,28 @@ public class TorrentUtil {
                             tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0)) || tt.getPeers().size() == 0) {
                         System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
                         synchronized (clients) {
-                            //tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
-                            //tck.remove(t);
-                            //try {
-                            //    FileUtils.deleteTorrent(tt);
-                            //    removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
-                            //} catch (IOException e) {
-                            //    e.printStackTrace();
-                            //}
                             try {
-                                removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
-                                clients.get(tt.getHexInfoHash()).stop(false);
-                                clients.remove(tt.getHexInfoHash());
+                                if(replication){
+                                    clients.get(tt.getHexInfoHash()).stop(false);
+                                    clients.remove(tt.getHexInfoHash());
+                                }else{
+                                    tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
+                                    removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
+                                    clients.get(tt.getHexInfoHash()).stop(false);
+                                    clients.remove(tt.getHexInfoHash());
+                                    tck.remove(t);
+                                    new Thread(() -> {
+                                        try {
+                                            FileUtils.deleteFiles(tt);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    });
+                                }
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
                         }
-                        /*tck.remove(tt);
-                        new Thread(() -> {
-                            try {
-                                FileUtils.deleteFiles(tt);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        });*/
                     }
                 } else {
                     System.out.println("\u001B[31mNew guy, let's start a new local client if we don't have one\u001B[0m");

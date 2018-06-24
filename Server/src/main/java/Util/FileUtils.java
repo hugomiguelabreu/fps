@@ -32,7 +32,8 @@ public class FileUtils {
                 if (!f.isDirectory()) {
                     Torrent t = Torrent.load(f);
                     //Colocar torrent no tracker para o anunciar.
-                    TrackedTorrent tt = TorrentUtil.announceTrackedTorrentWithObservers(tck, t, clients);
+                    //Se guardei o torrent é porque tenho responsabilidade de replicar.
+                    TrackedTorrent tt = TorrentUtil.announceTrackedTorrentWithObservers(tck, t, clients, true);
                 }
             }
         }
