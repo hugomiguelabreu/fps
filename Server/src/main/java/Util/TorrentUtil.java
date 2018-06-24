@@ -54,7 +54,8 @@ public class TorrentUtil {
 
                     //Se toda a gente terminou e todos os trackers também verificamos a eliminação.
                     if ((clients.containsKey(tt.getHexInfoHash()) &&
-                            tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0)) && tt.getInjectedPeers().size() == 1) {
+                            tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0)) &&
+                            tt.getInjectedPeers().stream().allMatch(x -> x.getLeft() == 0)) {
                         System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
                         synchronized (clients) {
                             try {
