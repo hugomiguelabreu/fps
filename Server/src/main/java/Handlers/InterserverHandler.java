@@ -36,11 +36,13 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
         if(type){
             System.out.println("Handle peer injection");
             if(openClients.containsKey(torrentId)){
+                System.out.println("TENHO");
                 //We're handling that torrent.
                 TrackedTorrent tt =  tck.getTrackedTorrents().stream().peek(x -> x.getHexInfoHash().equals(torrentId)).findFirst().get();
                 //PEERS SUPER NODOS
                 tt.injectPeer(new TrackedPeer(tt, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING))));
             }else{
+                System.out.println("NAO TENHO");
                 //Ainda não temos esse torrent, mas supostamente vamos receber.
                 if(!injectionsWaiting.containsKey(torrentId) || injectionsWaiting.get(torrentId) == null)
                     injectionsWaiting.put(torrentId, new ArrayList<>());
