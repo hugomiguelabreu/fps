@@ -78,6 +78,7 @@ public class TorrentUtil {
                                     clients.get(tt.getHexInfoHash()).stop(false);
                                     clients.remove(tt.getHexInfoHash());
                                     tck.remove(t);
+                                    FileUtils.deleteFiles(t);
                                     new Thread(() -> {
                                         try {
                                             FileUtils.deleteFiles(tt);
