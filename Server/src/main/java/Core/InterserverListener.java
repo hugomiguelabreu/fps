@@ -1,7 +1,6 @@
 package Core;
 
 import Handlers.InterserverInitializer;
-import Handlers.TorrentServerInitializer;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.Tracker;

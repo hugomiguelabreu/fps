@@ -1,6 +1,5 @@
 package Core;
 
-import Handlers.TorrentServerInitializer;
 import Network.ServerWrapper;
 import Util.FileUtils;
 import Util.TorrentUtil;
@@ -12,11 +11,6 @@ import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -111,19 +105,23 @@ public class MainServerListener extends Thread{
             t.newAnnounceEncode();
         }
 
-        //Save torrent for fault sake
-        FileUtils.saveTorrent(t);
+        //Save torrent for fault sake se somos nos a replicar
+        if(iteration == 0)
+            FileUtils.saveTorrent(t);
+
         //Init a client, so server can get the file
         Client serverCli = TorrentUtil.initClient(t, FileUtils.fileDir);
         openClients.put(t.getHexInfoHash(), serverCli);
         //Get a tracked torrent with observables;
-        TrackedTorrent tt =  TorrentUtil.announceTrackedTorrentWithObservers(tck, t, openClients);
+        //Só Replica o primeiro
+        TrackedTorrent tt =  TorrentUtil.announceTrackedTorrentWithObservers(tck, t, openClients, iteration == 0);
 
         //Obtem o peer local e define-o para
         //recebermos os updates de users normais também
         Peer cli = serverCli.getPeerSpec();
         tt.setlocalInjectPeerID(cli.getHexPeerId());
         //Efetuar o pedido de injeção aos outros servers e injetar os pendentes
+        tt.injectPeer(new TrackedPeer(tt, cli.getIp(), cli.getPort(), cli.getPeerId()));
         TorrentUtil.injectionRequest(cli, injectionsWaiting, tt);
     }
 
