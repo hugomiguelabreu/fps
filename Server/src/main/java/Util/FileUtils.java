@@ -51,9 +51,7 @@ public class FileUtils {
     }
 
     public static void deleteFiles(Torrent t) throws IOException {
-        File torrent = new File(System.getProperty( "user.home" ) + "/.fps-server/" + t.getHexInfoHash());
         File fileDownloaded = new File(System.getProperty( "user.home" ) + "/.fps-server/files/" + t.getFilenames().get(0));
-        Files.deleteIfExists(torrent.toPath());
         Files.deleteIfExists(fileDownloaded.toPath());
     }
 

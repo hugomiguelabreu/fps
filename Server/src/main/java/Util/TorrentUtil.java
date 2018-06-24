@@ -78,31 +78,26 @@ public class TorrentUtil {
                             tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0))) {
                         System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
                         synchronized (clients) {
-                            try {
-                                if(replication){
-                                    for (TrackedPeer del : tt.getInjectedPeers())
-                                        if(!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
-                                            tt.removeInjectedPeer(del.getHexPeerId());
-                                    clients.get(tt.getHexInfoHash()).stop(true);
-                                    clients.remove(tt.getHexInfoHash());
-                                    deletionsWaiting.remove(tt.getHexInfoHash());
-                                }else{
-                                    tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
-                                    clients.get(tt.getHexInfoHash()).stop(true);
-                                    clients.remove(tt.getHexInfoHash());
-                                    deletionsWaiting.remove(tt.getHexInfoHash());
-                                    tck.remove(t);
-                                    FileUtils.deleteFiles(t);
-                                    new Thread(() -> {
-                                        try {
-                                            FileUtils.deleteFiles(tt);
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    });
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                            if(replication){
+                                for (TrackedPeer del : tt.getInjectedPeers())
+                                    if(!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
+                                        tt.removeInjectedPeer(del.getHexPeerId());
+                                clients.get(tt.getHexInfoHash()).stop(false);
+                                clients.remove(tt.getHexInfoHash());
+                                deletionsWaiting.remove(tt.getHexInfoHash());
+                            }else{
+                                tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
+                                clients.get(tt.getHexInfoHash()).stop(false);
+                                clients.remove(tt.getHexInfoHash());
+                                deletionsWaiting.remove(tt.getHexInfoHash());
+                                tck.remove(t);
+                                new Thread(() -> {
+                                    try {
+                                        FileUtils.deleteFiles(tt);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }).start();
                             }
                         }
                     }
