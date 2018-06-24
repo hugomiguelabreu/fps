@@ -4,6 +4,7 @@ import Network.Interserver;
 import com.google.protobuf.ByteString;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.client.SharedTorrent;
+import com.turn.ttorrent.client.peer.SharingPeer;
 import com.turn.ttorrent.common.Peer;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.TrackedPeer;
@@ -20,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TorrentUtil {
@@ -51,19 +53,17 @@ public class TorrentUtil {
             if (!tp.getState().equals(TrackedPeer.PeerState.STOPPED) && !tp.getState().equals(TrackedPeer.PeerState.UNKNOWN)) {
                 if (tp.getLeft() == 0) {
                     System.out.println("\u001B[31m" + tp.getHexPeerId() + " is over\u001B[0m");
-                    if(tp.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())){
-                        System.out.println("FUI EU QUE TERMINEI PEÇO PARA ME REMOVEREM");
-                        try {
-                            removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                    //Verificar se posso desligar
+                    boolean allDownloaded = true;
+                    if((clients.containsKey(tt.getHexInfoHash()))){
+                        Set<SharingPeer> peersConnected = clients.get(tt.getHexInfoHash()).getPeers();
+                        for(SharingPeer sp : peersConnected){
+                            allDownloaded = allDownloaded && sp.isDownloading();
                         }
                     }
-                    System.out.println("!!!!!!!!!!" + tt.getInjectedPeers().size() + "!!!!!!!!!!!");
                     //Se toda a gente terminou e todos os trackers já pediram para terminar.
                     if ((clients.containsKey(tt.getHexInfoHash()) &&
-                            tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0))
-                            && tt.getInjectedPeers().size() == 1) {
+                            allDownloaded)) {
                         System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
                         synchronized (clients) {
                             try {
