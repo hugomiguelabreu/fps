@@ -1,6 +1,5 @@
 package Core;
 
-import Handlers.TorrentServerInitializer;
 import Network.ServerWrapper;
 import Util.FileUtils;
 import Util.TorrentUtil;
@@ -12,11 +11,6 @@ import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -117,7 +111,7 @@ public class MainServerListener extends Thread{
         Client serverCli = TorrentUtil.initClient(t, FileUtils.fileDir);
         openClients.put(t.getHexInfoHash(), serverCli);
         //Get a tracked torrent with observables;
-        TrackedTorrent tt =  TorrentUtil.announceTrackedTorrentWithObservers(tck, t, openClients);
+        TrackedTorrent tt =  TorrentUtil.announceTrackedTorrentWithObservers(tck, t, openClients, true);
 
         //Obtem o peer local e define-o para
         //recebermos os updates de users normais também

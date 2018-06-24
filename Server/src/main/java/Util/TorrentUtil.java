@@ -42,7 +42,7 @@ public class TorrentUtil {
         return c;
     }
 
-    public static TrackedTorrent announceTrackedTorrentWithObservers(Tracker tck, Torrent t, Map<String, Client> clients) throws IOException, NoSuchAlgorithmException {
+    public static TrackedTorrent announceTrackedTorrentWithObservers(Tracker tck, Torrent t, Map<String, Client> clients, boolean replication) throws IOException, NoSuchAlgorithmException {
         TrackedTorrent tt = new TrackedTorrent(t);
 
         tt.addObserver((o, arg) -> {
@@ -63,8 +63,13 @@ public class TorrentUtil {
                             //} catch (IOException e) {
                             //    e.printStackTrace();
                             //}
-                            clients.get(tt.getHexInfoHash()).stop(false);
-                            clients.remove(tt.getHexInfoHash());
+                            try {
+                                removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
+                                clients.get(tt.getHexInfoHash()).stop(false);
+                                clients.remove(tt.getHexInfoHash());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                         /*tck.remove(tt);
                         new Thread(() -> {
