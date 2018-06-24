@@ -52,14 +52,18 @@ public class TorrentUtil {
                 if (tp.getLeft() == 0) {
                     System.out.println("\u001B[31m" + tp.getHexPeerId() + " is over\u001B[0m");
                     if(tp.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())){
-                        System.out.println("FUI EU QUE TERMINEI REMOVO TODOS OS INJETADOS");
-                        for(TrackedPeer injP: tt.getInjectedPeers())
-                            tt.removeInjectedPeer(injP.getHexPeerId());
+                        System.out.println("FUI EU QUE TERMINEI PEÇO PARA ME REMOVEREM");
+                        try {
+                            removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     //Se toda a gente terminou e todos os trackers já pediram para terminar.
                     if ((clients.containsKey(tt.getHexInfoHash()) &&
-                            tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0))) {
+                            tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0))
+                            && tt.getInjectedPeers().size() == 1) {
                         System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
                         synchronized (clients) {
                             try {
