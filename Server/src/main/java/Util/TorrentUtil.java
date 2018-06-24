@@ -64,7 +64,8 @@ public class TorrentUtil {
                     System.out.println(allDownloaded);
                     //Se toda a gente terminou e todos os trackers já pediram para terminar.
                     if ((clients.containsKey(tt.getHexInfoHash()) &&
-                            allDownloaded)) {
+                            allDownloaded &&
+                            tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0))) {
                         System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
                         synchronized (clients) {
                             try {
@@ -100,10 +101,10 @@ public class TorrentUtil {
                         synchronized (clients) {
                             try {
                                 c = TorrentUtil.initClient(t, FileUtils.fileDir);
+                                clients.put(t.getHexInfoHash(), c);
                             } catch (IOException | NoSuchAlgorithmException | InterruptedException | ParserConfigurationException | SAXException e) {
                                 e.printStackTrace();
                             }
-                            clients.put(t.getHexInfoHash(), c);
                         }
                     }else{
                         System.out.println("\u001B[31mIgnore because we have a client\u001B[0m");
