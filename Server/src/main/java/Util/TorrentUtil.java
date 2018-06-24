@@ -79,16 +79,16 @@ public class TorrentUtil {
                         System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
                         synchronized (clients) {
                             if(replication){
-                                clients.get(tt.getHexInfoHash()).stop(false);
+                                clients.get(tt.getHexInfoHash()).stop(true);
                                 clients.remove(tt.getHexInfoHash());
                                 for (TrackedPeer del : tt.getInjectedPeers())
                                     if(!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
                                         tt.removeInjectedPeer(del.getHexPeerId());
                                 deletionsWaiting.remove(tt.getHexInfoHash());
                             }else{
-                                tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
-                                clients.get(tt.getHexInfoHash()).stop(false);
+                                clients.get(tt.getHexInfoHash()).stop(true);
                                 clients.remove(tt.getHexInfoHash());
+                                tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
                                 deletionsWaiting.remove(tt.getHexInfoHash());
                                 tck.remove(t);
                                 new Thread(() -> {
