@@ -22,14 +22,15 @@ public class ServerExec {
     public static void main(String[] args) throws IOException, InterruptedException, NoSuchAlgorithmException {
         ConcurrentHashMap<String, Client> clients = new ConcurrentHashMap<>();
         ConcurrentHashMap<String, ArrayList<TrackedPeer>> injectionsWaiting = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, ArrayList<TrackedPeer>> deletionsWaiting = new ConcurrentHashMap<>();
         int mainPort = Integer.parseInt(args[0]);
         int tckPort = Integer.parseInt(args[1]);
         int interPort = Integer.parseInt(args[2]);
         String serverId = args[3];
 
         Tracker tck = new Tracker(new InetSocketAddress(tckPort));
-        MainServerListener ms = new MainServerListener(mainPort, tck, clients, injectionsWaiting);
-        InterserverListener is = new InterserverListener(interPort, tck, clients, injectionsWaiting);
+        MainServerListener ms = new MainServerListener(mainPort, tck, clients, injectionsWaiting, deletionsWaiting);
+        InterserverListener is = new InterserverListener(interPort, tck, clients, injectionsWaiting, deletionsWaiting);
         ZooKeeperUtil zk = new ZooKeeperUtil(FileUtils.getMyIP() + ":2182");
 
         FileUtils.initDir();
@@ -47,7 +48,7 @@ public class ServerExec {
         System.out.println("Server registred");
 
         try {
-            if(!FileUtils.loadTorrents(tck, clients))
+            if(!FileUtils.loadTorrents(tck, clients, deletionsWaiting))
                 System.out.println("Could not load torrents persisted / No files");
         } catch (SAXException | ParserConfigurationException e) {
             e.printStackTrace();

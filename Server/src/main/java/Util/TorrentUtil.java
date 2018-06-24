@@ -11,6 +11,8 @@ import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import org.xml.sax.SAXException;
+
+import javax.sound.midi.Track;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +46,7 @@ public class TorrentUtil {
         return c;
     }
 
-    public static TrackedTorrent announceTrackedTorrentWithObservers(Tracker tck, Torrent t, Map<String, Client> clients, boolean replication) throws IOException, NoSuchAlgorithmException {
+    public static TrackedTorrent announceTrackedTorrentWithObservers(Tracker tck, Torrent t, Map<String, Client> clients, ConcurrentHashMap<String, ArrayList<TrackedPeer>> deletionsWaiting, boolean replication) throws IOException, NoSuchAlgorithmException {
         TrackedTorrent tt = new TrackedTorrent(t);
 
         tt.addObserver((o, arg) -> {
@@ -54,43 +56,41 @@ public class TorrentUtil {
                 if (tp.getLeft() == 0) {
                     System.out.println("\u001B[31m" + tp.getHexPeerId() + " is over\u001B[0m");
                     //Verificar se posso desligar
+                    if(tp.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
+                        try {
+                            removeInjectionRequest(tp, tt);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
                     boolean allDownloaded = true;
-                    boolean canProcced = true;
                     if((clients.containsKey(tt.getHexInfoHash()))){
                         Set<SharingPeer> peersConnected = clients.get(tt.getHexInfoHash()).getPeers();
                         for(SharingPeer sp : peersConnected){
                             allDownloaded = allDownloaded && !(sp.isDownloading());
                         }
-
-                        for(TrackedPeer tpt: tt.getInjectedPeers()){
-                            if(!tpt.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())){
-                                //Se não sou eu
-                                canProcced = canProcced && peersConnected.stream().anyMatch(x -> x.getHexPeerId().equals(tpt.getHexPeerId()));
-                            }
-                        }
                     }
-
-                    System.out.println(allDownloaded);
-                    System.out.println(canProcced);
-
 
                     //Se toda a gente terminou e todos os trackers já pediram para terminar.
                     if ((clients.containsKey(tt.getHexInfoHash()) &&
                             allDownloaded &&
-                            canProcced &&
+                            (deletionsWaiting.size() == tt.getInjectedPeers().size()-1) &&
                             tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0))) {
                         System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
                         synchronized (clients) {
                             try {
                                 if(replication){
-                                    removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
+                                    for (TrackedPeer del : tt.getInjectedPeers())
+                                        if(!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
+                                            tt.removeInjectedPeer(del.getHexPeerId());
                                     clients.get(tt.getHexInfoHash()).stop(true);
                                     clients.remove(tt.getHexInfoHash());
+                                    deletionsWaiting.remove(tt.getHexInfoHash());
                                 }else{
                                     tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
-                                    removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
                                     clients.get(tt.getHexInfoHash()).stop(true);
                                     clients.remove(tt.getHexInfoHash());
+                                    deletionsWaiting.remove(tt.getHexInfoHash());
                                     tck.remove(t);
                                     FileUtils.deleteFiles(t);
                                     new Thread(() -> {

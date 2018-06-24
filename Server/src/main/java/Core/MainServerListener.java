@@ -33,12 +33,16 @@ public class MainServerListener extends Thread{
     private Tracker tck;
     private Map<String, Client> openClients;
     private ConcurrentHashMap<String, ArrayList<TrackedPeer>> injectionsWaiting;
+    private ConcurrentHashMap<String, ArrayList<TrackedPeer>> deletionsWaiting;
 
-    public MainServerListener(int portParam, Tracker tckParam, Map<String, Client> clientsParam, ConcurrentHashMap<String, ArrayList<TrackedPeer>> injectionsWaitingParam) throws IOException {
+    public MainServerListener(int portParam, Tracker tckParam, Map<String, Client> clientsParam,
+                              ConcurrentHashMap<String, ArrayList<TrackedPeer>> injectionsWaitingParam,
+                              ConcurrentHashMap<String, ArrayList<TrackedPeer>> deletionsWaitingParam) throws IOException {
         this.port = portParam;
         this.tck = tckParam;
         this.openClients = clientsParam;
         this.injectionsWaiting = injectionsWaitingParam;
+        this.deletionsWaiting = deletionsWaitingParam;
         this.stop = false;
         this.server = new ServerSocket(port);
     }
@@ -114,7 +118,7 @@ public class MainServerListener extends Thread{
         openClients.put(t.getHexInfoHash(), serverCli);
         //Get a tracked torrent with observables;
         //Só Replica o primeiro
-        TrackedTorrent tt =  TorrentUtil.announceTrackedTorrentWithObservers(tck, t, openClients, iteration == 0);
+        TrackedTorrent tt =  TorrentUtil.announceTrackedTorrentWithObservers(tck, t, openClients, deletionsWaiting, iteration == 0);
 
         //Obtem o peer local e define-o para
         //recebermos os updates de users normais também

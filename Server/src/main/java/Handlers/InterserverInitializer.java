@@ -14,16 +14,21 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class InterserverInitializer extends ChannelInitializer<SocketChannel>{
 
     private Tracker trackedTorrents;
     private Map<String, Client> openClients;
     private Map<String, ArrayList<TrackedPeer>> injectionsWaiting;
+    private Map<String, ArrayList<TrackedPeer>> deletionsWaiting;
 
-    public InterserverInitializer(Tracker trackedTorrentsParam, Map<String, Client> openClientsParam, Map<String, ArrayList<TrackedPeer>> injectionsWaitingParam){
+    public InterserverInitializer(Tracker trackedTorrentsParam, Map<String, Client> openClientsParam,
+                                  Map<String, ArrayList<TrackedPeer>> injectionsWaitingParam,
+                                  Map<String, ArrayList<TrackedPeer>> deletionsWaitingParam){
         this.openClients = openClientsParam;
         this.injectionsWaiting = injectionsWaitingParam;
+        this.deletionsWaiting = deletionsWaitingParam;
         this.trackedTorrents = trackedTorrentsParam;
     }
 
@@ -35,6 +40,6 @@ public class InterserverInitializer extends ChannelInitializer<SocketChannel>{
         p.addLast(new ProtobufDecoder(Interserver.InterServerMessage.getDefaultInstance()));
         p.addLast(new ProtobufVarint32LengthFieldPrepender());
         p.addLast(new ProtobufEncoder());
-        p.addLast(new InterserverHandler(this.trackedTorrents, this.openClients, this.injectionsWaiting));
+        p.addLast(new InterserverHandler(this.trackedTorrents, this.openClients, this.injectionsWaiting, this.deletionsWaiting));
     }
 }
