@@ -1,12 +1,17 @@
 
+import org.apache.curator.RetryPolicy;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.atomic.DistributedAtomicLong;
+import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
+
 
 public class Zook implements Runnable{
 
@@ -14,72 +19,48 @@ public class Zook implements Runnable{
         (new Thread (new Zook())).run();
     }
 
-    public List<String> getOnline(String group) throws KeeperException, InterruptedException {
-        String path = "/groups/" + group + "/users" ;
-        List<String> children = null;
-        try {
-            children = zk.getChildren(path, false);
-        } catch (Exception e) { e.printStackTrace();}
+    private CuratorFramework client;
+    private RetryPolicy retryPolicy;
 
-        List<String> online = new ArrayList<>();
 
-        for (String user : children){
-            byte[] data = zk.getData("/users/" + user + "/online", false, null);
-            String result = new String(data);
+    public boolean incrementReceived(String group, String torrentId, String user) throws Exception {
 
-            if (result.equals("true"))
-                online.add(user);
+        String path = "/groups/" + group + "/torrents/" + torrentId;
+        DistributedAtomicLong counter = new DistributedAtomicLong(client, "/teste2", retryPolicy);
+
+        if (client.checkExists().forPath(path + "/file/counter") == null)
+            counter.initialize((long)0);
+
+
+        byte[] data = client.getData().forPath(path + "/file/total");
+        int total = Integer.parseInt(new String(data));
+
+        if (counter.increment().postValue() == total - 1) {
+            client.delete().deletingChildrenIfNeeded().forPath(path);
+            return true;
         }
 
-        return online;
-    }
+        return false;
 
-    public List<String> getGroupUsers(String group) {
-        String path = "/groups/" + group + "/users" ;
-        List<String> children = null;
-        try {
-            children = zk.getChildren(path, false);
-        } catch (Exception e) { e.printStackTrace();}
-
-        return children;
-    }
-
-    public void incrementReceived(String group, String torrentId, String user) throws KeeperException, InterruptedException {
-        String path = "/groups/" + group + "/torrents/" + torrentId;
-        zk.create(path + "/file" + user, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
-
-        List<String> children = zk.getChildren(path, false);
-        byte[] data_total = zk.getData(path + "/file/total", false, null);
-        int total = Integer.parseInt(Arrays.toString(data_total));
-
-        if (children.size() == total - 1)
-            ZKUtil.deleteRecursive(zk, path);
     }
 
 
-    private ZooKeeper zk;
 
-    public void connect(String hosts, int sessionTimeout)
-            throws IOException, InterruptedException {
 
-        final CountDownLatch connectedSignal = new CountDownLatch(1);
-        ZooKeeper zk = new ZooKeeper(hosts, sessionTimeout, new Watcher() {
-            @Override
-            public void process(WatchedEvent event) {
-                if (event.getState() == Watcher.Event.KeeperState.SyncConnected)
-                    connectedSignal.countDown();
-            }
-        });
-        connectedSignal.await();
-        this.zk = zk;
+    public void connect(){
+
+        retryPolicy = new ExponentialBackoffRetry(1000, 3);
+        client = CuratorFrameworkFactory.newClient("localhost:2184", retryPolicy);
+        client.start();
+
     }
 
     @Override
     public void run() {
         try {
-            this.connect("localhost:2184", 1000);
-            System.out.println(this.getGroupUsers("leddit"));
-            System.out.println(this.getOnline("leddit"));
+            connect();
+            byte[] bytes = client.getData().forPath("/groups/leddit/torrents/JIB/file");
+            System.out.println(new String(bytes));
         } catch (Exception e) {
             e.printStackTrace();
         }
