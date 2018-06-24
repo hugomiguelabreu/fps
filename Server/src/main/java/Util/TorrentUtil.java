@@ -18,6 +18,7 @@ import java.net.Socket;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -104,20 +105,24 @@ public class TorrentUtil {
     public static void injectionRequest(Peer peer, ConcurrentHashMap<String, ArrayList<TrackedPeer>> injectionsWaiting, TrackedTorrent tt) throws IOException {
         System.out.println("PEDIDO DE INJEÇÃO");
         //Inject peer in each of the trackers
+        int it = 0;
         for(URI tracker: tt.getAnnounceList().get(0)) {
-            Socket s = new Socket(tracker.getHost(), 6000);
-            Interserver.InterServerMessage im = Interserver.InterServerMessage.newBuilder()
-                    .setTypeOp(true)
-                    .setServerIp(ByteString.copyFromUtf8(peer.getIp()))
-                    .setServerCliPort(peer.getPort())
-                    .setTorrentHexId(ByteString.copyFromUtf8(tt.getHexInfoHash()))
-                    .setPeerId(ByteString.copyFrom(peer.getPeerId()))
-                    .build();
-            im.writeDelimitedTo(s.getOutputStream());
-            s.getOutputStream().flush();
-            s.getOutputStream().close();
-            s.close();
-            break;
+            //Ignorar-me a mim próprio
+            if(it != 0) {
+                Socket s = new Socket(tracker.getHost(), 6000);
+                Interserver.InterServerMessage im = Interserver.InterServerMessage.newBuilder()
+                        .setTypeOp(true)
+                        .setServerIp(ByteString.copyFromUtf8(peer.getIp()))
+                        .setServerCliPort(peer.getPort())
+                        .setTorrentHexId(ByteString.copyFromUtf8(tt.getHexInfoHash()))
+                        .setPeerId(ByteString.copyFrom(peer.getPeerId()))
+                        .build();
+                im.writeDelimitedTo(s.getOutputStream());
+                s.getOutputStream().flush();
+                s.getOutputStream().close();
+                s.close();
+            }
+            it++;
         }
 
         //Injetar os servers que já me tinham pedido.
@@ -133,20 +138,24 @@ public class TorrentUtil {
 
     public static void removeInjectionRequest(Peer peer, TrackedTorrent tt) throws IOException {
         //Send remove request
+        int it = 0;
         for(URI tracker: tt.getAnnounceList().get(0)) {
-            Socket s = new Socket(tracker.getHost(), 6000);
-            Interserver.InterServerMessage im = Interserver.InterServerMessage.newBuilder()
-                    .setTypeOp(false)
-                    .setServerIp(ByteString.copyFromUtf8(peer.getIp()))
-                    .setServerCliPort(peer.getPort())
-                    .setTorrentHexId(ByteString.copyFromUtf8(tt.getHexInfoHash()))
-                    .setPeerId(ByteString.copyFromUtf8(new String(peer.getPeerId().array())))
-                    .build();
-            im.writeDelimitedTo(s.getOutputStream());
-            s.getOutputStream().flush();
-            s.getOutputStream().close();
-            s.close();
-            break;
+            //Ignorar-me a mim próprio
+            if(it != 0) {
+                Socket s = new Socket(tracker.getHost(), 6000);
+                Interserver.InterServerMessage im = Interserver.InterServerMessage.newBuilder()
+                        .setTypeOp(false)
+                        .setServerIp(ByteString.copyFromUtf8(peer.getIp()))
+                        .setServerCliPort(peer.getPort())
+                        .setTorrentHexId(ByteString.copyFromUtf8(tt.getHexInfoHash()))
+                        .setPeerId(ByteString.copyFromUtf8(new String(peer.getPeerId().array())))
+                        .build();
+                im.writeDelimitedTo(s.getOutputStream());
+                s.getOutputStream().flush();
+                s.getOutputStream().close();
+                s.close();
+            }
+            it++;
         }
     }
 
