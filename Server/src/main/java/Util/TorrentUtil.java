@@ -56,13 +56,13 @@ public class TorrentUtil {
                 if (tp.getLeft() == 0) {
                     System.out.println("\u001B[31m" + tp.getHexPeerId() + " is over\u001B[0m");
                     //Verificar se posso desligar
-                    if(tp.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
+                    if(tp.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())){
                         try {
                             removeInjectionRequest(tp, tt);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-
+                    }
                     boolean allDownloaded = true;
                     if((clients.containsKey(tt.getHexInfoHash()))){
                         Set<SharingPeer> peersConnected = clients.get(tt.getHexInfoHash()).getPeers();
