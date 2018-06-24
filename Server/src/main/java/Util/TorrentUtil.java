@@ -82,12 +82,12 @@ public class TorrentUtil {
                                 for (TrackedPeer del : tt.getInjectedPeers())
                                     if(!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
                                         tt.removeInjectedPeer(del.getHexPeerId());
-                                clients.get(tt.getHexInfoHash()).stop(false);
+                                clients.get(tt.getHexInfoHash()).stop(true);
                                 clients.remove(tt.getHexInfoHash());
                                 deletionsWaiting.remove(tt.getHexInfoHash());
                             }else{
                                 tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
-                                clients.get(tt.getHexInfoHash()).stop(false);
+                                clients.get(tt.getHexInfoHash()).stop(true);
                                 clients.remove(tt.getHexInfoHash());
                                 deletionsWaiting.remove(tt.getHexInfoHash());
                                 tck.remove(t);
