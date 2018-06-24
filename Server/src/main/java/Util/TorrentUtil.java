@@ -59,7 +59,7 @@ public class TorrentUtil {
                             e.printStackTrace();
                         }
                     }
-
+                    System.out.println("!!!!!!!!!!" + tt.getInjectedPeers().size() + "!!!!!!!!!!!");
                     //Se toda a gente terminou e todos os trackers já pediram para terminar.
                     if ((clients.containsKey(tt.getHexInfoHash()) &&
                             tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0))

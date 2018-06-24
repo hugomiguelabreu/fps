@@ -3,6 +3,7 @@ package Handlers;
 import Network.Interserver;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.common.Torrent;
+import com.turn.ttorrent.common.Utils;
 import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
@@ -57,7 +58,7 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
         }else{
             System.out.println("Handle peer deletion");
             TrackedTorrent tt =  tck.getTrackedTorrents().stream().peek(x -> x.getHexInfoHash().equals(torrentId)).findFirst().get();
-            tt.removeInjectedPeer(peerId);
+            tt.removeInjectedPeer(Utils.bytesToHex(peerId.getBytes(Torrent.BYTE_ENCODING)));
             //Um servidor eliminou o ficheiro.
             //TODO: DELETE
         }
