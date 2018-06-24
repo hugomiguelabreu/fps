@@ -40,7 +40,12 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
                 //We're handling that torrent.
                 TrackedTorrent tt =  tck.getTrackedTorrents().stream().peek(x -> x.getHexInfoHash().equals(torrentId)).findFirst().get();
                 //PEERS SUPER NODOS
-                tt.injectPeer(new TrackedPeer(tt, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING))));
+                TrackedPeer tpInj = new TrackedPeer(tt, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING)));
+                System.out.println(tpInj.getIp());
+                System.out.println(tpInj.getPort());
+                System.out.println(tpInj.getHexPeerId());
+                System.out.println(tt.getHexInfoHash());
+                tt.injectPeer(tpInj);
             }else{
                 System.out.println("NAO TENHO");
                 //Ainda não temos esse torrent, mas supostamente vamos receber.

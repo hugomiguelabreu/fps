@@ -119,6 +119,15 @@ public class TorrentUtil {
             s.close();
             break;
         }
+
+        //Injetar os servers que já me tinham pedido.
+        if(injectionsWaiting.containsKey(tt.getHexInfoHash())){
+            for (TrackedPeer tp : injectionsWaiting.get(tt.getHexInfoHash())) {
+                System.out.println("INJETEI " + tp.getHexPeerId() + " EM ESPERA");
+                tt.injectPeer(new TrackedPeer(tt, tp.getIp(),  tp.getPort(), tp.getPeerId()));
+            }
+            injectionsWaiting.remove(tt.getHexInfoHash());
+        }
     }
 
 
