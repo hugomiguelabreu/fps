@@ -55,16 +55,28 @@ public class TorrentUtil {
                     System.out.println("\u001B[31m" + tp.getHexPeerId() + " is over\u001B[0m");
                     //Verificar se posso desligar
                     boolean allDownloaded = true;
+                    boolean canProcced = true;
                     if((clients.containsKey(tt.getHexInfoHash()))){
                         Set<SharingPeer> peersConnected = clients.get(tt.getHexInfoHash()).getPeers();
                         for(SharingPeer sp : peersConnected){
                             allDownloaded = allDownloaded && !(sp.isDownloading());
                         }
+
+                        for(TrackedPeer tpt: tt.getInjectedPeers()){
+                            if(!tpt.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())){
+                                //Se não sou eu
+                                canProcced = canProcced && peersConnected.stream().anyMatch(x -> x.getHexPeerId().equals(tpt.getHexPeerId()));
+                            }
+                        }
                     }
+
                     System.out.println(allDownloaded);
+
+
                     //Se toda a gente terminou e todos os trackers já pediram para terminar.
                     if ((clients.containsKey(tt.getHexInfoHash()) &&
                             allDownloaded &&
+                            canProcced &&
                             tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0))) {
                         System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
                         synchronized (clients) {

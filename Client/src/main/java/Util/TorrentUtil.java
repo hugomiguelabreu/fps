@@ -251,8 +251,10 @@ public class TorrentUtil {
                     System.out.println("Completou");
                     if(online){
                         //É online por isso persiste, logo vamos remover o torrent
-                        ServerOperations.removeTorrent(st, group);
-                        ServerOperations.removeClient(st);
+                        new Thread(() -> {
+                            ServerOperations.removeTorrent(st, group);
+                            ServerOperations.removeClient(st);
+                        }).start();
                     }
                 }
             });
