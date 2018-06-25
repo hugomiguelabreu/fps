@@ -92,6 +92,7 @@ public class MainServerListener extends Thread{
             String hexId = request.getRequestTorrent().getId();
             for(TrackedTorrent tt: tck.getTrackedTorrents()){
                 if(tt.getHexInfoHash().equals(hexId)){
+                    System.out.println("TENHO O TORRENT");
                     ServerWrapper.TorrentResponse tr = ServerWrapper.TorrentResponse.newBuilder()
                             .setContent(ByteString.copyFrom(tt.getEncoded()))
                             .build();
@@ -99,6 +100,8 @@ public class MainServerListener extends Thread{
                             .setTorrentResponse(tr)
                             .build();
                     send(sm, s);
+                    System.out.println("ENVIEI O TORRENT");
+                    System.out.println(sm);
                     return;
                 }
             }
