@@ -98,7 +98,7 @@ send_tracker(ID, Data, Group) ->
 	end.
 
 req_file(ID, File) ->
-	TrackerLOC = zk:getracker("1"),
+	TrackerLOC = zk:get_tracker("1"),
 
 	case TrackerLOC of 
 		error ->
