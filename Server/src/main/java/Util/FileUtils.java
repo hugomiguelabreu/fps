@@ -30,33 +30,39 @@ public class FileUtils {
         File parent = new File(System.getProperty("user.home") + "/.fps-server");
         //Ao carregar os torrent não criamos clientes, pois o servidores está a ligar;
         //supostamente, irá iniciar clientes à medida que for necessário.
+        String group;
         if(parent.exists()) {
             for (File f : parent.listFiles()) {
-                if (!f.isDirectory()) {
-                    Torrent t = Torrent.load(f);
-                    //Colocar torrent no tracker para o anunciar.
-                    //Se guardei o torrent é porque tenho responsabilidade de replicar.
-                    TrackedTorrent tt = TorrentUtil.announceTrackedTorrentWithObservers(tck, t, clients, deletionsWaiting, true);
+                if(f.isDirectory()) {
+                    for(File l: f.listFiles()) {
+                        if (!l.isDirectory()) {
+                            Torrent t = Torrent.load(l);
+                            //Colocar torrent no tracker para o anunciar.
+                            //Se guardei o torrent é porque tenho responsabilidade de replicar.
+                            TrackedTorrent tt = TorrentUtil.announceTrackedTorrentWithObservers(tck, t, clients, deletionsWaiting, true, f.getName());
+                        }
+                    }
                 }
             }
         }
         return true;
     }
 
-    public static void saveTorrent(Torrent t) throws IOException {
+    public static void saveTorrent(Torrent t, String group) throws IOException {
         FileOutputStream fos;
-        fos = new FileOutputStream(System.getProperty( "user.home" ) + "/.fps-server/" + t.getHexInfoHash());
+        fos = new FileOutputStream(System.getProperty( "user.home" ) + "/.fps-server/" + group + "/" + t.getHexInfoHash());
         t.save(fos);
         IOUtils.closeQuietly(fos);
     }
 
     public static void deleteFiles(Torrent t) throws IOException {
         File fileDownloaded = new File(System.getProperty( "user.home" ) + "/.fps-server/files/" + t.getFilenames().get(0));
+        System.out.println("DELETING " + fileDownloaded.toPath().toString());
         Files.deleteIfExists(fileDownloaded.toPath());
     }
 
-    public static void deleteTorrent(Torrent t) throws IOException {
-        File torrent = new File(System.getProperty( "user.home" ) + "/.fps-server/" + t.getHexInfoHash());
+    public static void deleteTorrent(Torrent t, String group) throws IOException {
+        File torrent = new File(System.getProperty( "user.home" ) + "/.fps-server/" + group + "/" + t.getHexInfoHash());
         Files.deleteIfExists(torrent.toPath());
     }
 

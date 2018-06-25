@@ -12,8 +12,8 @@ import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 
 public class ZooKeeperUtil {
-    private CuratorFramework client;
-    private RetryPolicy retryPolicy;
+    private static CuratorFramework client;
+    private static RetryPolicy retryPolicy;
 
     public ZooKeeperUtil(String host){
         try {
@@ -23,13 +23,13 @@ public class ZooKeeperUtil {
         }
     }
 
-    public void connect(String hosts, int sessionTimeout) throws IOException, InterruptedException {
+    public static void connect(String hosts, int sessionTimeout) throws IOException, InterruptedException {
         retryPolicy = new ExponentialBackoffRetry(1000, 3);
         client = CuratorFrameworkFactory.newClient(hosts, retryPolicy);
         client.start();
     }
 
-    public boolean incrementReceived(String group, String torrentId) throws Exception {
+    public static boolean incrementReceived(String group, String torrentId) throws Exception {
 
         String path = "/groups/" + group + "/torrents/" + torrentId;
         DistributedAtomicLong counter = new DistributedAtomicLong(client, "/teste2", retryPolicy);
@@ -50,7 +50,7 @@ public class ZooKeeperUtil {
 
     }
 
-    public boolean registerTracker(String serverId, String serverHost){
+    public static boolean registerTracker(String serverId, String serverHost){
         String path = "/trackers/" + serverId;
         try{
             if (client.checkExists().forPath(path) != null){

@@ -46,7 +46,8 @@ public class TorrentUtil {
         return c;
     }
 
-    public static TrackedTorrent announceTrackedTorrentWithObservers(Tracker tck, Torrent t, Map<String, Client> clients, ConcurrentHashMap<String, ArrayList<TrackedPeer>> deletionsWaiting, boolean replication) throws IOException, NoSuchAlgorithmException {
+    public static TrackedTorrent announceTrackedTorrentWithObservers(Tracker tck, Torrent t, Map<String, Client> clients, ConcurrentHashMap<String,
+            ArrayList<TrackedPeer>> deletionsWaiting, boolean replication, String group) throws IOException, NoSuchAlgorithmException {
         TrackedTorrent tt = new TrackedTorrent(t);
 
         tt.addObserver((o, arg) -> {
@@ -85,6 +86,21 @@ public class TorrentUtil {
                                     if(!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
                                         tt.removeInjectedPeer(del.getHexPeerId());
                                 deletionsWaiting.remove(tt.getHexInfoHash());
+                                try {
+                                    if(ZooKeeperUtil.incrementReceived(group, t.getHexInfoHash())){
+                                        tck.remove(t);
+                                        new Thread(() -> {
+                                            try {
+                                                FileUtils.deleteTorrent(t, group);
+                                                FileUtils.deleteFiles(t);
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }).start();
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }else{
                                 clients.get(tt.getHexInfoHash()).stop(true);
                                 clients.remove(tt.getHexInfoHash());
@@ -93,7 +109,7 @@ public class TorrentUtil {
                                 tck.remove(t);
                                 new Thread(() -> {
                                     try {
-                                        FileUtils.deleteFiles(tt);
+                                        FileUtils.deleteFiles(t);
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
