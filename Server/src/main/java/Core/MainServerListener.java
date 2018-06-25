@@ -111,14 +111,14 @@ public class MainServerListener extends Thread{
 
         //Save torrent for fault sake se somos nos a replicar
         if(iteration == 0)
-            FileUtils.saveTorrent(t);
+            FileUtils.saveTorrent(t, group);
 
         //Init a client, so server can get the file
         Client serverCli = TorrentUtil.initClient(t, FileUtils.fileDir);
         openClients.put(t.getHexInfoHash(), serverCli);
         //Get a tracked torrent with observables;
         //Só Replica o primeiro
-        TrackedTorrent tt =  TorrentUtil.announceTrackedTorrentWithObservers(tck, t, openClients, deletionsWaiting, iteration == 0);
+        TrackedTorrent tt =  TorrentUtil.announceTrackedTorrentWithObservers(tck, t, openClients, deletionsWaiting, iteration == 0, group);
 
         //Obtem o peer local e define-o para
         //recebermos os updates de users normais também
