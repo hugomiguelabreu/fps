@@ -30,6 +30,10 @@ message TorrentWrapper{
     string id = 3;
 }
 
+message RemoveTorrent{
+    string id = 1;
+}
+
 message OnlineUsers{
     string onlineUsers = 1;
 }
@@ -48,5 +52,6 @@ message ClientMessage {
         TorrentWrapper torrentWrapper = 6;
         OnlineUsers onlineUsers = 7;
         GroupUsers groupUsers = 8;
+        RemoveTorrent removeTorrent = 9;
     }   
 }
