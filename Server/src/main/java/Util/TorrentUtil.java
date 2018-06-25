@@ -87,9 +87,11 @@ public class TorrentUtil {
                                 for (TrackedPeer del : tt.getInjectedPeers())
                                     if (!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
                                         tt.removeInjectedPeer(del.getHexPeerId());
+                                System.out.println("ELIMINEI TODOS OS INJETADOS");
                                 deletionsWaiting.remove(tt.getHexInfoHash());
                                 try {
                                     if (ZooKeeperUtil.incrementReceived(group, t.getHexInfoHash())) {
+                                        System.out.println("TODA A GENTE FEZ O DOWNLOAD");
                                         tck.remove(t);
                                         new Thread(() -> {
                                             try {
@@ -106,15 +108,9 @@ public class TorrentUtil {
                             } else {
                                 System.out.println("WONT REPLICATE");
                                 clients.get(tt.getHexInfoHash()).stop(false);
-                                System.out.println("ELIMINAR1");
                                 clients.remove(tt.getHexInfoHash());
-                                System.out.println("ELIMINAR2");
-                                tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
-                                System.out.println("ELIMINAR3");
                                 deletionsWaiting.remove(tt.getHexInfoHash());
-                                System.out.println("ELIMINAR4");
                                 tck.remove(t);
-                                System.out.println("ELIMINAR");
                                 new Thread(() -> {
                                     try {
                                         FileUtils.deleteFiles(t);
