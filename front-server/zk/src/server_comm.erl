@@ -35,7 +35,7 @@ msg_decrypt(Data) ->
 	{_, {T, D}} =  server_wrapper:decode_msg(Data, 'ServerMessage'),
 	case T of
 		frontEndTorrent ->
-			{'FrontEndTorrent', TID, .serList, Group, Content} = D,
+			{'FrontEndTorrent', TID, UserList, Group, Content} = D,
 			%sendTracker(integer_to_list(ID), Content),
 			lists:foreach( fun(User) ->
 				case data:get_pid(User) of
@@ -98,7 +98,7 @@ send_tracker(ID, Data, Group) ->
 	end.
 
 req_file(ID, File) ->
-	TrackerLOC = zk:get_tracker("1"),
+	TrackerLOC = zk:getracker("1"),
 
 	case TrackerLOC of 
 		error ->
