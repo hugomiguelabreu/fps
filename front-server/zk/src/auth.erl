@@ -23,7 +23,7 @@ init(ID,Port) ->
 	end.		
 
 %%====================================================================
-%% Initialization
+%% InitializationTorrentResponse
 %%====================================================================
 
 acceptor(LSock,ID) ->
@@ -86,9 +86,10 @@ logged_loop(Socket, Username, ID) ->
 set_received(TID, Username, Group) ->
 	case zk:received_torrent(binary_to_list(TID), Username, Group) of
 					{ok, remove} ->
-						file:delete("./torrents/" ++ binary_to_list(TID));
+						data:delete_file(TID),
+						io:format(">> torrent "  ++ binary_to_list(TID) ++ " removido.\n");
 					_ ->
-						io:format(">> torrent "  ++ binary_to_list(TID) ++ " removido.\n")
+						io:format("")
 	end.
 
 msg_decrypt(Data, User, Socket, ID) ->
@@ -149,7 +150,7 @@ login(Username, Password, ID, Socket) ->
 			gen_tcp:send(Socket, MsgContainer),
 			io:format("> Client " ++ Username ++ " logged in.\n"),
 			
-			%check_new_content(Username, ID),
+			data:check_new_content(Username, ID),
 			logged_loop(Socket, Username, ID);
 		false ->
 			MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {response,#'Response'{rep=false}}}),
@@ -164,7 +165,6 @@ create_group(User, GroupName, Socket) ->
 			gen_tcp:send(Socket, MsgContainer);
 		group_exists ->
 			MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {response,#'Response'{rep=false}}}),
-			io:format("ola"),
 			gen_tcp:send(Socket, MsgContainer);
 		error -> 
 			create_group(User,GroupName,Socket)
@@ -203,8 +203,8 @@ redirect(ProtoTorrent, ID, CurrentUser) ->
 	case zk:get_group_location(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
 		{ok, UsersMap, Length} ->
 			{'TorrentWrapper', _, Content , TID} = ProtoTorrent,
+			data:create_file(TID,ID),
 			zk:new_torrent(binary_to_list(TID), CurrentUser, binary_to_list(ProtoTorrent#'TorrentWrapper'.group), Length),
-			file:write_file("./torrents/" ++ TID, ProtoTorrent),
 			lists:foreach(fun(ServerID) ->
 							case ServerID of
 								offline ->
@@ -231,24 +231,4 @@ redirect(ProtoTorrent, ID, CurrentUser) ->
 
 		_ ->
 			io:format("list error\n")
-	end.
-
-get_content(File, ID) ->
-	case file:read_file_info(File) of 
-		{error, _} ->
-			server_comm:req_file(ID, File);
-		_ ->
-			file:read_file("./torrents/" ++ File)
-	end.
-			
-
-check_new_content(User, ID) ->
-	case zk:get_new_content(User) of
-		{ok, L} ->
-			lists:foreach(fun(Filename) ->
-					ProtoTorrent = get_content(Filename, ID),
-					self() ! {User, packed_torrent, ProtoTorrent}
-				end, L);
-		_ ->
-			error_new_Content
 	end.
