@@ -23,7 +23,7 @@ init(ID,Port) ->
 	end.		
 
 %%====================================================================
-%% Initialization
+%% InitializationTorrentResponse
 %%====================================================================
 
 acceptor(LSock,ID) ->
@@ -150,7 +150,7 @@ login(Username, Password, ID, Socket) ->
 			gen_tcp:send(Socket, MsgContainer),
 			io:format("> Client " ++ Username ++ " logged in.\n"),
 			
-			%check_new_content(Username, ID),
+			data:check_new_content(Username, ID),
 			logged_loop(Socket, Username, ID);
 		false ->
 			MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {response,#'Response'{rep=false}}}),
@@ -203,6 +203,7 @@ redirect(ProtoTorrent, ID, CurrentUser) ->
 	case zk:get_group_location(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
 		{ok, UsersMap, Length} ->
 			{'TorrentWrapper', _, Content , TID} = ProtoTorrent,
+			data:create_file(TID,ID),
 			zk:new_torrent(binary_to_list(TID), CurrentUser, binary_to_list(ProtoTorrent#'TorrentWrapper'.group), Length),
 			lists:foreach(fun(ServerID) ->
 							case ServerID of
