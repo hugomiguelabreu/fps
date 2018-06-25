@@ -47,48 +47,45 @@ public class TorrentUtil {
     }
 
     public static TrackedTorrent announceTrackedTorrentWithObservers(Tracker tck, Torrent t, Map<String, Client> clients, ConcurrentHashMap<String,
-            ArrayList<TrackedPeer>> deletionsWaiting, boolean replication, String group) throws IOException, NoSuchAlgorithmException {
+        ArrayList<TrackedPeer>> deletionsWaiting, boolean replication, String group) throws IOException, NoSuchAlgorithmException {
         TrackedTorrent tt = new TrackedTorrent(t);
 
         tt.addObserver((o, arg) -> {
             TrackedPeer tp = (TrackedPeer) arg;
-            System.out.println("\u001B[31m" + tp.getHexPeerId() + " changed\u001B[0m");
-            if (!tp.getState().equals(TrackedPeer.PeerState.STOPPED) && !tp.getState().equals(TrackedPeer.PeerState.UNKNOWN)) {
-                if (tp.getLeft() == 0) {
-                    System.out.println("\u001B[31m" + tp.getHexPeerId() + " is over\u001B[0m");
-                    //Verificar se posso desligar
-                    if(tp.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())){
-                        try {
-                            removeInjectionRequest(tp, tt);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+            synchronized (clients) {
+                if (!tp.getState().equals(TrackedPeer.PeerState.STOPPED) && !tp.getState().equals(TrackedPeer.PeerState.UNKNOWN)) {
+                    if (tp.getLeft() == 0) {
+                        //Verificar se posso desligar
+                        boolean allDownloaded = true;
+                        if (tp.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())) {
+                            try {
+                                removeInjectionRequest(tp, tt);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                    boolean allDownloaded = true;
-                    if((clients.containsKey(tt.getHexInfoHash()))){
-                        Set<SharingPeer> peersConnected = clients.get(tt.getHexInfoHash()).getPeers();
-                        for(SharingPeer sp : peersConnected){
-                            allDownloaded = allDownloaded && !(sp.isDownloading());
+                        if ((clients.containsKey(tt.getHexInfoHash()))) {
+                            Set<SharingPeer> peersConnected = clients.get(tt.getHexInfoHash()).getPeers();
+                            for (SharingPeer sp : peersConnected) {
+                                allDownloaded = allDownloaded && !(sp.isDownloading());
+                            }
                         }
-                    }
-
-                    //Se toda a gente terminou e todos os trackers já pediram para terminar.
-                    if ((clients.containsKey(tt.getHexInfoHash()) &&
-                            allDownloaded &&
-                            (deletionsWaiting.size() == tt.getInjectedPeers().size()-1) &&
-                            tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0))) {
-                        System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
-                        synchronized (clients) {
-                            if(replication){
+                        //Se toda a gente terminou e todos os trackers já pediram para terminar.
+                        if ((clients.containsKey(tt.getHexInfoHash()) &&
+                                allDownloaded &&
+                                (deletionsWaiting.size() == tt.getInjectedPeers().size() - 1) &&
+                                tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0))) {
+                            System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
+                            if (replication) {
                                 System.out.println("WILL REPLICATE");
                                 clients.get(tt.getHexInfoHash()).stop(false);
                                 clients.remove(tt.getHexInfoHash());
                                 for (TrackedPeer del : tt.getInjectedPeers())
-                                    if(!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
+                                    if (!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
                                         tt.removeInjectedPeer(del.getHexPeerId());
                                 deletionsWaiting.remove(tt.getHexInfoHash());
                                 try {
-                                    if(ZooKeeperUtil.incrementReceived(group, t.getHexInfoHash())){
+                                    if (ZooKeeperUtil.incrementReceived(group, t.getHexInfoHash())) {
                                         tck.remove(t);
                                         new Thread(() -> {
                                             try {
@@ -102,7 +99,7 @@ public class TorrentUtil {
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
-                            }else{
+                            } else {
                                 System.out.println("WONT REPLICATE");
                                 clients.get(tt.getHexInfoHash()).stop(false);
                                 clients.remove(tt.getHexInfoHash());
@@ -119,24 +116,22 @@ public class TorrentUtil {
                                 }).start();
                             }
                         }
-                    }
-                } else {
-                    System.out.println("\u001B[31mNew guy, let's start a new local client if we don't have one\u001B[0m");
-                    if (!clients.containsKey(t.getHexInfoHash())) {
-                        System.out.println("\u001B[31mWe don't have a client\u001B[0m");
-                        Client c = null;
-                        //Thread safe to avoid creating Clients that will be
-                        //collected as garbage;
-                        synchronized (clients) {
+                    } else {
+                        System.out.println("\u001B[31mNew guy, let's start a new local client if we don't have one\u001B[0m");
+                        if (!clients.containsKey(t.getHexInfoHash())) {
+                            System.out.println("\u001B[31mWe don't have a client\u001B[0m");
+                            Client c = null;
+                            //Thread safe to avoid creating Clients that will be
+                            //collected as garbage;
                             try {
                                 c = TorrentUtil.initClient(t, FileUtils.fileDir);
                                 clients.put(t.getHexInfoHash(), c);
                             } catch (IOException | NoSuchAlgorithmException | InterruptedException | ParserConfigurationException | SAXException e) {
                                 e.printStackTrace();
                             }
+                        } else {
+                            System.out.println("\u001B[31mIgnore because we have a client\u001B[0m");
                         }
-                    }else{
-                        System.out.println("\u001B[31mIgnore because we have a client\u001B[0m");
                     }
                 }
             }
