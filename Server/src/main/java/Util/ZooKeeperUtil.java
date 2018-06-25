@@ -25,7 +25,7 @@ public class ZooKeeperUtil {
 
     public void connect(String hosts, int sessionTimeout) throws IOException, InterruptedException {
         retryPolicy = new ExponentialBackoffRetry(1000, 3);
-        client = CuratorFrameworkFactory.newClient("localhost:2184", retryPolicy);
+        client = CuratorFrameworkFactory.newClient(hosts, retryPolicy);
         client.start();
     }
 
