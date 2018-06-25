@@ -33,7 +33,7 @@ public class FileUtils {
         String group;
         if(parent.exists()) {
             for (File f : parent.listFiles()) {
-                if(f.isDirectory()) {
+                if(f.isDirectory() && !f.getName().equals("files")) {
                     for(File l: f.listFiles()) {
                         if (!l.isDirectory()) {
                             System.out.println("READING:" + l.getName());
