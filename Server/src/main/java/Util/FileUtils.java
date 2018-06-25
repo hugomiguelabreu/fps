@@ -36,6 +36,7 @@ public class FileUtils {
                 if(f.isDirectory()) {
                     for(File l: f.listFiles()) {
                         if (!l.isDirectory()) {
+                            System.out.println("READING:" + l.getName());
                             Torrent t = Torrent.load(l);
                             //Colocar torrent no tracker para o anunciar.
                             //Se guardei o torrent é porque tenho responsabilidade de replicar.
@@ -50,6 +51,7 @@ public class FileUtils {
 
     public static void saveTorrent(Torrent t, String group) throws IOException {
         FileOutputStream fos;
+        new File(System.getProperty( "user.home" ) + "/.fps-server/" + group).mkdirs();
         fos = new FileOutputStream(System.getProperty( "user.home" ) + "/.fps-server/" + group + "/" + t.getHexInfoHash());
         t.save(fos);
         IOUtils.closeQuietly(fos);
