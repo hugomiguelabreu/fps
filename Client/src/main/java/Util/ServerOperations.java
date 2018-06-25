@@ -65,27 +65,31 @@ public class ServerOperations {
     }
 
     public static void addTorrent(Torrent t, String group) throws InterruptedException, NoSuchAlgorithmException, IOException {
-        //Temos de colocar o tracker do torrent o nosso primário
-        int iteration = 0;
-        URI uri = null;
-        for(URI uriIt: t.getAnnounceList().get(0)){
-            //Verificar qual deles é o nosso primario
-            if(uriIt.toString().equals(trackersOnline.get(0))){
-                uri = uriIt;
-                break;
+
+        if(!t.getCreatedBy().equals(username)){
+
+            //Temos de colocar o tracker do torrent o nosso primário
+            int iteration = 0;
+            URI uri = null;
+            for(URI uriIt: t.getAnnounceList().get(0)){
+                //Verificar qual deles é o nosso primario
+                if(uriIt.toString().equals(trackersOnline.get(0))){
+                    uri = uriIt;
+                    break;
+                }
+                iteration++;
             }
-            iteration++;
+            //Remover o nosso primario do indice onde esta e coloca-lo em primeiro
+            t.getAnnounceList().get(0).remove(iteration);
+            t.getAnnounceList().get(0).add(0, uri);
+            //Volta a codificar novamente o torrent
+            t.newAnnounceEncode();
+            //Guarda o torrent
+            FileUtils.addTorrent(t, group);
+            ArrayList<Torrent> gt = groupTorrents.get(group);
+            gt.add(0, t);
+            groupTorrents.putTorrent(group, gt);
         }
-        //Remover o nosso primario do indice onde esta e coloca-lo em primeiro
-        t.getAnnounceList().get(0).remove(iteration);
-        t.getAnnounceList().get(0).add(0, uri);
-        //Volta a codificar novamente o torrent
-        t.newAnnounceEncode();
-        //Guarda o torrent
-        FileUtils.addTorrent(t, group);
-        ArrayList<Torrent> gt = groupTorrents.get(group);
-        gt.add(0, t);
-        groupTorrents.putTorrent(group, gt);
     }
 
     public static void updateUsers(ArrayList<String> users, String group){

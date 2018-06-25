@@ -83,22 +83,11 @@ public class TorrentUtil {
                             if (replication) {
                                 System.out.println("WILL REPLICATE");
                                 clients.get(tt.getHexInfoHash()).stop(false);
+                                for (TrackedPeer del : tt.getInjectedPeers())
+                                    if (!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
+                                        tt.removeInjectedPeer(del.getHexPeerId());
+
                                 clients.remove(tt.getHexInfoHash());
-                                new Thread(() -> {
-                                    try{
-                                        for (TrackedPeer del : tt.getInjectedPeers()){
-                                            System.out.println("CICLO");
-                                            if (!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())){
-                                                System.out.println("ELIMINA");
-                                                tt.removeInjectedPeer(del.getHexPeerId());
-                                                System.out.println("ELIMINOU");
-                                            }
-                                        System.out.println("ELIMINEI TODOS OS INJETADOS");
-                                        }
-                                    }catch (Exception e){
-                                        e.printStackTrace();
-                                    }
-                                }).start();
                                 deletionsWaiting.remove(tt.getHexInfoHash());
                                 try {
                                     if (ZooKeeperUtil.incrementReceived(group, t.getHexInfoHash())) {

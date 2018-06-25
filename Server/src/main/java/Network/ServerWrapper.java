@@ -1426,6 +1426,941 @@ public final class ServerWrapper {
 
   }
 
+  public interface RequestTorrentOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Network.RequestTorrent)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string id = 1;</code>
+     */
+    java.lang.String getId();
+    /**
+     * <code>string id = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getIdBytes();
+  }
+  /**
+   * Protobuf type {@code Network.RequestTorrent}
+   */
+  public  static final class RequestTorrent extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:Network.RequestTorrent)
+      RequestTorrentOrBuilder {
+    // Use RequestTorrent.newBuilder() to construct.
+    private RequestTorrent(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private RequestTorrent() {
+      id_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+    }
+    private RequestTorrent(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      int mutable_bitField0_ = 0;
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!input.skipField(tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              id_ = s;
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return Network.ServerWrapper.internal_static_Network_RequestTorrent_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return Network.ServerWrapper.internal_static_Network_RequestTorrent_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              Network.ServerWrapper.RequestTorrent.class, Network.ServerWrapper.RequestTorrent.Builder.class);
+    }
+
+    public static final int ID_FIELD_NUMBER = 1;
+    private volatile java.lang.Object id_;
+    /**
+     * <code>string id = 1;</code>
+     */
+    public java.lang.String getId() {
+      java.lang.Object ref = id_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        id_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string id = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getIdBytes() {
+      java.lang.Object ref = id_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        id_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getIdBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, id_);
+      }
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getIdBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, id_);
+      }
+      memoizedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof Network.ServerWrapper.RequestTorrent)) {
+        return super.equals(obj);
+      }
+      Network.ServerWrapper.RequestTorrent other = (Network.ServerWrapper.RequestTorrent) obj;
+
+      boolean result = true;
+      result = result && getId()
+          .equals(other.getId());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + ID_FIELD_NUMBER;
+      hash = (53 * hash) + getId().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static Network.ServerWrapper.RequestTorrent parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static Network.ServerWrapper.RequestTorrent parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static Network.ServerWrapper.RequestTorrent parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static Network.ServerWrapper.RequestTorrent parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static Network.ServerWrapper.RequestTorrent parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static Network.ServerWrapper.RequestTorrent parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static Network.ServerWrapper.RequestTorrent parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static Network.ServerWrapper.RequestTorrent parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static Network.ServerWrapper.RequestTorrent parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static Network.ServerWrapper.RequestTorrent parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(Network.ServerWrapper.RequestTorrent prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code Network.RequestTorrent}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Network.RequestTorrent)
+        Network.ServerWrapper.RequestTorrentOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return Network.ServerWrapper.internal_static_Network_RequestTorrent_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return Network.ServerWrapper.internal_static_Network_RequestTorrent_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                Network.ServerWrapper.RequestTorrent.class, Network.ServerWrapper.RequestTorrent.Builder.class);
+      }
+
+      // Construct using Network.ServerWrapper.RequestTorrent.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        id_ = "";
+
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return Network.ServerWrapper.internal_static_Network_RequestTorrent_descriptor;
+      }
+
+      public Network.ServerWrapper.RequestTorrent getDefaultInstanceForType() {
+        return Network.ServerWrapper.RequestTorrent.getDefaultInstance();
+      }
+
+      public Network.ServerWrapper.RequestTorrent build() {
+        Network.ServerWrapper.RequestTorrent result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public Network.ServerWrapper.RequestTorrent buildPartial() {
+        Network.ServerWrapper.RequestTorrent result = new Network.ServerWrapper.RequestTorrent(this);
+        result.id_ = id_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof Network.ServerWrapper.RequestTorrent) {
+          return mergeFrom((Network.ServerWrapper.RequestTorrent)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(Network.ServerWrapper.RequestTorrent other) {
+        if (other == Network.ServerWrapper.RequestTorrent.getDefaultInstance()) return this;
+        if (!other.getId().isEmpty()) {
+          id_ = other.id_;
+          onChanged();
+        }
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        Network.ServerWrapper.RequestTorrent parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (Network.ServerWrapper.RequestTorrent) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object id_ = "";
+      /**
+       * <code>string id = 1;</code>
+       */
+      public java.lang.String getId() {
+        java.lang.Object ref = id_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          id_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string id = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getIdBytes() {
+        java.lang.Object ref = id_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          id_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string id = 1;</code>
+       */
+      public Builder setId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        id_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string id = 1;</code>
+       */
+      public Builder clearId() {
+        
+        id_ = getDefaultInstance().getId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string id = 1;</code>
+       */
+      public Builder setIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        id_ = value;
+        onChanged();
+        return this;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return this;
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return this;
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:Network.RequestTorrent)
+    }
+
+    // @@protoc_insertion_point(class_scope:Network.RequestTorrent)
+    private static final Network.ServerWrapper.RequestTorrent DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new Network.ServerWrapper.RequestTorrent();
+    }
+
+    public static Network.ServerWrapper.RequestTorrent getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<RequestTorrent>
+        PARSER = new com.google.protobuf.AbstractParser<RequestTorrent>() {
+      public RequestTorrent parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new RequestTorrent(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<RequestTorrent> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RequestTorrent> getParserForType() {
+      return PARSER;
+    }
+
+    public Network.ServerWrapper.RequestTorrent getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface TorrentResponseOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:Network.TorrentResponse)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>bytes content = 1;</code>
+     */
+    com.google.protobuf.ByteString getContent();
+  }
+  /**
+   * Protobuf type {@code Network.TorrentResponse}
+   */
+  public  static final class TorrentResponse extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:Network.TorrentResponse)
+      TorrentResponseOrBuilder {
+    // Use TorrentResponse.newBuilder() to construct.
+    private TorrentResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private TorrentResponse() {
+      content_ = com.google.protobuf.ByteString.EMPTY;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return com.google.protobuf.UnknownFieldSet.getDefaultInstance();
+    }
+    private TorrentResponse(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      int mutable_bitField0_ = 0;
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!input.skipField(tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 10: {
+
+              content_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return Network.ServerWrapper.internal_static_Network_TorrentResponse_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return Network.ServerWrapper.internal_static_Network_TorrentResponse_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              Network.ServerWrapper.TorrentResponse.class, Network.ServerWrapper.TorrentResponse.Builder.class);
+    }
+
+    public static final int CONTENT_FIELD_NUMBER = 1;
+    private com.google.protobuf.ByteString content_;
+    /**
+     * <code>bytes content = 1;</code>
+     */
+    public com.google.protobuf.ByteString getContent() {
+      return content_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!content_.isEmpty()) {
+        output.writeBytes(1, content_);
+      }
+    }
+
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!content_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, content_);
+      }
+      memoizedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof Network.ServerWrapper.TorrentResponse)) {
+        return super.equals(obj);
+      }
+      Network.ServerWrapper.TorrentResponse other = (Network.ServerWrapper.TorrentResponse) obj;
+
+      boolean result = true;
+      result = result && getContent()
+          .equals(other.getContent());
+      return result;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + CONTENT_FIELD_NUMBER;
+      hash = (53 * hash) + getContent().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static Network.ServerWrapper.TorrentResponse parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static Network.ServerWrapper.TorrentResponse parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static Network.ServerWrapper.TorrentResponse parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static Network.ServerWrapper.TorrentResponse parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static Network.ServerWrapper.TorrentResponse parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static Network.ServerWrapper.TorrentResponse parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static Network.ServerWrapper.TorrentResponse parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static Network.ServerWrapper.TorrentResponse parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static Network.ServerWrapper.TorrentResponse parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static Network.ServerWrapper.TorrentResponse parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(Network.ServerWrapper.TorrentResponse prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code Network.TorrentResponse}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:Network.TorrentResponse)
+        Network.ServerWrapper.TorrentResponseOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return Network.ServerWrapper.internal_static_Network_TorrentResponse_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return Network.ServerWrapper.internal_static_Network_TorrentResponse_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                Network.ServerWrapper.TorrentResponse.class, Network.ServerWrapper.TorrentResponse.Builder.class);
+      }
+
+      // Construct using Network.ServerWrapper.TorrentResponse.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        content_ = com.google.protobuf.ByteString.EMPTY;
+
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return Network.ServerWrapper.internal_static_Network_TorrentResponse_descriptor;
+      }
+
+      public Network.ServerWrapper.TorrentResponse getDefaultInstanceForType() {
+        return Network.ServerWrapper.TorrentResponse.getDefaultInstance();
+      }
+
+      public Network.ServerWrapper.TorrentResponse build() {
+        Network.ServerWrapper.TorrentResponse result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public Network.ServerWrapper.TorrentResponse buildPartial() {
+        Network.ServerWrapper.TorrentResponse result = new Network.ServerWrapper.TorrentResponse(this);
+        result.content_ = content_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder clone() {
+        return (Builder) super.clone();
+      }
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.setField(field, value);
+      }
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return (Builder) super.clearField(field);
+      }
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return (Builder) super.clearOneof(oneof);
+      }
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, Object value) {
+        return (Builder) super.setRepeatedField(field, index, value);
+      }
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          Object value) {
+        return (Builder) super.addRepeatedField(field, value);
+      }
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof Network.ServerWrapper.TorrentResponse) {
+          return mergeFrom((Network.ServerWrapper.TorrentResponse)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(Network.ServerWrapper.TorrentResponse other) {
+        if (other == Network.ServerWrapper.TorrentResponse.getDefaultInstance()) return this;
+        if (other.getContent() != com.google.protobuf.ByteString.EMPTY) {
+          setContent(other.getContent());
+        }
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        Network.ServerWrapper.TorrentResponse parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (Network.ServerWrapper.TorrentResponse) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private com.google.protobuf.ByteString content_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes content = 1;</code>
+       */
+      public com.google.protobuf.ByteString getContent() {
+        return content_;
+      }
+      /**
+       * <code>bytes content = 1;</code>
+       */
+      public Builder setContent(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        content_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes content = 1;</code>
+       */
+      public Builder clearContent() {
+        
+        content_ = getDefaultInstance().getContent();
+        onChanged();
+        return this;
+      }
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return this;
+      }
+
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return this;
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:Network.TorrentResponse)
+    }
+
+    // @@protoc_insertion_point(class_scope:Network.TorrentResponse)
+    private static final Network.ServerWrapper.TorrentResponse DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new Network.ServerWrapper.TorrentResponse();
+    }
+
+    public static Network.ServerWrapper.TorrentResponse getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<TorrentResponse>
+        PARSER = new com.google.protobuf.AbstractParser<TorrentResponse>() {
+      public TorrentResponse parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+          return new TorrentResponse(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<TorrentResponse> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<TorrentResponse> getParserForType() {
+      return PARSER;
+    }
+
+    public Network.ServerWrapper.TorrentResponse getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface ServerMessageOrBuilder extends
       // @@protoc_insertion_point(interface_extends:Network.ServerMessage)
       com.google.protobuf.MessageOrBuilder {
@@ -1447,6 +2382,24 @@ public final class ServerWrapper {
      * <code>.Network.TrackerTorrent trackerTorrent = 2;</code>
      */
     Network.ServerWrapper.TrackerTorrentOrBuilder getTrackerTorrentOrBuilder();
+
+    /**
+     * <code>.Network.RequestTorrent requestTorrent = 3;</code>
+     */
+    Network.ServerWrapper.RequestTorrent getRequestTorrent();
+    /**
+     * <code>.Network.RequestTorrent requestTorrent = 3;</code>
+     */
+    Network.ServerWrapper.RequestTorrentOrBuilder getRequestTorrentOrBuilder();
+
+    /**
+     * <code>.Network.TorrentResponse torrentResponse = 4;</code>
+     */
+    Network.ServerWrapper.TorrentResponse getTorrentResponse();
+    /**
+     * <code>.Network.TorrentResponse torrentResponse = 4;</code>
+     */
+    Network.ServerWrapper.TorrentResponseOrBuilder getTorrentResponseOrBuilder();
 
     public Network.ServerWrapper.ServerMessage.MsgCase getMsgCase();
   }
@@ -1517,6 +2470,34 @@ public final class ServerWrapper {
               msgCase_ = 2;
               break;
             }
+            case 26: {
+              Network.ServerWrapper.RequestTorrent.Builder subBuilder = null;
+              if (msgCase_ == 3) {
+                subBuilder = ((Network.ServerWrapper.RequestTorrent) msg_).toBuilder();
+              }
+              msg_ =
+                  input.readMessage(Network.ServerWrapper.RequestTorrent.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((Network.ServerWrapper.RequestTorrent) msg_);
+                msg_ = subBuilder.buildPartial();
+              }
+              msgCase_ = 3;
+              break;
+            }
+            case 34: {
+              Network.ServerWrapper.TorrentResponse.Builder subBuilder = null;
+              if (msgCase_ == 4) {
+                subBuilder = ((Network.ServerWrapper.TorrentResponse) msg_).toBuilder();
+              }
+              msg_ =
+                  input.readMessage(Network.ServerWrapper.TorrentResponse.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((Network.ServerWrapper.TorrentResponse) msg_);
+                msg_ = subBuilder.buildPartial();
+              }
+              msgCase_ = 4;
+              break;
+            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -1546,6 +2527,8 @@ public final class ServerWrapper {
         implements com.google.protobuf.Internal.EnumLite {
       FRONTENDTORRENT(1),
       TRACKERTORRENT(2),
+      REQUESTTORRENT(3),
+      TORRENTRESPONSE(4),
       MSG_NOT_SET(0);
       private final int value;
       private MsgCase(int value) {
@@ -1563,6 +2546,8 @@ public final class ServerWrapper {
         switch (value) {
           case 1: return FRONTENDTORRENT;
           case 2: return TRACKERTORRENT;
+          case 3: return REQUESTTORRENT;
+          case 4: return TORRENTRESPONSE;
           case 0: return MSG_NOT_SET;
           default: return null;
         }
@@ -1618,6 +2603,46 @@ public final class ServerWrapper {
       return Network.ServerWrapper.TrackerTorrent.getDefaultInstance();
     }
 
+    public static final int REQUESTTORRENT_FIELD_NUMBER = 3;
+    /**
+     * <code>.Network.RequestTorrent requestTorrent = 3;</code>
+     */
+    public Network.ServerWrapper.RequestTorrent getRequestTorrent() {
+      if (msgCase_ == 3) {
+         return (Network.ServerWrapper.RequestTorrent) msg_;
+      }
+      return Network.ServerWrapper.RequestTorrent.getDefaultInstance();
+    }
+    /**
+     * <code>.Network.RequestTorrent requestTorrent = 3;</code>
+     */
+    public Network.ServerWrapper.RequestTorrentOrBuilder getRequestTorrentOrBuilder() {
+      if (msgCase_ == 3) {
+         return (Network.ServerWrapper.RequestTorrent) msg_;
+      }
+      return Network.ServerWrapper.RequestTorrent.getDefaultInstance();
+    }
+
+    public static final int TORRENTRESPONSE_FIELD_NUMBER = 4;
+    /**
+     * <code>.Network.TorrentResponse torrentResponse = 4;</code>
+     */
+    public Network.ServerWrapper.TorrentResponse getTorrentResponse() {
+      if (msgCase_ == 4) {
+         return (Network.ServerWrapper.TorrentResponse) msg_;
+      }
+      return Network.ServerWrapper.TorrentResponse.getDefaultInstance();
+    }
+    /**
+     * <code>.Network.TorrentResponse torrentResponse = 4;</code>
+     */
+    public Network.ServerWrapper.TorrentResponseOrBuilder getTorrentResponseOrBuilder() {
+      if (msgCase_ == 4) {
+         return (Network.ServerWrapper.TorrentResponse) msg_;
+      }
+      return Network.ServerWrapper.TorrentResponse.getDefaultInstance();
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1636,6 +2661,12 @@ public final class ServerWrapper {
       if (msgCase_ == 2) {
         output.writeMessage(2, (Network.ServerWrapper.TrackerTorrent) msg_);
       }
+      if (msgCase_ == 3) {
+        output.writeMessage(3, (Network.ServerWrapper.RequestTorrent) msg_);
+      }
+      if (msgCase_ == 4) {
+        output.writeMessage(4, (Network.ServerWrapper.TorrentResponse) msg_);
+      }
     }
 
     public int getSerializedSize() {
@@ -1650,6 +2681,14 @@ public final class ServerWrapper {
       if (msgCase_ == 2) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, (Network.ServerWrapper.TrackerTorrent) msg_);
+      }
+      if (msgCase_ == 3) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, (Network.ServerWrapper.RequestTorrent) msg_);
+      }
+      if (msgCase_ == 4) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, (Network.ServerWrapper.TorrentResponse) msg_);
       }
       memoizedSize = size;
       return size;
@@ -1679,6 +2718,14 @@ public final class ServerWrapper {
           result = result && getTrackerTorrent()
               .equals(other.getTrackerTorrent());
           break;
+        case 3:
+          result = result && getRequestTorrent()
+              .equals(other.getRequestTorrent());
+          break;
+        case 4:
+          result = result && getTorrentResponse()
+              .equals(other.getTorrentResponse());
+          break;
         case 0:
         default:
       }
@@ -1700,6 +2747,14 @@ public final class ServerWrapper {
         case 2:
           hash = (37 * hash) + TRACKERTORRENT_FIELD_NUMBER;
           hash = (53 * hash) + getTrackerTorrent().hashCode();
+          break;
+        case 3:
+          hash = (37 * hash) + REQUESTTORRENT_FIELD_NUMBER;
+          hash = (53 * hash) + getRequestTorrent().hashCode();
+          break;
+        case 4:
+          hash = (37 * hash) + TORRENTRESPONSE_FIELD_NUMBER;
+          hash = (53 * hash) + getTorrentResponse().hashCode();
           break;
         case 0:
         default:
@@ -1860,6 +2915,20 @@ public final class ServerWrapper {
             result.msg_ = trackerTorrentBuilder_.build();
           }
         }
+        if (msgCase_ == 3) {
+          if (requestTorrentBuilder_ == null) {
+            result.msg_ = msg_;
+          } else {
+            result.msg_ = requestTorrentBuilder_.build();
+          }
+        }
+        if (msgCase_ == 4) {
+          if (torrentResponseBuilder_ == null) {
+            result.msg_ = msg_;
+          } else {
+            result.msg_ = torrentResponseBuilder_.build();
+          }
+        }
         result.msgCase_ = msgCase_;
         onBuilt();
         return result;
@@ -1909,6 +2978,14 @@ public final class ServerWrapper {
           }
           case TRACKERTORRENT: {
             mergeTrackerTorrent(other.getTrackerTorrent());
+            break;
+          }
+          case REQUESTTORRENT: {
+            mergeRequestTorrent(other.getRequestTorrent());
+            break;
+          }
+          case TORRENTRESPONSE: {
+            mergeTorrentResponse(other.getTorrentResponse());
             break;
           }
           case MSG_NOT_SET: {
@@ -2215,6 +3292,266 @@ public final class ServerWrapper {
         onChanged();;
         return trackerTorrentBuilder_;
       }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          Network.ServerWrapper.RequestTorrent, Network.ServerWrapper.RequestTorrent.Builder, Network.ServerWrapper.RequestTorrentOrBuilder> requestTorrentBuilder_;
+      /**
+       * <code>.Network.RequestTorrent requestTorrent = 3;</code>
+       */
+      public Network.ServerWrapper.RequestTorrent getRequestTorrent() {
+        if (requestTorrentBuilder_ == null) {
+          if (msgCase_ == 3) {
+            return (Network.ServerWrapper.RequestTorrent) msg_;
+          }
+          return Network.ServerWrapper.RequestTorrent.getDefaultInstance();
+        } else {
+          if (msgCase_ == 3) {
+            return requestTorrentBuilder_.getMessage();
+          }
+          return Network.ServerWrapper.RequestTorrent.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.Network.RequestTorrent requestTorrent = 3;</code>
+       */
+      public Builder setRequestTorrent(Network.ServerWrapper.RequestTorrent value) {
+        if (requestTorrentBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          msg_ = value;
+          onChanged();
+        } else {
+          requestTorrentBuilder_.setMessage(value);
+        }
+        msgCase_ = 3;
+        return this;
+      }
+      /**
+       * <code>.Network.RequestTorrent requestTorrent = 3;</code>
+       */
+      public Builder setRequestTorrent(
+          Network.ServerWrapper.RequestTorrent.Builder builderForValue) {
+        if (requestTorrentBuilder_ == null) {
+          msg_ = builderForValue.build();
+          onChanged();
+        } else {
+          requestTorrentBuilder_.setMessage(builderForValue.build());
+        }
+        msgCase_ = 3;
+        return this;
+      }
+      /**
+       * <code>.Network.RequestTorrent requestTorrent = 3;</code>
+       */
+      public Builder mergeRequestTorrent(Network.ServerWrapper.RequestTorrent value) {
+        if (requestTorrentBuilder_ == null) {
+          if (msgCase_ == 3 &&
+              msg_ != Network.ServerWrapper.RequestTorrent.getDefaultInstance()) {
+            msg_ = Network.ServerWrapper.RequestTorrent.newBuilder((Network.ServerWrapper.RequestTorrent) msg_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            msg_ = value;
+          }
+          onChanged();
+        } else {
+          if (msgCase_ == 3) {
+            requestTorrentBuilder_.mergeFrom(value);
+          }
+          requestTorrentBuilder_.setMessage(value);
+        }
+        msgCase_ = 3;
+        return this;
+      }
+      /**
+       * <code>.Network.RequestTorrent requestTorrent = 3;</code>
+       */
+      public Builder clearRequestTorrent() {
+        if (requestTorrentBuilder_ == null) {
+          if (msgCase_ == 3) {
+            msgCase_ = 0;
+            msg_ = null;
+            onChanged();
+          }
+        } else {
+          if (msgCase_ == 3) {
+            msgCase_ = 0;
+            msg_ = null;
+          }
+          requestTorrentBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.Network.RequestTorrent requestTorrent = 3;</code>
+       */
+      public Network.ServerWrapper.RequestTorrent.Builder getRequestTorrentBuilder() {
+        return getRequestTorrentFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.Network.RequestTorrent requestTorrent = 3;</code>
+       */
+      public Network.ServerWrapper.RequestTorrentOrBuilder getRequestTorrentOrBuilder() {
+        if ((msgCase_ == 3) && (requestTorrentBuilder_ != null)) {
+          return requestTorrentBuilder_.getMessageOrBuilder();
+        } else {
+          if (msgCase_ == 3) {
+            return (Network.ServerWrapper.RequestTorrent) msg_;
+          }
+          return Network.ServerWrapper.RequestTorrent.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.Network.RequestTorrent requestTorrent = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          Network.ServerWrapper.RequestTorrent, Network.ServerWrapper.RequestTorrent.Builder, Network.ServerWrapper.RequestTorrentOrBuilder> 
+          getRequestTorrentFieldBuilder() {
+        if (requestTorrentBuilder_ == null) {
+          if (!(msgCase_ == 3)) {
+            msg_ = Network.ServerWrapper.RequestTorrent.getDefaultInstance();
+          }
+          requestTorrentBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              Network.ServerWrapper.RequestTorrent, Network.ServerWrapper.RequestTorrent.Builder, Network.ServerWrapper.RequestTorrentOrBuilder>(
+                  (Network.ServerWrapper.RequestTorrent) msg_,
+                  getParentForChildren(),
+                  isClean());
+          msg_ = null;
+        }
+        msgCase_ = 3;
+        onChanged();;
+        return requestTorrentBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          Network.ServerWrapper.TorrentResponse, Network.ServerWrapper.TorrentResponse.Builder, Network.ServerWrapper.TorrentResponseOrBuilder> torrentResponseBuilder_;
+      /**
+       * <code>.Network.TorrentResponse torrentResponse = 4;</code>
+       */
+      public Network.ServerWrapper.TorrentResponse getTorrentResponse() {
+        if (torrentResponseBuilder_ == null) {
+          if (msgCase_ == 4) {
+            return (Network.ServerWrapper.TorrentResponse) msg_;
+          }
+          return Network.ServerWrapper.TorrentResponse.getDefaultInstance();
+        } else {
+          if (msgCase_ == 4) {
+            return torrentResponseBuilder_.getMessage();
+          }
+          return Network.ServerWrapper.TorrentResponse.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.Network.TorrentResponse torrentResponse = 4;</code>
+       */
+      public Builder setTorrentResponse(Network.ServerWrapper.TorrentResponse value) {
+        if (torrentResponseBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          msg_ = value;
+          onChanged();
+        } else {
+          torrentResponseBuilder_.setMessage(value);
+        }
+        msgCase_ = 4;
+        return this;
+      }
+      /**
+       * <code>.Network.TorrentResponse torrentResponse = 4;</code>
+       */
+      public Builder setTorrentResponse(
+          Network.ServerWrapper.TorrentResponse.Builder builderForValue) {
+        if (torrentResponseBuilder_ == null) {
+          msg_ = builderForValue.build();
+          onChanged();
+        } else {
+          torrentResponseBuilder_.setMessage(builderForValue.build());
+        }
+        msgCase_ = 4;
+        return this;
+      }
+      /**
+       * <code>.Network.TorrentResponse torrentResponse = 4;</code>
+       */
+      public Builder mergeTorrentResponse(Network.ServerWrapper.TorrentResponse value) {
+        if (torrentResponseBuilder_ == null) {
+          if (msgCase_ == 4 &&
+              msg_ != Network.ServerWrapper.TorrentResponse.getDefaultInstance()) {
+            msg_ = Network.ServerWrapper.TorrentResponse.newBuilder((Network.ServerWrapper.TorrentResponse) msg_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            msg_ = value;
+          }
+          onChanged();
+        } else {
+          if (msgCase_ == 4) {
+            torrentResponseBuilder_.mergeFrom(value);
+          }
+          torrentResponseBuilder_.setMessage(value);
+        }
+        msgCase_ = 4;
+        return this;
+      }
+      /**
+       * <code>.Network.TorrentResponse torrentResponse = 4;</code>
+       */
+      public Builder clearTorrentResponse() {
+        if (torrentResponseBuilder_ == null) {
+          if (msgCase_ == 4) {
+            msgCase_ = 0;
+            msg_ = null;
+            onChanged();
+          }
+        } else {
+          if (msgCase_ == 4) {
+            msgCase_ = 0;
+            msg_ = null;
+          }
+          torrentResponseBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.Network.TorrentResponse torrentResponse = 4;</code>
+       */
+      public Network.ServerWrapper.TorrentResponse.Builder getTorrentResponseBuilder() {
+        return getTorrentResponseFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.Network.TorrentResponse torrentResponse = 4;</code>
+       */
+      public Network.ServerWrapper.TorrentResponseOrBuilder getTorrentResponseOrBuilder() {
+        if ((msgCase_ == 4) && (torrentResponseBuilder_ != null)) {
+          return torrentResponseBuilder_.getMessageOrBuilder();
+        } else {
+          if (msgCase_ == 4) {
+            return (Network.ServerWrapper.TorrentResponse) msg_;
+          }
+          return Network.ServerWrapper.TorrentResponse.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.Network.TorrentResponse torrentResponse = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          Network.ServerWrapper.TorrentResponse, Network.ServerWrapper.TorrentResponse.Builder, Network.ServerWrapper.TorrentResponseOrBuilder> 
+          getTorrentResponseFieldBuilder() {
+        if (torrentResponseBuilder_ == null) {
+          if (!(msgCase_ == 4)) {
+            msg_ = Network.ServerWrapper.TorrentResponse.getDefaultInstance();
+          }
+          torrentResponseBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              Network.ServerWrapper.TorrentResponse, Network.ServerWrapper.TorrentResponse.Builder, Network.ServerWrapper.TorrentResponseOrBuilder>(
+                  (Network.ServerWrapper.TorrentResponse) msg_,
+                  getParentForChildren(),
+                  isClean());
+          msg_ = null;
+        }
+        msgCase_ = 4;
+        onChanged();;
+        return torrentResponseBuilder_;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -2275,6 +3612,16 @@ public final class ServerWrapper {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_Network_TrackerTorrent_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_Network_RequestTorrent_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_Network_RequestTorrent_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_Network_TorrentResponse_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_Network_TorrentResponse_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_Network_ServerMessage_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -2291,11 +3638,15 @@ public final class ServerWrapper {
       "\n\024server_wrapper.proto\022\007Network\"K\n\017Front" +
       "EndTorrent\022\n\n\002id\030\001 \001(\t\022\014\n\004user\030\002 \001(\t\022\r\n\005" +
       "group\030\003 \001(\t\022\017\n\007content\030\004 \001(\014\"0\n\016TrackerT" +
-      "orrent\022\r\n\005group\030\001 \001(\t\022\017\n\007content\030\002 \001(\014\"~" +
-      "\n\rServerMessage\0223\n\017frontEndTorrent\030\001 \001(\013" +
-      "2\030.Network.FrontEndTorrentH\000\0221\n\016trackerT" +
-      "orrent\030\002 \001(\0132\027.Network.TrackerTorrentH\000B" +
-      "\005\n\003msgb\006proto3"
+      "orrent\022\r\n\005group\030\001 \001(\t\022\017\n\007content\030\002 \001(\014\"\034" +
+      "\n\016RequestTorrent\022\n\n\002id\030\001 \001(\t\"\"\n\017TorrentR" +
+      "esponse\022\017\n\007content\030\001 \001(\014\"\346\001\n\rServerMessa" +
+      "ge\0223\n\017frontEndTorrent\030\001 \001(\0132\030.Network.Fr" +
+      "ontEndTorrentH\000\0221\n\016trackerTorrent\030\002 \001(\0132" +
+      "\027.Network.TrackerTorrentH\000\0221\n\016requestTor" +
+      "rent\030\003 \001(\0132\027.Network.RequestTorrentH\000\0223\n",
+      "\017torrentResponse\030\004 \001(\0132\030.Network.Torrent" +
+      "ResponseH\000B\005\n\003msgb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2321,12 +3672,24 @@ public final class ServerWrapper {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Network_TrackerTorrent_descriptor,
         new java.lang.String[] { "Group", "Content", });
-    internal_static_Network_ServerMessage_descriptor =
+    internal_static_Network_RequestTorrent_descriptor =
       getDescriptor().getMessageTypes().get(2);
+    internal_static_Network_RequestTorrent_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_Network_RequestTorrent_descriptor,
+        new java.lang.String[] { "Id", });
+    internal_static_Network_TorrentResponse_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_Network_TorrentResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_Network_TorrentResponse_descriptor,
+        new java.lang.String[] { "Content", });
+    internal_static_Network_ServerMessage_descriptor =
+      getDescriptor().getMessageTypes().get(4);
     internal_static_Network_ServerMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Network_ServerMessage_descriptor,
-        new java.lang.String[] { "FrontEndTorrent", "TrackerTorrent", "Msg", });
+        new java.lang.String[] { "FrontEndTorrent", "TrackerTorrent", "RequestTorrent", "TorrentResponse", "Msg", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

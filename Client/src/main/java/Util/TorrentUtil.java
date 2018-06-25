@@ -8,8 +8,8 @@ import Offline.Utils.User;
 import com.google.protobuf.ByteString;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.client.SharedTorrent;
+import com.turn.ttorrent.client.peer.SharingPeer;
 import com.turn.ttorrent.common.Torrent;
-import com.turn.ttorrent.common.Utils;
 import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
-import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -156,22 +155,6 @@ public class TorrentUtil {
 
         torrentPeers.put(t.getHexInfoHash(),new ArrayList<>());
 
-//        if(userToSend == null){
-//
-//            //Broadcast
-//            for (Map.Entry<String, User> entry : foundUsers.entrySet()) {
-//
-//                if(!entry.getValue().getUsername().equals(t.getCreatedBy())){
-//
-//                    torrentPeers.get(tr.getHexInfoHash()).add(entry.getValue().getUsername());
-//
-//                    System.out.println("Sending to: " + entry.getKey());
-//                    Socket s = new Socket(entry.getValue().getIpv4(), 5558);
-//                    wrapper.writeDelimitedTo(s.getOutputStream());
-//                }
-//            }
-//        }
-
         //Manda so para um men
         for (Map.Entry<String, User> entry : foundUsers.entrySet()) {
 
@@ -215,6 +198,27 @@ public class TorrentUtil {
                 username);
 
         c.share(-1);
+
+        //TODO parar clientes depois de mandar o ficheiro para o tracker
+
+        st.addObserver((o,arg) -> {
+
+            boolean b = true;
+
+            for(SharingPeer sp : c.getPeers()){
+
+                if(sp.isDownloading()){
+                    b = false;
+                    break;
+                }
+            }
+
+            if(b){
+
+                c.stop();
+                FileUtils.deleteTorrent(c.getTorrent(), group);
+            }
+        });
 
         return c;
     }

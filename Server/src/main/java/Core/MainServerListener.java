@@ -11,6 +11,7 @@ import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
+import org.simpleframework.transport.Server;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -61,7 +62,7 @@ public class MainServerListener extends Thread{
                 byte[] data = in.readRawBytes(l);
                 ServerWrapper.ServerMessage sm = ServerWrapper.ServerMessage.parseFrom(data);
                 //Received a torrent, let's handle
-                channelRead(sm);
+                channelRead(sm, s);
 
             } catch (Exception e) {
                 try {
@@ -80,9 +81,40 @@ public class MainServerListener extends Thread{
         server.close();
     }
 
-    private void channelRead(ServerWrapper.ServerMessage request) throws IOException, NoSuchAlgorithmException, InterruptedException, ParserConfigurationException, SAXException {
-        Torrent t = new Torrent(request.getTrackerTorrent().getContent().toByteArray(), false);
-        String group = request.getTrackerTorrent().getGroup();
+    private void channelRead(ServerWrapper.ServerMessage request, Socket s) throws IOException, NoSuchAlgorithmException, InterruptedException, ParserConfigurationException, SAXException {
+        boolean torrent = request.getMsgCase().equals(ServerWrapper.ServerMessage.MsgCase.TRACKERTORRENT);
+        if(torrent){
+            Torrent t = new Torrent(request.getTrackerTorrent().getContent().toByteArray(), false);
+            String group = request.getTrackerTorrent().getGroup();
+            handleTorrent(t, group);
+        }else{
+
+            String hexId = request.getRequestTorrent().getId();
+            for(TrackedTorrent tt: tck.getTrackedTorrents()){
+                if(tt.getHexInfoHash().equals(hexId)){
+                    ServerWrapper.TorrentResponse tr = ServerWrapper.TorrentResponse.newBuilder()
+                            .setContent(ByteString.copyFrom(tt.getEncoded()))
+                            .build();
+                    ServerWrapper.ServerMessage sm = ServerWrapper.ServerMessage.newBuilder()
+                            .setTorrentResponse(tr)
+                            .build();
+                    send(sm, s);
+                    return;
+                }
+            }
+
+            ServerWrapper.TorrentResponse tr = ServerWrapper.TorrentResponse.newBuilder()
+                    .setContent(ByteString.copyFrom("".getBytes()))
+                    .build();
+            ServerWrapper.ServerMessage sm = ServerWrapper.ServerMessage.newBuilder()
+                    .setTorrentResponse(tr)
+                    .build();
+            send(sm, s);
+
+        }
+    }
+
+    private void handleTorrent(Torrent t, String group) throws IOException, NoSuchAlgorithmException, InterruptedException, ParserConfigurationException, SAXException {
         //Verificar o nosso local na lista de trackers e colocar
         //o próprio em primeiro lugar
         String ip = FileUtils.getMyIP();
@@ -151,5 +183,17 @@ public class MainServerListener extends Thread{
             s.getOutputStream().close();
             s.close();
         }
+    }
+
+    public boolean send(ServerWrapper.ServerMessage msg, Socket s){
+        try {
+            byte[] size = ByteBuffer.allocate(4).putInt(msg.getSerializedSize()).array();
+            s.getOutputStream().write(size);
+            msg.writeTo(s.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 }

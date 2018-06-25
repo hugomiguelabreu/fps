@@ -100,8 +100,6 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         //UI
         paneDrop.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
 
-//        TestThread t = new TestThread(available);
-//        t.start();
     }
 
 
@@ -148,6 +146,8 @@ public class OfflineUI implements MapEvent, ArrayEvent {
 
                         System.out.println("clicked on user, init local send process");
                         sendLocal(path, username, value);
+
+                        showAlert("File sent");
                     }
                 });
 
@@ -177,6 +177,8 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                             for(String users : groups.get(newValue)){
                                 sendLocal(path, username, users);
                             }
+
+                            showAlert("File sent");
                         }
                     });
                 });
@@ -504,5 +506,13 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                 }
             }
         });
+    }
+
+    private void showAlert(String info){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Info");
+        alert.setHeaderText(info);
+
+        alert.showAndWait();
     }
 }
