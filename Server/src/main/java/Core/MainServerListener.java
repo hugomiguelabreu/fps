@@ -193,6 +193,7 @@ public class MainServerListener extends Thread{
             byte[] size = ByteBuffer.allocate(4).putInt(msg.getSerializedSize()).array();
             s.getOutputStream().write(size);
             msg.writeTo(s.getOutputStream());
+            s.getOutputStream().flush();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
