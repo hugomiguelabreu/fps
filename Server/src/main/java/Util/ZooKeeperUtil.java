@@ -32,7 +32,7 @@ public class ZooKeeperUtil {
     public static boolean incrementReceived(String group, String torrentId) throws Exception {
 
         String path = "/groups/" + group + "/torrents/" + torrentId;
-        DistributedAtomicLong counter = new DistributedAtomicLong(client, "/teste2", retryPolicy);
+        DistributedAtomicLong counter = new DistributedAtomicLong(client, path + "/file/counter", retryPolicy);
 
         if (client.checkExists().forPath(path + "/file/counter") == null)
             counter.initialize((long)0);
