@@ -2,32 +2,40 @@ syntax = "proto3";
 package Network;
 
 message Login {
-	string username = 1;
-	string password = 2;
+    string username = 1;
+    string password = 2;
 }
 
 message Register {
-	string username = 1;
-	string password = 2;
-	string name = 3;
+    string username = 1;
+    string password = 2;
+    string name = 3;
 }
 
 message Response {
-	bool rep = 1;
+    bool rep = 1;
 }
 
-message CreateGroup {	
-	string group = 1;
+message CreateGroup {
+    string group = 1;
 }
 
-message JoinGroup {	
-	string group = 1;
+message JoinGroup {
+    string group = 1;
 }
 
 message TorrentWrapper{
-	string group = 1;
+    string group = 1;
     bytes content = 2;
     string id = 3;
+}
+
+message OnlineUsers{
+    string onlineUsers = 1;
+}
+
+message GroupUsers {
+    string groupUsers = 1;
 }
 
 message ClientMessage {
@@ -38,5 +46,7 @@ message ClientMessage {
         CreateGroup createGroup = 4;
         JoinGroup joinGroup = 5;
         TorrentWrapper torrentWrapper = 6;
-    }   
+        OnlineUsers onlineUsers = 7;
+        GroupUsers groupUsers = 8;
+    }
 }
