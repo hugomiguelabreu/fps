@@ -155,7 +155,7 @@ public class Client implements Runnable{
 
 
             data = in.readRawBytes(l);
-
+BGUM24
             System.out.println(ClientWrapper.ClientMessage.parseFrom(data).getTorrentWrapper());
             socket.close();
 

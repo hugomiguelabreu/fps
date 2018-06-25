@@ -24,7 +24,6 @@ acceptor(LSock, ID) ->
 msg_listener(Socket, ID) ->
 	receive 
 		{tcp, Socket, Data} ->
-			io:format("OlaaaaaaaDASD\n"),
 			msg_decrypt(Data);
 		{error, _} ->
 			io:format("closed\n");
@@ -48,7 +47,8 @@ msg_decrypt(Data) ->
 			end, string:tokens(binary_to_list(UserList),";"));
 		trackerTorrent ->
 			{'RequestTorrent', _, C} = D,
-			C
+			C;
+		t
 	end.
 
 
