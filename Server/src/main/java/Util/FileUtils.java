@@ -2,6 +2,7 @@ package Util;
 
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.common.Torrent;
+import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import org.apache.commons.io.IOUtils;
@@ -12,7 +13,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FileUtils {
 
@@ -23,39 +26,45 @@ public class FileUtils {
         new File(System.getProperty( "user.home" ) + "/.fps-server/files").mkdirs();
     }
 
-    public static boolean loadTorrents(Tracker tck, Map<String, Client> clients) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
+    public static boolean loadTorrents(Tracker tck, Map<String, Client> clients, ConcurrentHashMap<String, ArrayList<TrackedPeer>> deletionsWaiting) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
         File parent = new File(System.getProperty("user.home") + "/.fps-server");
         //Ao carregar os torrent não criamos clientes, pois o servidores está a ligar;
         //supostamente, irá iniciar clientes à medida que for necessário.
+        String group;
         if(parent.exists()) {
             for (File f : parent.listFiles()) {
-                if (!f.isDirectory()) {
-                    Torrent t = Torrent.load(f);
-                    //Colocar torrent no tracker para o anunciar.
-                    //Se guardei o torrent é porque tenho responsabilidade de replicar.
-                    TrackedTorrent tt = TorrentUtil.announceTrackedTorrentWithObservers(tck, t, clients, true);
+                if(f.isDirectory()) {
+                    for(File l: f.listFiles()) {
+                        if (!l.isDirectory()) {
+                            System.out.println("READING:" + l.getName());
+                            Torrent t = Torrent.load(l);
+                            //Colocar torrent no tracker para o anunciar.
+                            //Se guardei o torrent é porque tenho responsabilidade de replicar.
+                            TrackedTorrent tt = TorrentUtil.announceTrackedTorrentWithObservers(tck, t, clients, deletionsWaiting, true, f.getName());
+                        }
+                    }
                 }
             }
         }
         return true;
     }
 
-    public static void saveTorrent(Torrent t) throws IOException {
+    public static void saveTorrent(Torrent t, String group) throws IOException {
         FileOutputStream fos;
-        fos = new FileOutputStream(System.getProperty( "user.home" ) + "/.fps-server/" + t.getHexInfoHash());
+        new File(System.getProperty( "user.home" ) + "/.fps-server/" + group).mkdirs();
+        fos = new FileOutputStream(System.getProperty( "user.home" ) + "/.fps-server/" + group + "/" + t.getHexInfoHash());
         t.save(fos);
         IOUtils.closeQuietly(fos);
     }
 
     public static void deleteFiles(Torrent t) throws IOException {
-        File torrent = new File(System.getProperty( "user.home" ) + "/.fps-server/" + t.getHexInfoHash());
         File fileDownloaded = new File(System.getProperty( "user.home" ) + "/.fps-server/files/" + t.getFilenames().get(0));
-        Files.deleteIfExists(torrent.toPath());
+        System.out.println("DELETING " + fileDownloaded.toPath().toString());
         Files.deleteIfExists(fileDownloaded.toPath());
     }
 
-    public static void deleteTorrent(Torrent t) throws IOException {
-        File torrent = new File(System.getProperty( "user.home" ) + "/.fps-server/" + t.getHexInfoHash());
+    public static void deleteTorrent(Torrent t, String group) throws IOException {
+        File torrent = new File(System.getProperty( "user.home" ) + "/.fps-server/" + group + "/" + t.getHexInfoHash());
         Files.deleteIfExists(torrent.toPath());
     }
 

@@ -11,6 +11,8 @@ import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
 import org.xml.sax.SAXException;
+
+import javax.sound.midi.Track;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +46,8 @@ public class TorrentUtil {
         return c;
     }
 
-    public static TrackedTorrent announceTrackedTorrentWithObservers(Tracker tck, Torrent t, Map<String, Client> clients, boolean replication) throws IOException, NoSuchAlgorithmException {
+    public static TrackedTorrent announceTrackedTorrentWithObservers(Tracker tck, Torrent t, Map<String, Client> clients, ConcurrentHashMap<String,
+            ArrayList<TrackedPeer>> deletionsWaiting, boolean replication, String group) throws IOException, NoSuchAlgorithmException {
         TrackedTorrent tt = new TrackedTorrent(t);
 
         tt.addObserver((o, arg) -> {
@@ -54,6 +57,13 @@ public class TorrentUtil {
                 if (tp.getLeft() == 0) {
                     System.out.println("\u001B[31m" + tp.getHexPeerId() + " is over\u001B[0m");
                     //Verificar se posso desligar
+                    if(tp.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())){
+                        try {
+                            removeInjectionRequest(tp, tt);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     boolean allDownloaded = true;
                     if((clients.containsKey(tt.getHexInfoHash()))){
                         Set<SharingPeer> peersConnected = clients.get(tt.getHexInfoHash()).getPeers();
@@ -61,34 +71,49 @@ public class TorrentUtil {
                             allDownloaded = allDownloaded && !(sp.isDownloading());
                         }
                     }
-                    System.out.println(allDownloaded);
+
                     //Se toda a gente terminou e todos os trackers já pediram para terminar.
                     if ((clients.containsKey(tt.getHexInfoHash()) &&
                             allDownloaded &&
+                            (deletionsWaiting.size() == tt.getInjectedPeers().size()-1) &&
                             tt.getPeers().values().stream().allMatch(x -> x.getLeft() == 0))) {
                         System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
                         synchronized (clients) {
-                            try {
-                                if(replication){
-                                    clients.get(tt.getHexInfoHash()).stop(false);
-                                    clients.remove(tt.getHexInfoHash());
-                                }else{
-                                    tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
-                                    removeInjectionRequest(clients.get(tt.getHexInfoHash()).getPeerSpec(), tt);
-                                    clients.get(tt.getHexInfoHash()).stop(false);
-                                    clients.remove(tt.getHexInfoHash());
-                                    tck.remove(t);
-                                    FileUtils.deleteFiles(t);
-                                    new Thread(() -> {
-                                        try {
-                                            FileUtils.deleteFiles(tt);
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    });
+                            if(replication){
+                                clients.get(tt.getHexInfoHash()).stop(false);
+                                clients.remove(tt.getHexInfoHash());
+                                for (TrackedPeer del : tt.getInjectedPeers())
+                                    if(!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
+                                        tt.removeInjectedPeer(del.getHexPeerId());
+                                deletionsWaiting.remove(tt.getHexInfoHash());
+                                try {
+                                    if(ZooKeeperUtil.incrementReceived(group, t.getHexInfoHash())){
+                                        tck.remove(t);
+                                        new Thread(() -> {
+                                            try {
+                                                FileUtils.deleteTorrent(t, group);
+                                                FileUtils.deleteFiles(t);
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }).start();
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                            }else{
+                                clients.get(t.getHexInfoHash()).stop(false);
+                                clients.remove(t.getHexInfoHash());
+                                tt.removelocalInjectPeerID(clients.get(t.getHexInfoHash()).getPeerSpec().getHexPeerId());
+                                deletionsWaiting.remove(t.getHexInfoHash());
+                                tck.remove(t);
+                                new Thread(() -> {
+                                    try {
+                                        FileUtils.deleteFiles(t);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }).start();
                             }
                         }
                     }

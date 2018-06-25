@@ -19,10 +19,14 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
     private Tracker tck;
     private Map<String, Client> openClients;
     private Map<String, ArrayList<TrackedPeer>> injectionsWaiting;
+    private Map<String, ArrayList<TrackedPeer>> deletionsWaiting;
 
-    public InterserverHandler(Tracker trackedTorrentsParam, Map<String, Client> openClientsParam, Map<String, ArrayList<TrackedPeer>> injectionsWaitingParam) {
+    public InterserverHandler(Tracker trackedTorrentsParam, Map<String, Client> openClientsParam,
+                              Map<String, ArrayList<TrackedPeer>> injectionsWaitingParam,
+                              Map<String, ArrayList<TrackedPeer>> deletionsWaitingParam) {
         this.openClients = openClientsParam;
         this.injectionsWaiting = injectionsWaitingParam;
+        this.deletionsWaiting = deletionsWaitingParam;
         this.tck = trackedTorrentsParam;
     }
 
@@ -58,9 +62,15 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
         }else{
             System.out.println("Handle peer deletion");
             TrackedTorrent tt =  tck.getTrackedTorrents().stream().peek(x -> x.getHexInfoHash().equals(torrentId)).findFirst().get();
-            tt.removeInjectedPeer(Utils.bytesToHex(peerId.getBytes(Torrent.BYTE_ENCODING)));
-            //Um servidor eliminou o ficheiro.
-            //TODO: DELETE
+            if(!deletionsWaiting.containsKey(torrentId) || deletionsWaiting.get(torrentId) == null)
+                deletionsWaiting.put(torrentId, new ArrayList<>());
+            TrackedPeer deleteadd = new TrackedPeer(null, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING)));
+            if(deletionsWaiting.get(torrentId).stream().anyMatch(x -> x.getHexPeerId().equals(deleteadd.getHexPeerId()))){
+                System.out.println("Remove injection duplicated");
+            }else{
+                deletionsWaiting.get(torrentId).add(deleteadd);
+            }
+            //tt.removeInjectedPeer(Utils.bytesToHex(peerId.getBytes(Torrent.BYTE_ENCODING)));
         }
     }
 
