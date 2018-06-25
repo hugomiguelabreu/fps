@@ -113,8 +113,8 @@ req_file(ID, File) ->
 		    		io:format("> Requested torrent to Tracker\n"),
 					receive 
 						{tcp, TrackerSocket, Data} ->
-							gen_tcp:close(TrackerSocket),
-							msg_decrypt(Data);
+							msg_decrypt(Data),
+							gen_tcp:close(TrackerSocket);
 						_ ->
 							req_file(ID, File)
 					end;
