@@ -133,13 +133,13 @@ create_group(PID,Name,User) ->
 	GroupPath = "/groups/" ++ Name,
 	case erlzk:exists(PID,GroupPath) of
 		{error, no_node} ->
-			erlzk:create(PID,GroupPath, list_to_binary("")),
-			erlzk:create(PID,GroupPath ++ "/log", list_to_binary("")),
-			erlzk:create(PID,GroupPath ++ "/meta", list_to_binary("")),
-			erlzk:create(PID,GroupPath ++ "/torrents", list_to_binary("")),
-			erlzk:create(PID,GroupPath ++ "/users", list_to_binary("")),
-			erlzk:create(PID,GroupPath ++ "/users/" ++ User, list_to_binary("admin")),
-			erlzk:create(PID, "/users/" ++ User ++ "/groups/" ++ Name, ""),
+			erlzk:create(PID, GroupPath, list_to_binary("")),
+			erlzk:create(PID, GroupPath ++ "/log", list_to_binary("")),
+			erlzk:create(PID, GroupPath ++ "/meta", list_to_binary("")),
+			erlzk:create(PID, GroupPath ++ "/torrents", list_to_binary("")),
+			erlzk:create(PID, GroupPath ++ "/users", list_to_binary("")),
+			erlzk:create(PID, GroupPath ++ "/users/" ++ User, list_to_binary("admin")),
+			erlzk:create(PID, "/users/" ++ User ++ "/groups/" ++ Name, list_to_binary("")),
 			ok;
 		{ok, _} ->
 			group_exists;
@@ -155,7 +155,7 @@ join_group(Name, Username, PID) ->
 			no_group;
 		{ok, _} ->
 			erlzk:create(PID, GroupPath ++ "/users/" ++ Username, list_to_binary("user")),
-			erlzk:create(PID, "/users/" ++ Username ++ "/groups/" ++ Name, ""),
+			erlzk:create(PID, "/users/" ++ Username ++ "/groups/" ++ Name, list_to_binary("")),
 			ok;
 		_ ->
 			error
@@ -246,7 +246,6 @@ users_online_group(Group, PID) ->
 		_ ->
 			[]
 	end.
-	
 is_online_user(User, PID) ->
 	case erlzk:get_data(PID, "/users/" ++ User ++ "/online") of
 		{error, _} ->

@@ -88,7 +88,7 @@ set_received(TID, Username, Group) ->
 					{ok, remove} ->
 						file:delete("./torrents/" ++ binary_to_list(TID));
 					_ ->
-						io:format(">> torrent "  ++ binary_to_list(TID) ++ "removido.\n")
+						io:format(">> torrent "  ++ binary_to_list(TID) ++ " removido.\n")
 	end.
 
 msg_decrypt(Data, User, Socket, ID) ->
@@ -164,8 +164,8 @@ create_group(User, GroupName, Socket) ->
 			gen_tcp:send(Socket, MsgContainer);
 		group_exists ->
 			MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {response,#'Response'{rep=false}}}),
-			Result = gen_tcp:send(Socket, MsgContainer),
-			io:format(Result);
+			io:format("ola"),
+			gen_tcp:send(Socket, MsgContainer);
 		error -> 
 			create_group(User,GroupName,Socket)
 	end.
