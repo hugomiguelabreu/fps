@@ -106,9 +106,13 @@ public class TorrentUtil {
                             } else {
                                 System.out.println("WONT REPLICATE");
                                 clients.get(tt.getHexInfoHash()).stop(false);
+                                System.out.println("ELIMINAR1");
                                 clients.remove(tt.getHexInfoHash());
+                                System.out.println("ELIMINAR2");
                                 tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
+                                System.out.println("ELIMINAR3");
                                 deletionsWaiting.remove(tt.getHexInfoHash());
+                                System.out.println("ELIMINAR4");
                                 tck.remove(t);
                                 System.out.println("ELIMINAR");
                                 new Thread(() -> {
