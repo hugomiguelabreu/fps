@@ -65,7 +65,7 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
             if(!deletionsWaiting.containsKey(torrentId) || deletionsWaiting.get(torrentId) == null)
                 deletionsWaiting.put(torrentId, new ArrayList<>());
             TrackedPeer deleteadd = new TrackedPeer(null, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING)));
-            if(deletionsWaiting.containsKey(deleteadd)){
+            if(deletionsWaiting.get(torrentId).stream().anyMatch(x -> x.getHexPeerId().equals(deleteadd.getHexPeerId()))){
                 System.out.println("Remove injection duplicated");
             }else{
                 deletionsWaiting.get(torrentId).add(deleteadd);
