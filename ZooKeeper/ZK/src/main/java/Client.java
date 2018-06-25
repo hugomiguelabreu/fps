@@ -22,39 +22,92 @@ public class Client implements Runnable{
         this.password = password;
     }
 
+
+    private void send(Socket socket, ClientWrapper.ClientMessage wrapper) {
+
+       try {
+           CodedInputStream in = CodedInputStream.newInstance(socket.getInputStream());
+
+           byte[] size = ByteBuffer.allocate(4).putInt(wrapper.getSerializedSize()).array();
+           socket.getOutputStream().write(size);
+           wrapper.writeTo(socket.getOutputStream());
+
+           byte[] header = in.readRawBytes(4);
+           int l = ByteBuffer.wrap(header).getInt();
+           System.out.println(l);
+           byte[] data = in.readRawBytes(l);
+           System.out.println(username + ": " + ClientWrapper.ClientMessage.parseFrom(data));
+
+       } catch (Exception e) {}
+
+    }
+
+
     @Override
     public void run() {
         Socket socket = null;
         try {
-            if(username.equals("jib") || username.equals("cr7"))
-                socket = new Socket("localhost"  , 2001);
+            int port;
+
+            if(username.equals("Melon") || username.equals("Vaarg"))
+                port = 2001;
             else
-                socket = new Socket("localhost"  , 2002);
+                port = 2002;
 
-            CodedInputStream in = CodedInputStream.newInstance(socket.getInputStream());
-
+            socket = new Socket("localhost"  , port);
 
             ClientWrapper.Login login = ClientWrapper.Login.newBuilder()
                     .setUsername(username)
-                    .setPassword(password).build();
+                    .setPassword(password)
+                    .build();
 
             ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
                     .setLogin(login).build();
 
-
-            byte[] size = ByteBuffer.allocate(4).putInt(wrapper.getSerializedSize()).array();
-            socket.getOutputStream().write(size);
-            wrapper.writeTo(socket.getOutputStream());
-
-            byte[] header = in.readRawBytes(4);
-            int l = ByteBuffer.wrap(header).getInt();
-            byte[] data = in.readRawBytes(l);
-
-            System.out.println(ClientWrapper.ClientMessage.parseFrom(data).getResponse());
-
+            send(socket, wrapper);
             Thread.sleep(2000);
 
+            ClientWrapper.GroupUsers cg = ClientWrapper.GroupUsers.newBuilder()
+                    .setGroupUsers(username)
+                    .build();
+
+            wrapper = ClientWrapper.ClientMessage.newBuilder()
+                    .setGroupUsers(cg).build();
+
+            send(socket,wrapper);
+
+
             /*
+
+
+            if(username.equals("Vaarg")){
+                ClientWrapper.CreateGroup cg = ClientWrapper.CreateGroup.newBuilder()
+                                                .setGroup("BGUM24")
+                                                .build();
+
+                wrapper = ClientWrapper.ClientMessage.newBuilder()
+                        .setCreateGroup(cg).build();
+
+
+                send(socket, wrapper);
+
+            }
+
+             if(!username.equals("Vaarg")){
+                ClientWrapper.JoinGroup cg = ClientWrapper.JoinGroup.newBuilder()
+                                                .setGroup("Reuniao")
+                                                .build();
+
+                wrapper = ClientWrapper.ClientMessage.newBuilder()
+                        .setJoinGroup(cg).build();
+
+
+                send(socket, wrapper);
+
+            }
+
+
+
             ClientWrapper.OnlineUsers cg = ClientWrapper.OnlineUsers.newBuilder()
                                             .setOnlineUsers("leddit")
                                             .build();
@@ -74,7 +127,7 @@ public class Client implements Runnable{
 
             System.out.println(ClientWrapper.ClientMessage.parseFrom(data));
 
-           */
+
 
 
 
@@ -106,6 +159,8 @@ public class Client implements Runnable{
             System.out.println(ClientWrapper.ClientMessage.parseFrom(data).getTorrentWrapper());
             socket.close();
 
+            */
+
 
 
         } catch (Exception e) { e.printStackTrace();}
@@ -113,8 +168,8 @@ public class Client implements Runnable{
 
     public static void main(String[] args) {
 
-        (new Thread(new Client("jib", "asd"))).start();
-        (new Thread(new Client("divisao", "123"))).start();
-        (new Thread(new Client("cr7", "123"))).start();
+        (new Thread(new Client("Melon", "asd"))).start();
+        (new Thread(new Client("Vaarg", "123"))).start();
+        (new Thread(new Client("Tsuman", "123"))).start();
     }
 }
