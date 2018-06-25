@@ -80,6 +80,7 @@ public class TorrentUtil {
                         System.out.println("\u001B[31mWe will remove local peer\u001B[0m");
                         synchronized (clients) {
                             if(replication){
+                                System.out.println("WILL REPLICATE");
                                 clients.get(tt.getHexInfoHash()).stop(false);
                                 clients.remove(tt.getHexInfoHash());
                                 for (TrackedPeer del : tt.getInjectedPeers())
@@ -102,10 +103,11 @@ public class TorrentUtil {
                                     e.printStackTrace();
                                 }
                             }else{
-                                clients.get(t.getHexInfoHash()).stop(false);
-                                clients.remove(t.getHexInfoHash());
-                                tt.removelocalInjectPeerID(clients.get(t.getHexInfoHash()).getPeerSpec().getHexPeerId());
-                                deletionsWaiting.remove(t.getHexInfoHash());
+                                System.out.println("WONT REPLICATE");
+                                clients.get(tt.getHexInfoHash()).stop(false);
+                                clients.remove(tt.getHexInfoHash());
+                                tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
+                                deletionsWaiting.remove(tt.getHexInfoHash());
                                 tck.remove(t);
                                 new Thread(() -> {
                                     try {
