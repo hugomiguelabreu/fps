@@ -38,7 +38,7 @@ public class ZooKeeperUtil {
             counter.initialize((long)0);
 
 
-        byte[] data = client.getData().forPath(path + "/file/total");
+        byte[] data = client.getData().forPath(path + "/file");
         int total = Integer.parseInt(new String(data));
 
         if (counter.increment().postValue() == total - 1) {
