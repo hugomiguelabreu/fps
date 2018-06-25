@@ -66,4 +66,14 @@ public class FileUtils {
 
         return ret;
     }
+
+    public static void deletePartFile(String file){
+        Path path = Paths.get(saveFilesPath + file + ".part");
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

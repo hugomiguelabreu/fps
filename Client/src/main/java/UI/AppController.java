@@ -27,12 +27,14 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.util.Duration;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class AppController implements MapEvent{
 
@@ -77,12 +79,25 @@ public class AppController implements MapEvent{
 
         notifications = new ArrayList<>();
 
-        groupTorrents.put("migos", new ArrayList<>());
-        groupUsers.put("migos", new ArrayList<>());
-        groupTorrents.put("leddit", new ArrayList<>());
-        groupUsers.put("leddit", new ArrayList<>());
+        ArrayList<String> groups = ServerOperations.getUsersGroup();
 
-        list_groups.setItems(FXCollections.observableArrayList(new ArrayList<>(groupTorrents.keySet())));
+        for(String g: groups){
+
+            ArrayList<String> list = ServerOperations.getOnlineUsers(g);
+
+            if(list != null){
+                groupUsers.put(g, list);
+            }
+
+            groupTorrents.put(g,new ArrayList<>());
+        }
+
+//        groupTorrents.put("migos", new ArrayList<>());
+//        groupUsers.put("migos", new ArrayList<>());
+//        groupTorrents.put("leddit", new ArrayList<>());
+//        groupUsers.put("leddit", new ArrayList<>());
+
+        //list_groups.setItems(FXCollections.observableArrayList(new ArrayList<>(groupTorrents.keySet())));
 
         list_groups.addEventHandler(javafx.scene.input.MouseEvent.MOUSE_CLICKED, event -> {
             try {
@@ -97,6 +112,8 @@ public class AppController implements MapEvent{
                 e.printStackTrace();
             }
         });
+
+        updateUsersGroups();
     }
 
     private void loadFiles(String group) throws IOException, NoSuchAlgorithmException {
@@ -192,7 +209,9 @@ public class AppController implements MapEvent{
                 pane.getChildren().add(pb);
                 pane.getChildren().add(pi);
                 new Thread(() -> {
+
                     TorrentUtil.download(st, true, ServerOperations.username, groupSelected, pb, pi);
+
                 }).start();
             } catch (IOException | NoSuchAlgorithmException e) {
                 e.printStackTrace();
@@ -200,12 +219,14 @@ public class AppController implements MapEvent{
         });
 
         close.setOnMouseClicked(mouseEvent -> {
+
             ServerOperations.removeTorrent(t, groupSelected);
             ServerOperations.removeClient(t);
             AnchorPane selectedPane = (AnchorPane) close.getUserData();
             list_groups_files.getChildren().remove(selectedPane);
             int indexNot = notifications.indexOf(selectedPane);
             notifications.remove(selectedPane);
+
             for(Pane p : notifications){
                 if(notifications.indexOf(p) >= indexNot){
                     System.out.println("go up");
@@ -240,8 +261,11 @@ public class AppController implements MapEvent{
             a.showAndWait().filter(response -> response == ButtonType.OK);
         }else{
             String path = event.getDragboard().getFiles().get(0).getAbsolutePath();
-            new Thread(()->
-                ServerOperations.sendTorrent(path, groupSelected)
+            new Thread(()-> {
+                String p = "/root/120MB.tar.gz";
+                ServerOperations.sendTorrent(p, groupSelected);
+            }
+
             ).start();
         }
         event.setDropCompleted(true);
@@ -322,5 +346,37 @@ public class AppController implements MapEvent{
     @Override
     public void removeEvent() {
 
+    }
+
+    private void updateUsersGroups(){
+
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool ( 1 );
+
+        Runnable r = () -> {
+
+            try {
+
+                for (Map.Entry<String, ArrayList<String>> entry : groupUsers.entrySet()) {
+
+                    groupUsers.put(entry.getKey(), ServerOperations.getOnlineUsers(entry.getKey()));
+                }
+
+                Platform.runLater(() -> {
+
+                    try{
+
+                        list_users.setItems(FXCollections.observableArrayList(groupUsers.get(groupSelected)));
+
+                    }catch (NullPointerException e){
+                        //no group selected
+                    }
+                });
+
+            } catch ( Exception e ) {
+                e.printStackTrace();
+            }
+        };
+
+        executor.scheduleAtFixedRate( r , 500 , 3000 , TimeUnit.MILLISECONDS ); // ( runnable , initialDelay , period , TimeUnit )
     }
 }

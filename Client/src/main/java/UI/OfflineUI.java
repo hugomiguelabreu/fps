@@ -14,7 +14,6 @@ import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -56,6 +55,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
     private ArrayList<AnchorPane> notifications;
     private HashMap<String, ArrayList<String>> groups;
     private HashMap<String,Client> torrentClients;
+    private HashMap<String,Client> clientsDownloading;
 
     @FXML
     void initialize(){
@@ -69,6 +69,7 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         usersOn = new HashMap<>();
         groups = new HashMap<>();
         torrentClients = new HashMap<>();
+        clientsDownloading = new HashMap<>();
     }
 
     public void initLocal(String username){
@@ -371,21 +372,21 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                 ProgressBar pb = new ProgressBar(0);
                 ProgressIndicator pi = new ProgressIndicator(0);
 
-                pb.setPrefWidth(70);
+                pb.setPrefWidth(50);
                 pb.setLayoutY(15);
-                pb.setLayoutX(378);
+                pb.setLayoutX(368);
 
-                pi.setLayoutX(363);
+                pi.setLayoutX(425);
                 pi.setLayoutY(8);
 
                 pane.getChildren().remove(accept);
                 pane.getChildren().add(pb);
                 pane.getChildren().add(pi);
 
-
                 try {
                     SharedTorrent st = new SharedTorrent(t, dest);
-                    TorrentUtil.download(st, false, username, "", pb, pi);
+                    Client c = TorrentUtil.download(st, false, username, "", pb, pi);
+                    clientsDownloading.put(t.getHexInfoHash(),c);
                 } catch (IOException | NoSuchAlgorithmException e) {
                     e.printStackTrace();
                 }
@@ -394,6 +395,11 @@ public class OfflineUI implements MapEvent, ArrayEvent {
         });
 
         close.setOnMouseClicked(mouseEvent -> {
+
+            Client c = clientsDownloading.get(t.getHexInfoHash());
+            c.stop();
+            clientsDownloading.remove(c);
+            FileUtils.deletePartFile(t.getFilenames().get(0));
 
             AnchorPane selectedPane = (AnchorPane) close.getUserData();
             mainPane.getChildren().remove(selectedPane);
@@ -409,19 +415,6 @@ public class OfflineUI implements MapEvent, ArrayEvent {
                     up.setNode(p);
                     up.play();
                 }
-            }
-
-            // remove o torrent do tracker e para o cliente a ele associado
-
-            try{
-                offlineTck.remove(t);
-                System.out.println("remove torrent");
-                torrentClients.get(t.getHexInfoHash()).stop();
-                System.out.println("remove cliente");
-                torrentClients.remove(t.getHexInfoHash());
-                System.out.println("remove do hashmap");
-            }catch (Exception e){
-                // o cliente pode ainda nao ter iniciado
             }
 
         });

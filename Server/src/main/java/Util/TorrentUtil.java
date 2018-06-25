@@ -53,6 +53,10 @@ public class TorrentUtil {
         tt.addObserver((o, arg) -> {
             TrackedPeer tp = (TrackedPeer) arg;
             synchronized (clients) {
+
+                for (TrackedPeer rp : tt.getInjectedPeers())
+                    System.out.println(rp.getIp() + ":" + rp.getPort());
+
                 if (!tp.getState().equals(TrackedPeer.PeerState.STOPPED) && !tp.getState().equals(TrackedPeer.PeerState.UNKNOWN)) {
                     if (tp.getLeft() == 0) {
                         //Verificar se posso desligar
@@ -80,12 +84,25 @@ public class TorrentUtil {
                                 System.out.println("WILL REPLICATE");
                                 clients.get(tt.getHexInfoHash()).stop(false);
                                 clients.remove(tt.getHexInfoHash());
-                                for (TrackedPeer del : tt.getInjectedPeers())
-                                    if (!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
-                                        tt.removeInjectedPeer(del.getHexPeerId());
+                                new Thread(() -> {
+                                    try{
+                                        for (TrackedPeer del : tt.getInjectedPeers()){
+                                            System.out.println("CICLO");
+                                            if (!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())){
+                                                System.out.println("ELIMINA");
+                                                tt.removeInjectedPeer(del.getHexPeerId());
+                                                System.out.println("ELIMINOU");
+                                            }
+                                        System.out.println("ELIMINEI TODOS OS INJETADOS");
+                                        }
+                                    }catch (Exception e){
+                                        e.printStackTrace();
+                                    }
+                                }).start();
                                 deletionsWaiting.remove(tt.getHexInfoHash());
                                 try {
                                     if (ZooKeeperUtil.incrementReceived(group, t.getHexInfoHash())) {
+                                        System.out.println("TODA A GENTE FEZ O DOWNLOAD");
                                         tck.remove(t);
                                         new Thread(() -> {
                                             try {
@@ -103,10 +120,8 @@ public class TorrentUtil {
                                 System.out.println("WONT REPLICATE");
                                 clients.get(tt.getHexInfoHash()).stop(false);
                                 clients.remove(tt.getHexInfoHash());
-                                tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
                                 deletionsWaiting.remove(tt.getHexInfoHash());
                                 tck.remove(t);
-                                System.out.println("ELIMINAR");
                                 new Thread(() -> {
                                     try {
                                         FileUtils.deleteFiles(t);

@@ -20,12 +20,18 @@ public class Connector extends Thread{
     private CodedInputStream in;
     private Socket socket;
     private LinkedBlockingQueue<Boolean> responses;
+    private LinkedBlockingQueue<String> groupsResponses;
+    private LinkedBlockingQueue<String> usersResponses;
     private boolean connected;
     private boolean stop;
 
 
     public Connector(Collection<String> ips) throws URISyntaxException {
+
         responses = new LinkedBlockingQueue<>();
+        groupsResponses = new LinkedBlockingQueue<>();
+        usersResponses = new LinkedBlockingQueue<>();
+
         for (String ip : ips) {
             URI uri = new URI("fps://" + ip);
             try {
@@ -64,9 +70,27 @@ public class Connector extends Thread{
                             true);
                     ServerOperations.addTorrent(t, group);
                 }else{
-                    boolean response = cm.getResponse().getRep();
-                    System.out.println(response);
-                    this.responses.offer(response);
+
+                    // recebeu a resposta a um pedido de users de um grupo
+                    if(cm.getMsgCase().equals(ClientWrapper.ClientMessage.MsgCase.GROUPUSERS)){
+
+                        String s = cm.getGroupUsers().getGroupUsers();
+                        groupsResponses.offer(s);
+
+                    }else{
+
+                        if(cm.getMsgCase().equals(ClientWrapper.ClientMessage.MsgCase.ONLINEUSERS)){
+
+                            String s = cm.getOnlineUsers().getOnlineUsers();
+                            usersResponses.offer(s);
+
+                        }else {
+
+                            boolean response = cm.getResponse().getRep();
+                            System.out.println(response);
+                            this.responses.offer(response);
+                        }
+                    }
                 }
 
             } catch (Exception e) {
@@ -78,6 +102,14 @@ public class Connector extends Thread{
 
     public boolean readResponse() throws InterruptedException {
         return this.responses.take();
+    }
+
+    public String readGroupResponses() throws InterruptedException {
+        return this.groupsResponses.take();
+    }
+
+    public String readUserResponses() throws InterruptedException {
+        return this.usersResponses.take();
     }
 
     public boolean send(ClientWrapper.ClientMessage msg){
