@@ -9,7 +9,8 @@ message FrontEndTorrent{
 }
 
 message TrackerTorrent{
-    bytes content = 1;
+    string group = 1;
+    bytes content = 2;
 }
 
 message ServerMessage {

@@ -316,7 +316,7 @@ getNewContent(User, PID) ->
 
 getGroupOnline(G) -> rpc({group_online, G}).
 getGroupOnline(Group, PID) ->
-	case getGroupUsers(Group) of 
+	case erlzk:get_children(PID,"/groups/" ++ Group  ++ "/users") of 
 		{ok, L} ->
 			lists:filter(fun(X) -> isUserOnline(X,PID)== true end, L);
 		_ ->

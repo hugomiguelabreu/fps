@@ -53,6 +53,11 @@ public class FileUtils {
         Files.deleteIfExists(fileDownloaded.toPath());
     }
 
+    public static void deleteTorrent(Torrent t) throws IOException {
+        File torrent = new File(System.getProperty( "user.home" ) + "/.fps-server/" + t.getHexInfoHash());
+        Files.deleteIfExists(torrent.toPath());
+    }
+
     public static String getMyIP() throws IOException {
         URL whatismyip = new URL("http://checkip.amazonaws.com");
         BufferedReader in = new BufferedReader(new InputStreamReader(

@@ -55,12 +55,12 @@ public class Client implements Runnable{
             Thread.sleep(2000);
 
 
-            ClientWrapper.GroupUsers cg = ClientWrapper.GroupUsers.newBuilder()
-                                            .setGroupUsers(username)
+            ClientWrapper.OnlineUsers cg = ClientWrapper.OnlineUsers.newBuilder()
+                                            .setOnlineUsers("leddit")
                                             .build();
 
             wrapper = ClientWrapper.ClientMessage.newBuilder()
-                    .setGroupUsers(cg).build();
+                    .setOnlineUsers(cg).build();
 
             System.out.println(wrapper);
 
@@ -133,8 +133,9 @@ public class Client implements Runnable{
     }
 
     public static void main(String[] args) {
-         (new Thread(new Client("jib", "asd"))).start();
-        //(new Thread(new Client("merda", "123"))).start();
+
+        (new Thread(new Client("jib", "asd"))).start();
+        (new Thread(new Client("merda", "123"))).start();
         //(new Thread(new Client("cr7", "123"))).start();
     }
 }
