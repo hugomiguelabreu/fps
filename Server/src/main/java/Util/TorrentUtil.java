@@ -109,6 +109,7 @@ public class TorrentUtil {
                                 tt.removelocalInjectPeerID(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId());
                                 deletionsWaiting.remove(tt.getHexInfoHash());
                                 tck.remove(t);
+                                System.out.println("ELIMINAR");
                                 new Thread(() -> {
                                     try {
                                         FileUtils.deleteFiles(t);
