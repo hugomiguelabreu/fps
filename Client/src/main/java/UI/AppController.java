@@ -268,6 +268,9 @@ public class AppController implements MapEvent{
 
             ).start();
         }
+
+        showAlert("File sent");
+
         event.setDropCompleted(true);
         event.consume();
     }
