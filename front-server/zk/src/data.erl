@@ -4,7 +4,7 @@
 % o primeiro atributo do record e a Key
 -record(connections, {user, pid}).
 
--export ([start/0, register_pid/2, get_pid/1, delete_pid/1, create_file/2, delete_file/2, check_new_content/2]).
+-export ([start/0, register_pid/2, get_pid/1, delete_pid/1, create_file/2, delete_file/1, check_new_content/2]).
 
 %%====================================================================
 %% start mnesia
@@ -64,10 +64,10 @@ create_file(Filename, Content) ->
 			io:format("File " ++ Filename ++ " already exists.")
 	end.
 
-delete_file(Filename, Content) ->
+delete_file(Filename) ->
 	case file:read_file_info("./torrents/" ++ Filename) of 
 		{error, _} ->
-			file:write_file("./torrents/" ++ Filename, Content);
+			file:delete("./torrents/" ++ Filename);
 		_ ->
 			io:format("File " ++ Filename ++ " already exists.")
 	end.
