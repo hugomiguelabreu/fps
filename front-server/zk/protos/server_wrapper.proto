@@ -17,11 +17,16 @@ message RequestTorrent {
     string id = 1; 
 }
 
+message TorrentResponse{
+    bytes content = 1;
+}
+
 message ServerMessage {
     oneof msg {
         FrontEndTorrent frontEndTorrent = 1;
         TrackerTorrent trackerTorrent = 2;
         RequestTorrent requestTorrent = 3;
+        TorrentResponse torrentResponse = 4;
     }   
 }
 

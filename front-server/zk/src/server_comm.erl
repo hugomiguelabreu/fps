@@ -45,10 +45,12 @@ msg_decrypt(Data) ->
 						zk:unreceived_torrent(binary_to_list(TID), User, binary_to_list(Group))
 				end
 			end, string:tokens(binary_to_list(UserList),";"));
-		trackerTorrent ->
-			{'RequestTorrent', _, C} = D,
+		torrentResponse ->
+			{'TorrentResponse', C} = D,
 			C;
-		t
+		removeTorrent ->
+			{'RemoveTorrent', ID} = D,
+			data:delete_file(ID)
 	end.
 
 
@@ -96,7 +98,7 @@ send_tracker(ID, Data, Group) ->
 	end.
 
 req_file(ID, File) ->
-	TrackerLOC = zk:getTracker(ID),
+	TrackerLOC = zk:getTracker(1),
 
 	case TrackerLOC of 
 		error ->
