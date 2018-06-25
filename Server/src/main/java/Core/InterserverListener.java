@@ -1,7 +1,6 @@
 package Core;
 
 import Handlers.InterserverInitializer;
-import Handlers.TorrentServerInitializer;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.Tracker;
@@ -24,12 +23,16 @@ public class InterserverListener extends Thread{
     private Tracker tck;
     private Map<String, Client> clients;
     private Map<String, ArrayList<TrackedPeer>> injectionsWaiting;
+    private Map<String, ArrayList<TrackedPeer>> deletionsWaiting;
 
-    public InterserverListener(int portParam, Tracker tckParam, Map<String, Client> clientsParam, ConcurrentHashMap<String, ArrayList<TrackedPeer>> injectionsWaitingParam){
+    public InterserverListener(int portParam, Tracker tckParam, Map<String, Client> clientsParam,
+                               ConcurrentHashMap<String, ArrayList<TrackedPeer>> injectionsWaitingParam,
+                               ConcurrentHashMap<String, ArrayList<TrackedPeer>> deletionsWaitingParam){
         this.port = portParam;
         this.tck = tckParam;
         this.clients = clientsParam;
         this.injectionsWaiting = injectionsWaitingParam;
+        this.deletionsWaiting = deletionsWaitingParam;
         //Acceptor
         this.bossGroup = new NioEventLoopGroup(1);
         //Workers
@@ -41,7 +44,7 @@ public class InterserverListener extends Thread{
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new InterserverInitializer(tck, clients, injectionsWaiting));
+                    .childHandler(new InterserverInitializer(tck, clients, injectionsWaiting, deletionsWaiting));
 
             cf = b.bind(port).sync();
             //Wait for channel to close

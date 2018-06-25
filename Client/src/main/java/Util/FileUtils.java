@@ -32,6 +32,7 @@ public class FileUtils {
     public static void addTorrent(Torrent t, String group){
         FileOutputStream fos = null;
         try {
+            new File(System.getProperty( "user.home" ) + "/.fps/" + group).mkdirs();
             fos = new FileOutputStream(System.getProperty( "user.home" ) + "/.fps/" + group + "/" + t.getHexInfoHash());
             t.save(fos);
             IOUtils.closeQuietly(fos);
@@ -65,4 +66,14 @@ public class FileUtils {
 
         return ret;
     }
+
+    public static void deletePartFile(String file){
+        Path path = Paths.get(saveFilesPath + file + ".part");
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

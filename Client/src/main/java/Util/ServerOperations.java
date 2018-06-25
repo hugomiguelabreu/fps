@@ -58,7 +58,8 @@ public class ServerOperations {
     }
 
     public static void removeTorrent(Torrent t, String group) {
-        ArrayList<Torrent> gt = groupTorrents.get(group);
+        System.out.println(group);
+        ArrayList<Torrent> gt = ServerOperations.groupTorrents.get(group);
         gt.removeIf(x -> x.getHexInfoHash().equals(t.getHexInfoHash()));
         FileUtils.deleteTorrent(t, group);
     }
@@ -201,6 +202,73 @@ public class ServerOperations {
         }
 
         return ret;
+    }
+
+    public static ArrayList<String> getUsersGroup(){
+
+        if(channel == null)
+            return null;
+
+        ClientWrapper.GroupUsers request = ClientWrapper.GroupUsers.newBuilder()
+                .setGroupUsers(username).build();
+
+        ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
+                .setGroupUsers(request).build();
+
+        if(!channel.send(wrapper))
+            return null;
+
+        System.out.println("username = " + username);
+
+        try {
+            ArrayList list = new ArrayList<>();
+            String s = channel.readGroupResponses();
+
+            System.out.println("String = " + s);
+
+            for(String ss : s.split(";")){
+
+                list.add(ss);
+            }
+
+            return list;
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static ArrayList<String> getOnlineUsers(String group){
+
+        if(channel == null)
+            return null;
+
+        ClientWrapper.OnlineUsers request = ClientWrapper.OnlineUsers.newBuilder()
+                .setOnlineUsers(group).build();
+
+        ClientWrapper.ClientMessage wrapper = ClientWrapper.ClientMessage.newBuilder()
+                .setOnlineUsers(request).build();
+
+        if(!channel.send(wrapper))
+            return null;
+
+        try {
+            ArrayList list = new ArrayList<>();
+            String s = channel.readUserResponses();
+
+            for(String ss : s.split(";")){
+
+                list.add(ss);
+            }
+
+            return list;
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
 }

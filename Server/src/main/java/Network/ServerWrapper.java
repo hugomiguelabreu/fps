@@ -862,7 +862,17 @@ public final class ServerWrapper {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>bytes content = 1;</code>
+     * <code>string group = 1;</code>
+     */
+    java.lang.String getGroup();
+    /**
+     * <code>string group = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getGroupBytes();
+
+    /**
+     * <code>bytes content = 2;</code>
      */
     com.google.protobuf.ByteString getContent();
   }
@@ -878,6 +888,7 @@ public final class ServerWrapper {
       super(builder);
     }
     private TrackerTorrent() {
+      group_ = "";
       content_ = com.google.protobuf.ByteString.EMPTY;
     }
 
@@ -907,6 +918,12 @@ public final class ServerWrapper {
               break;
             }
             case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              group_ = s;
+              break;
+            }
+            case 18: {
 
               content_ = input.readBytes();
               break;
@@ -934,10 +951,44 @@ public final class ServerWrapper {
               Network.ServerWrapper.TrackerTorrent.class, Network.ServerWrapper.TrackerTorrent.Builder.class);
     }
 
-    public static final int CONTENT_FIELD_NUMBER = 1;
+    public static final int GROUP_FIELD_NUMBER = 1;
+    private volatile java.lang.Object group_;
+    /**
+     * <code>string group = 1;</code>
+     */
+    public java.lang.String getGroup() {
+      java.lang.Object ref = group_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        group_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string group = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getGroupBytes() {
+      java.lang.Object ref = group_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        group_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int CONTENT_FIELD_NUMBER = 2;
     private com.google.protobuf.ByteString content_;
     /**
-     * <code>bytes content = 1;</code>
+     * <code>bytes content = 2;</code>
      */
     public com.google.protobuf.ByteString getContent() {
       return content_;
@@ -955,8 +1006,11 @@ public final class ServerWrapper {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (!getGroupBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, group_);
+      }
       if (!content_.isEmpty()) {
-        output.writeBytes(1, content_);
+        output.writeBytes(2, content_);
       }
     }
 
@@ -965,9 +1019,12 @@ public final class ServerWrapper {
       if (size != -1) return size;
 
       size = 0;
+      if (!getGroupBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, group_);
+      }
       if (!content_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, content_);
+          .computeBytesSize(2, content_);
       }
       memoizedSize = size;
       return size;
@@ -985,6 +1042,8 @@ public final class ServerWrapper {
       Network.ServerWrapper.TrackerTorrent other = (Network.ServerWrapper.TrackerTorrent) obj;
 
       boolean result = true;
+      result = result && getGroup()
+          .equals(other.getGroup());
       result = result && getContent()
           .equals(other.getContent());
       return result;
@@ -997,6 +1056,8 @@ public final class ServerWrapper {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + GROUP_FIELD_NUMBER;
+      hash = (53 * hash) + getGroup().hashCode();
       hash = (37 * hash) + CONTENT_FIELD_NUMBER;
       hash = (53 * hash) + getContent().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -1117,6 +1178,8 @@ public final class ServerWrapper {
       }
       public Builder clear() {
         super.clear();
+        group_ = "";
+
         content_ = com.google.protobuf.ByteString.EMPTY;
 
         return this;
@@ -1141,6 +1204,7 @@ public final class ServerWrapper {
 
       public Network.ServerWrapper.TrackerTorrent buildPartial() {
         Network.ServerWrapper.TrackerTorrent result = new Network.ServerWrapper.TrackerTorrent(this);
+        result.group_ = group_;
         result.content_ = content_;
         onBuilt();
         return result;
@@ -1183,6 +1247,10 @@ public final class ServerWrapper {
 
       public Builder mergeFrom(Network.ServerWrapper.TrackerTorrent other) {
         if (other == Network.ServerWrapper.TrackerTorrent.getDefaultInstance()) return this;
+        if (!other.getGroup().isEmpty()) {
+          group_ = other.group_;
+          onChanged();
+        }
         if (other.getContent() != com.google.protobuf.ByteString.EMPTY) {
           setContent(other.getContent());
         }
@@ -1212,15 +1280,84 @@ public final class ServerWrapper {
         return this;
       }
 
+      private java.lang.Object group_ = "";
+      /**
+       * <code>string group = 1;</code>
+       */
+      public java.lang.String getGroup() {
+        java.lang.Object ref = group_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          group_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string group = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getGroupBytes() {
+        java.lang.Object ref = group_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          group_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string group = 1;</code>
+       */
+      public Builder setGroup(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        group_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string group = 1;</code>
+       */
+      public Builder clearGroup() {
+        
+        group_ = getDefaultInstance().getGroup();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string group = 1;</code>
+       */
+      public Builder setGroupBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        group_ = value;
+        onChanged();
+        return this;
+      }
+
       private com.google.protobuf.ByteString content_ = com.google.protobuf.ByteString.EMPTY;
       /**
-       * <code>bytes content = 1;</code>
+       * <code>bytes content = 2;</code>
        */
       public com.google.protobuf.ByteString getContent() {
         return content_;
       }
       /**
-       * <code>bytes content = 1;</code>
+       * <code>bytes content = 2;</code>
        */
       public Builder setContent(com.google.protobuf.ByteString value) {
         if (value == null) {
@@ -1232,7 +1369,7 @@ public final class ServerWrapper {
         return this;
       }
       /**
-       * <code>bytes content = 1;</code>
+       * <code>bytes content = 2;</code>
        */
       public Builder clearContent() {
         
@@ -2153,11 +2290,12 @@ public final class ServerWrapper {
     java.lang.String[] descriptorData = {
       "\n\024server_wrapper.proto\022\007Network\"K\n\017Front" +
       "EndTorrent\022\n\n\002id\030\001 \001(\t\022\014\n\004user\030\002 \001(\t\022\r\n\005" +
-      "group\030\003 \001(\t\022\017\n\007content\030\004 \001(\014\"!\n\016TrackerT" +
-      "orrent\022\017\n\007content\030\001 \001(\014\"~\n\rServerMessage" +
-      "\0223\n\017frontEndTorrent\030\001 \001(\0132\030.Network.Fron" +
-      "tEndTorrentH\000\0221\n\016trackerTorrent\030\002 \001(\0132\027." +
-      "Network.TrackerTorrentH\000B\005\n\003msgb\006proto3"
+      "group\030\003 \001(\t\022\017\n\007content\030\004 \001(\014\"0\n\016TrackerT" +
+      "orrent\022\r\n\005group\030\001 \001(\t\022\017\n\007content\030\002 \001(\014\"~" +
+      "\n\rServerMessage\0223\n\017frontEndTorrent\030\001 \001(\013" +
+      "2\030.Network.FrontEndTorrentH\000\0221\n\016trackerT" +
+      "orrent\030\002 \001(\0132\027.Network.TrackerTorrentH\000B" +
+      "\005\n\003msgb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2182,7 +2320,7 @@ public final class ServerWrapper {
     internal_static_Network_TrackerTorrent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Network_TrackerTorrent_descriptor,
-        new java.lang.String[] { "Content", });
+        new java.lang.String[] { "Group", "Content", });
     internal_static_Network_ServerMessage_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_Network_ServerMessage_fieldAccessorTable = new

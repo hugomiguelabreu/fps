@@ -3,6 +3,7 @@ package Handlers;
 import Network.Interserver;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.common.Torrent;
+import com.turn.ttorrent.common.Utils;
 import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
@@ -18,16 +19,19 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
     private Tracker tck;
     private Map<String, Client> openClients;
     private Map<String, ArrayList<TrackedPeer>> injectionsWaiting;
+    private Map<String, ArrayList<TrackedPeer>> deletionsWaiting;
 
-    public InterserverHandler(Tracker trackedTorrentsParam, Map<String, Client> openClientsParam, Map<String, ArrayList<TrackedPeer>> injectionsWaitingParam) {
+    public InterserverHandler(Tracker trackedTorrentsParam, Map<String, Client> openClientsParam,
+                              Map<String, ArrayList<TrackedPeer>> injectionsWaitingParam,
+                              Map<String, ArrayList<TrackedPeer>> deletionsWaitingParam) {
         this.openClients = openClientsParam;
         this.injectionsWaiting = injectionsWaitingParam;
+        this.deletionsWaiting = deletionsWaitingParam;
         this.tck = trackedTorrentsParam;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Interserver.InterServerMessage message) throws Exception {
-        System.out.println("Handle peer injection or Deletion");
         boolean type = message.getTypeOp();
         String ip = message.getServerIp().toStringUtf8();
         int port = message.getServerCliPort();
@@ -35,23 +39,38 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
         String peerId = message.getPeerId().toStringUtf8();
 
         if(type){
+            System.out.println("Handle peer injection");
             if(openClients.containsKey(torrentId)){
+                System.out.println("TENHO");
                 //We're handling that torrent.
                 TrackedTorrent tt =  tck.getTrackedTorrents().stream().peek(x -> x.getHexInfoHash().equals(torrentId)).findFirst().get();
                 //PEERS SUPER NODOS
-                tt.injectPeer(new TrackedPeer(tt, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING))));
+                TrackedPeer tpInj = new TrackedPeer(tt, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING)));
+                System.out.println(tpInj.getIp());
+                System.out.println(tpInj.getPort());
+                System.out.println(tpInj.getHexPeerId());
+                System.out.println(tt.getHexInfoHash());
+                tt.injectPeer(tpInj);
             }else{
+                System.out.println("NAO TENHO");
                 //Ainda não temos esse torrent, mas supostamente vamos receber.
-                if(injectionsWaiting.get(torrentId) == null)
+                if(!injectionsWaiting.containsKey(torrentId) || injectionsWaiting.get(torrentId) == null)
                     injectionsWaiting.put(torrentId, new ArrayList<>());
                 //Novo server que também vai querer e tem o ficheiro
                 injectionsWaiting.get(torrentId).add(new TrackedPeer(null, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING))));
             }
         }else{
+            System.out.println("Handle peer deletion");
             TrackedTorrent tt =  tck.getTrackedTorrents().stream().peek(x -> x.getHexInfoHash().equals(torrentId)).findFirst().get();
-            tt.removeInjectedPeer(peerId);
-            //Um servidor eliminou o ficheiro.
-            //TODO: DELETE
+            if(!deletionsWaiting.containsKey(torrentId) || deletionsWaiting.get(torrentId) == null)
+                deletionsWaiting.put(torrentId, new ArrayList<>());
+            TrackedPeer deleteadd = new TrackedPeer(null, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING)));
+            if(deletionsWaiting.containsKey(deleteadd)){
+                System.out.println("Remove injection duplicated");
+            }else{
+                deletionsWaiting.get(torrentId).add(deleteadd);
+            }
+            //tt.removeInjectedPeer(Utils.bytesToHex(peerId.getBytes(Torrent.BYTE_ENCODING)));
         }
     }
 
