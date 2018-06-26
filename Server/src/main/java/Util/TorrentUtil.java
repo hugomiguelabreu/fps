@@ -49,6 +49,7 @@ public class TorrentUtil {
     public static TrackedTorrent announceTrackedTorrentWithObservers(Tracker tck, Torrent t, Map<String, Client> clients, ConcurrentHashMap<String,
         ArrayList<TrackedPeer>> deletionsWaiting, boolean replication, String group) throws IOException, NoSuchAlgorithmException {
         TrackedTorrent tt = new TrackedTorrent(t);
+        ArrayList<String> finishedPeers = new ArrayList<>();
 
         tt.addObserver((o, arg) -> {
             TrackedPeer tp = (TrackedPeer) arg;
@@ -59,6 +60,17 @@ public class TorrentUtil {
 
                 if (!tp.getState().equals(TrackedPeer.PeerState.STOPPED) && !tp.getState().equals(TrackedPeer.PeerState.UNKNOWN)) {
                     if (tp.getLeft() == 0) {
+                        boolean canDelete = false;
+                        if(!finishedPeers.contains(tp.getHexPeerId()) &&
+                                !tp.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())){
+                            finishedPeers.add(tp.getHexPeerId());
+                            //Mais um que fez download
+                            try {
+                                canDelete = ZooKeeperUtil.incrementReceived(group, t.getHexInfoHash());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                         //Verificar se posso desligar
                         boolean allDownloaded = true;
                         if (tp.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())) {
@@ -83,25 +95,14 @@ public class TorrentUtil {
                             if (replication) {
                                 System.out.println("WILL REPLICATE");
                                 clients.get(tt.getHexInfoHash()).stop(false);
+                                for (TrackedPeer del : tt.getInjectedPeers())
+                                    if (!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId()))
+                                        tt.removeInjectedPeer(del.getHexPeerId());
+
                                 clients.remove(tt.getHexInfoHash());
-                                new Thread(() -> {
-                                    try{
-                                        for (TrackedPeer del : tt.getInjectedPeers()){
-                                            System.out.println("CICLO");
-                                            if (!del.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())){
-                                                System.out.println("ELIMINA");
-                                                tt.removeInjectedPeer(del.getHexPeerId());
-                                                System.out.println("ELIMINOU");
-                                            }
-                                        System.out.println("ELIMINEI TODOS OS INJETADOS");
-                                        }
-                                    }catch (Exception e){
-                                        e.printStackTrace();
-                                    }
-                                }).start();
                                 deletionsWaiting.remove(tt.getHexInfoHash());
                                 try {
-                                    if (ZooKeeperUtil.incrementReceived(group, t.getHexInfoHash())) {
+                                    if (canDelete) {
                                         System.out.println("TODA A GENTE FEZ O DOWNLOAD");
                                         tck.remove(t);
                                         new Thread(() -> {

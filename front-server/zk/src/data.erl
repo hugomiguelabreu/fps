@@ -4,7 +4,7 @@
 % o primeiro atributo do record e a Key
 -record(connections, {user, pid}).
 
--export ([start/0, register_pid/2, get_pid/1, delete_pid/1, create_file/2, delete_file/1, check_new_content/2]).
+-export ([start/0, register_pid/2, get_pid/1, delete_pid/1, create_file/2, delete_file/1, get_content/2]).
 
 %%====================================================================
 %% start mnesia
@@ -81,15 +81,4 @@ get_content(File, ID) ->
 			file:read_file("./torrents/" ++ File)
 	end.
 			
-
-check_new_content(User, ID) ->
-	case zk:get_new_content(User) of
-		{ok, L} ->
-			lists:foreach(fun(Filename) ->
-					ProtoTorrent = get_content(Filename, ID),
-					self() ! {User, packed_torrent, ProtoTorrent}
-				end, L);
-		_ ->
-			error_new_Content
-	end.
 

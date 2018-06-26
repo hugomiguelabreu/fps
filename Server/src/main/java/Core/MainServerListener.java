@@ -11,6 +11,7 @@ import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.tracker.TrackedPeer;
 import com.turn.ttorrent.tracker.TrackedTorrent;
 import com.turn.ttorrent.tracker.Tracker;
+import org.simpleframework.transport.Server;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,6 +23,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +34,7 @@ public class MainServerListener extends Thread{
     private boolean stop;
     private Tracker tck;
     private Map<String, Client> openClients;
+    private HashMap<String, String> torrentGroups = new HashMap<>();
     private ConcurrentHashMap<String, ArrayList<TrackedPeer>> injectionsWaiting;
     private ConcurrentHashMap<String, ArrayList<TrackedPeer>> deletionsWaiting;
 
@@ -60,8 +63,8 @@ public class MainServerListener extends Thread{
                 int l = ByteBuffer.wrap(length_b).getInt();
                 byte[] data = in.readRawBytes(l);
                 ServerWrapper.ServerMessage sm = ServerWrapper.ServerMessage.parseFrom(data);
-                //Received a torrent, let's handle
-                channelRead(sm);
+                //Received a request, let's handle
+                channelRead(sm, s);
 
             } catch (Exception e) {
                 try {
@@ -80,9 +83,40 @@ public class MainServerListener extends Thread{
         server.close();
     }
 
-    private void channelRead(ServerWrapper.ServerMessage request) throws IOException, NoSuchAlgorithmException, InterruptedException, ParserConfigurationException, SAXException {
-        Torrent t = new Torrent(request.getTrackerTorrent().getContent().toByteArray(), false);
-        String group = request.getTrackerTorrent().getGroup();
+    private void channelRead(ServerWrapper.ServerMessage request, Socket s) throws IOException, NoSuchAlgorithmException, InterruptedException, ParserConfigurationException, SAXException {
+        boolean torrent = request.getMsgCase().equals(ServerWrapper.ServerMessage.MsgCase.TRACKERTORRENT);
+        if(torrent){
+            Torrent t = new Torrent(request.getTrackerTorrent().getContent().toByteArray(), false);
+            String group = request.getTrackerTorrent().getGroup();
+            torrentGroups.put(t.getHexInfoHash(), group);
+            handleTorrent(t, group);
+        }else{
+            String hexId = request.getRequestTorrent().getId();
+            Torrent t = FileUtils.loadTorrent(hexId, torrentGroups.get(hexId));
+            if(t!=null) {
+                System.out.println("TENHO O TORRENT");
+                ServerWrapper.TorrentResponse tr = ServerWrapper.TorrentResponse.newBuilder()
+                        .setContent(ByteString.copyFrom(t.getEncoded()))
+                        .build();
+                ServerWrapper.ServerMessage sm = ServerWrapper.ServerMessage.newBuilder()
+                        .setTorrentResponse(tr)
+                        .build();
+                send(sm, s);
+                System.out.println("ENVIEI O TORRENT");
+                System.out.println(sm);
+            }else {
+                ServerWrapper.TorrentResponse tr = ServerWrapper.TorrentResponse.newBuilder()
+                        .setContent(ByteString.copyFrom("".getBytes()))
+                        .build();
+                ServerWrapper.ServerMessage sm = ServerWrapper.ServerMessage.newBuilder()
+                        .setTorrentResponse(tr)
+                        .build();
+                send(sm, s);
+            }
+        }
+    }
+
+    private void handleTorrent(Torrent t, String group) throws IOException, NoSuchAlgorithmException, InterruptedException, ParserConfigurationException, SAXException {
         //Verificar o nosso local na lista de trackers e colocar
         //o próprio em primeiro lugar
         String ip = FileUtils.getMyIP();
@@ -151,5 +185,18 @@ public class MainServerListener extends Thread{
             s.getOutputStream().close();
             s.close();
         }
+    }
+
+    public boolean send(ServerWrapper.ServerMessage msg, Socket s){
+        try {
+            byte[] size = ByteBuffer.allocate(4).putInt(msg.getSerializedSize()).array();
+            s.getOutputStream().write(size);
+            msg.writeTo(s.getOutputStream());
+            s.getOutputStream().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 }

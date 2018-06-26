@@ -26,6 +26,14 @@ public class FileUtils {
         new File(System.getProperty( "user.home" ) + "/.fps-server/files").mkdirs();
     }
 
+    public static Torrent loadTorrent(String hex, String group) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
+        File parent = new File(System.getProperty("user.home") + "/.fps-server/" + group + "/" + hex);
+        if(parent.exists())
+            return Torrent.load(parent);
+        else
+            return null;
+    }
+
     public static boolean loadTorrents(Tracker tck, Map<String, Client> clients, ConcurrentHashMap<String, ArrayList<TrackedPeer>> deletionsWaiting) throws IOException, NoSuchAlgorithmException, InterruptedException, SAXException, ParserConfigurationException {
         File parent = new File(System.getProperty("user.home") + "/.fps-server");
         //Ao carregar os torrent não criamos clientes, pois o servidores está a ligar;
@@ -33,7 +41,7 @@ public class FileUtils {
         String group;
         if(parent.exists()) {
             for (File f : parent.listFiles()) {
-                if(f.isDirectory()) {
+                if(f.isDirectory() && !f.getName().equals("files")) {
                     for(File l: f.listFiles()) {
                         if (!l.isDirectory()) {
                             System.out.println("READING:" + l.getName());

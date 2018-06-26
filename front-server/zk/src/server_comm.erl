@@ -19,9 +19,9 @@ init(Port, ID) ->
 acceptor(LSock, ID) ->
 	{ok, Socket} = gen_tcp:accept(LSock),
 	spawn(fun() -> acceptor(LSock, ID) end),
-	msg_listener(Socket, ID).
+	msg_listener(Socket).
 
-msg_listener(Socket, ID) ->
+msg_listener(Socket) ->
 	receive 
 		{tcp, Socket, Data} ->
 			msg_decrypt(Data);
@@ -40,7 +40,7 @@ msg_decrypt(Data) ->
 			lists:foreach( fun(User) ->
 				case data:get_pid(User) of
 					{ok, Pid} ->
-						Pid ! {User, unpacked_torrent, binary_to_list(Group), Content, TID};
+						Pid ! {User, unpacked_torrent, binary_to_list(Group), Content, binary_to_list(TID)};
 					_ ->
 						zk:unreceived_torrent(binary_to_list(TID), User, binary_to_list(Group))
 				end
@@ -98,7 +98,7 @@ send_tracker(ID, Data, Group) ->
 	end.
 
 req_file(ID, File) ->
-	TrackerLOC = zk:getTracker(1),
+	TrackerLOC = zk:get_tracker("1"),
 
 	case TrackerLOC of 
 		error ->
