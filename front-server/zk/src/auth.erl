@@ -87,7 +87,7 @@ set_received(TID, Username, Group) ->
 	case zk:received_torrent(TID, Username, Group) of
 					{ok, remove} ->
 						data:delete_file(TID),
-						io:format(">> torrent "  ++ binary_to_list(TID) ++ " removido.\n");
+						io:format(">> torrent "  ++ TID ++ " removido.\n");
 					_ ->
 						io:format("")
 	end.
