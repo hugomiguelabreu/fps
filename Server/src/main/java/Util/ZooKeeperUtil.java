@@ -41,7 +41,7 @@ public class ZooKeeperUtil {
         byte[] data = client.getData().forPath(path + "/file");
         int total = Integer.parseInt(new String(data));
 
-        if (counter.increment().postValue() == total - 1) {
+        if (counter.increment().postValue() == total) {
             client.delete().deletingChildrenIfNeeded().forPath(path);
             return true;
         }
