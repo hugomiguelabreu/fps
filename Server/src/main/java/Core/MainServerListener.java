@@ -23,6 +23,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,6 +34,7 @@ public class MainServerListener extends Thread{
     private boolean stop;
     private Tracker tck;
     private Map<String, Client> openClients;
+    private HashMap<String, String> torrentGroups = new HashMap<>();
     private ConcurrentHashMap<String, ArrayList<TrackedPeer>> injectionsWaiting;
     private ConcurrentHashMap<String, ArrayList<TrackedPeer>> deletionsWaiting;
 
@@ -86,10 +88,11 @@ public class MainServerListener extends Thread{
         if(torrent){
             Torrent t = new Torrent(request.getTrackerTorrent().getContent().toByteArray(), false);
             String group = request.getTrackerTorrent().getGroup();
+            torrentGroups.put(t.getHexInfoHash(), group);
             handleTorrent(t, group);
         }else{
             String hexId = request.getRequestTorrent().getId();
-            Torrent t = FileUtils.loadTorrent(hexId, "reddit");
+            Torrent t = FileUtils.loadTorrent(hexId, torrentGroups.get(hexId));
             if(t!=null) {
                 System.out.println("TENHO O TORRENT");
                 ServerWrapper.TorrentResponse tr = ServerWrapper.TorrentResponse.newBuilder()
