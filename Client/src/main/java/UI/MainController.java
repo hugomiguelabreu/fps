@@ -62,6 +62,7 @@ public class MainController implements Initializable{
         trackers.add("http://167.99.90.193:6969/announce");
         trackers.add("http://207.154.229.185:6969/announce");
 
+
         try {
             channel = new Connector(servers);
             if(channel.isConnected()){
@@ -130,7 +131,7 @@ public class MainController implements Initializable{
             Parent root = loader.load(fxmlStream);
 
             OfflineUI controller = loader.getController();
-            controller.initLocal(login_username_offline.getText().substring(0, 11));
+            controller.initLocal(login_username_offline.getText().substring(0, Math.min(login_username_offline.getText().length(), 11)));
 
             Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
