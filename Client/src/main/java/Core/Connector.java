@@ -65,9 +65,16 @@ public class Connector extends Thread{
                 if(torrent){
                     byte[] byteTorrent = cm.getTorrentWrapper().getContent().toByteArray();
                     String group = cm.getTorrentWrapper().getGroup();
+
+                    System.out.println(byteTorrent);
+                    System.out.println(group);
+
                     Torrent t = new Torrent(
                             byteTorrent,
-                            true);
+                            false);
+
+
+
                     ServerOperations.addTorrent(t, group);
                 }else{
 

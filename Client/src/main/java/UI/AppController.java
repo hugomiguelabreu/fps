@@ -262,8 +262,8 @@ public class AppController implements MapEvent{
         }else{
             String path = event.getDragboard().getFiles().get(0).getAbsolutePath();
             new Thread(()-> {
-                String p = "/root/120MB.tar.gz";
-                ServerOperations.sendTorrent(p, groupSelected);
+                //String p = "/root/120MB.tar.gz";
+                ServerOperations.sendTorrent(path, groupSelected);
             }
 
             ).start();
@@ -376,7 +376,7 @@ public class AppController implements MapEvent{
                 });
 
             } catch ( Exception e ) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         };
 

@@ -86,7 +86,13 @@ public class ServerOperations {
             t.newAnnounceEncode();
             //Guarda o torrent
             FileUtils.addTorrent(t, group);
-            ArrayList<Torrent> gt = groupTorrents.get(group);
+            ArrayList<Torrent> gt = null;
+            gt = groupTorrents.get(group);
+
+            if(gt == null){
+                gt = new ArrayList<>();
+            }
+
             gt.add(0, t);
             groupTorrents.putTorrent(group, gt);
         }
