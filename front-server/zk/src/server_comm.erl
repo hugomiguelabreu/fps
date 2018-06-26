@@ -40,7 +40,7 @@ msg_decrypt(Data) ->
 			lists:foreach( fun(User) ->
 				case data:get_pid(User) of
 					{ok, Pid} ->
-						Pid ! {User, unpacked_torrent, binary_to_list(Group), Content, TID};
+						Pid ! {User, unpacked_torrent, binary_to_list(Group), Content, binary_to_list(TID)};
 					_ ->
 						zk:unreceived_torrent(binary_to_list(TID), User, binary_to_list(Group))
 				end
