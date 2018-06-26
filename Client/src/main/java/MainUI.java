@@ -31,7 +31,6 @@ public class MainUI extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException, URISyntaxException {
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
         FileUtils.initDir();
         System.out.println("Started client");
 

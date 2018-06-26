@@ -27,7 +27,7 @@ public class ServerExec {
         int tckPort = Integer.parseInt(args[1]);
         int interPort = Integer.parseInt(args[2]);
         String serverId = args[3];
-
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "trace");
         Tracker tck = new Tracker(new InetSocketAddress(tckPort));
         MainServerListener ms = new MainServerListener(mainPort, tck, clients, injectionsWaiting, deletionsWaiting);
         InterserverListener is = new InterserverListener(interPort, tck, clients, injectionsWaiting, deletionsWaiting);
