@@ -61,7 +61,7 @@ public class MainServerListener extends Thread{
                 int l = ByteBuffer.wrap(length_b).getInt();
                 byte[] data = in.readRawBytes(l);
                 ServerWrapper.ServerMessage sm = ServerWrapper.ServerMessage.parseFrom(data);
-                //Received a torrent, let's handle
+                //Received a request, let's handle
                 channelRead(sm, s);
 
             } catch (Exception e) {
@@ -88,7 +88,6 @@ public class MainServerListener extends Thread{
             String group = request.getTrackerTorrent().getGroup();
             handleTorrent(t, group);
         }else{
-
             String hexId = request.getRequestTorrent().getId();
             for(TrackedTorrent tt: tck.getTrackedTorrents()){
                 if(tt.getHexInfoHash().equals(hexId)){
