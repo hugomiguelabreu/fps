@@ -1,6 +1,7 @@
 package Handlers;
 
 import Network.Interserver;
+import Util.FileUtils;
 import com.turn.ttorrent.client.Client;
 import com.turn.ttorrent.common.Torrent;
 import com.turn.ttorrent.common.Utils;
@@ -10,6 +11,7 @@ import com.turn.ttorrent.tracker.Tracker;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Map;
@@ -37,6 +39,7 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
         int port = message.getServerCliPort();
         String torrentId = message.getTorrentHexId().toStringUtf8();
         String peerId = message.getPeerId().toStringUtf8();
+        String group = message.getGroup();
 
         if(type){
             System.out.println("Handle peer injection");
@@ -60,16 +63,34 @@ public class InterserverHandler extends SimpleChannelInboundHandler<Interserver.
                 injectionsWaiting.get(torrentId).add(new TrackedPeer(null, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING))));
             }
         }else{
-            System.out.println("Handle peer deletion");
-            if(!deletionsWaiting.containsKey(torrentId) || deletionsWaiting.get(torrentId) == null)
-                deletionsWaiting.put(torrentId, new ArrayList<>());
-            TrackedPeer deleteadd = new TrackedPeer(null, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING)));
-            if(deletionsWaiting.get(torrentId).stream().anyMatch(x -> x.getHexPeerId().equals(deleteadd.getHexPeerId()))){
-                System.out.println("Remove injection duplicated");
+            if(!group.equals("")){
+                TrackedTorrent delete = null;
+                for(TrackedTorrent tt: tck.getTrackedTorrents())
+                    if(tt.getHexInfoHash().equals(torrentId))
+                        delete = tt;
+                if(delete != null){
+                    tck.remove(delete);
+                    TrackedTorrent finalDelete = delete;
+                    new Thread(() -> {
+                        try {
+                            FileUtils.deleteTorrent(finalDelete, group);
+                            FileUtils.deleteFiles(finalDelete);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+                }
             }else{
-                deletionsWaiting.get(torrentId).add(deleteadd);
+                System.out.println("Handle peer deletion");
+                if(!deletionsWaiting.containsKey(torrentId) || deletionsWaiting.get(torrentId) == null)
+                    deletionsWaiting.put(torrentId, new ArrayList<>());
+                TrackedPeer deleteadd = new TrackedPeer(null, ip, port, ByteBuffer.wrap(peerId.getBytes(Torrent.BYTE_ENCODING)));
+                if(deletionsWaiting.get(torrentId).stream().anyMatch(x -> x.getHexPeerId().equals(deleteadd.getHexPeerId()))){
+                    System.out.println("Remove injection duplicated");
+                }else{
+                    deletionsWaiting.get(torrentId).add(deleteadd);
+                }
             }
-            //tt.removeInjectedPeer(Utils.bytesToHex(peerId.getBytes(Torrent.BYTE_ENCODING)));
         }
     }
 

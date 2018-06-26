@@ -42,6 +42,16 @@ public final class Interserver {
      * <code>bytes peerId = 5;</code>
      */
     com.google.protobuf.ByteString getPeerId();
+
+    /**
+     * <code>string group = 6;</code>
+     */
+    java.lang.String getGroup();
+    /**
+     * <code>string group = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getGroupBytes();
   }
   /**
    * Protobuf type {@code Network.InterServerMessage}
@@ -60,6 +70,7 @@ public final class Interserver {
       serverIp_ = com.google.protobuf.ByteString.EMPTY;
       serverCliPort_ = 0;
       peerId_ = com.google.protobuf.ByteString.EMPTY;
+      group_ = "";
     }
 
     @java.lang.Override
@@ -110,6 +121,12 @@ public final class Interserver {
             case 42: {
 
               peerId_ = input.readBytes();
+              break;
+            }
+            case 50: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              group_ = s;
               break;
             }
           }
@@ -180,6 +197,40 @@ public final class Interserver {
       return peerId_;
     }
 
+    public static final int GROUP_FIELD_NUMBER = 6;
+    private volatile java.lang.Object group_;
+    /**
+     * <code>string group = 6;</code>
+     */
+    public java.lang.String getGroup() {
+      java.lang.Object ref = group_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        group_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string group = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getGroupBytes() {
+      java.lang.Object ref = group_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        group_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -206,6 +257,9 @@ public final class Interserver {
       }
       if (!peerId_.isEmpty()) {
         output.writeBytes(5, peerId_);
+      }
+      if (!getGroupBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, group_);
       }
     }
 
@@ -234,6 +288,9 @@ public final class Interserver {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(5, peerId_);
       }
+      if (!getGroupBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, group_);
+      }
       memoizedSize = size;
       return size;
     }
@@ -260,6 +317,8 @@ public final class Interserver {
           == other.getServerCliPort());
       result = result && getPeerId()
           .equals(other.getPeerId());
+      result = result && getGroup()
+          .equals(other.getGroup());
       return result;
     }
 
@@ -281,6 +340,8 @@ public final class Interserver {
       hash = (53 * hash) + getServerCliPort();
       hash = (37 * hash) + PEERID_FIELD_NUMBER;
       hash = (53 * hash) + getPeerId().hashCode();
+      hash = (37 * hash) + GROUP_FIELD_NUMBER;
+      hash = (53 * hash) + getGroup().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -409,6 +470,8 @@ public final class Interserver {
 
         peerId_ = com.google.protobuf.ByteString.EMPTY;
 
+        group_ = "";
+
         return this;
       }
 
@@ -436,6 +499,7 @@ public final class Interserver {
         result.serverIp_ = serverIp_;
         result.serverCliPort_ = serverCliPort_;
         result.peerId_ = peerId_;
+        result.group_ = group_;
         onBuilt();
         return result;
       }
@@ -491,6 +555,10 @@ public final class Interserver {
         }
         if (other.getPeerId() != com.google.protobuf.ByteString.EMPTY) {
           setPeerId(other.getPeerId());
+        }
+        if (!other.getGroup().isEmpty()) {
+          group_ = other.group_;
+          onChanged();
         }
         onChanged();
         return this;
@@ -656,6 +724,75 @@ public final class Interserver {
         onChanged();
         return this;
       }
+
+      private java.lang.Object group_ = "";
+      /**
+       * <code>string group = 6;</code>
+       */
+      public java.lang.String getGroup() {
+        java.lang.Object ref = group_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          group_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string group = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getGroupBytes() {
+        java.lang.Object ref = group_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          group_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string group = 6;</code>
+       */
+      public Builder setGroup(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        group_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string group = 6;</code>
+       */
+      public Builder clearGroup() {
+        
+        group_ = getDefaultInstance().getGroup();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string group = 6;</code>
+       */
+      public Builder setGroupBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        group_ = value;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -719,10 +856,11 @@ public final class Interserver {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\021Interserver.proto\022\007Network\"w\n\022InterSer" +
-      "verMessage\022\024\n\014torrentHexId\030\001 \001(\014\022\017\n\007type" +
-      "_op\030\002 \001(\010\022\021\n\tserver_ip\030\003 \001(\014\022\027\n\017server_c" +
-      "li_port\030\004 \001(\005\022\016\n\006peerId\030\005 \001(\014b\006proto3"
+      "\n\021Interserver.proto\022\007Network\"\206\001\n\022InterSe" +
+      "rverMessage\022\024\n\014torrentHexId\030\001 \001(\014\022\017\n\007typ" +
+      "e_op\030\002 \001(\010\022\021\n\tserver_ip\030\003 \001(\014\022\027\n\017server_" +
+      "cli_port\030\004 \001(\005\022\016\n\006peerId\030\005 \001(\014\022\r\n\005group\030" +
+      "\006 \001(\tb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -741,7 +879,7 @@ public final class Interserver {
     internal_static_Network_InterServerMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Network_InterServerMessage_descriptor,
-        new java.lang.String[] { "TorrentHexId", "TypeOp", "ServerIp", "ServerCliPort", "PeerId", });
+        new java.lang.String[] { "TorrentHexId", "TypeOp", "ServerIp", "ServerCliPort", "PeerId", "Group", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

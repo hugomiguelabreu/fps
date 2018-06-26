@@ -7,4 +7,5 @@ message InterServerMessage {
     bytes server_ip = 3;
     int32 server_cli_port = 4;
     bytes peerId = 5;
+    string group = 6;
 }

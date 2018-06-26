@@ -72,7 +72,7 @@ public class TorrentUtil {
                         boolean allDownloaded = true;
                         if (tp.getHexPeerId().equals(clients.get(tt.getHexInfoHash()).getPeerSpec().getHexPeerId())) {
                             try {
-                                removeInjectionRequest(tp, tt);
+                                removeInjectionRequest(tp, tt, "");
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -101,6 +101,8 @@ public class TorrentUtil {
                                 try {
                                     if (canDelete) {
                                         System.out.println("TODA A GENTE FEZ O DOWNLOAD");
+                                        //Peço a outros servidores para eliminar;
+                                        removeInjectionRequest(tp, tt, group);
                                         tck.remove(t);
                                         new Thread(() -> {
                                             try {
@@ -115,11 +117,18 @@ public class TorrentUtil {
                                     e.printStackTrace();
                                 }
                             } else {
+                                try {
                                 System.out.println("WONT REPLICATE");
                                 clients.get(tt.getHexInfoHash()).stop(false);
                                 clients.remove(tt.getHexInfoHash());
                                 deletionsWaiting.remove(tt.getHexInfoHash());
                                 tck.remove(t);
+                                //Peço a outros servidores para eliminar;
+                                if(canDelete)
+                                    removeInjectionRequest(tp, tt, group);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                                 new Thread(() -> {
                                     try {
                                         FileUtils.deleteFiles(t);
@@ -169,6 +178,7 @@ public class TorrentUtil {
                         .setServerCliPort(peer.getPort())
                         .setTorrentHexId(ByteString.copyFromUtf8(tt.getHexInfoHash()))
                         .setPeerId(ByteString.copyFrom(peer.getPeerId()))
+                        .setGroup("")
                         .build();
                 im.writeDelimitedTo(s.getOutputStream());
                 s.getOutputStream().flush();
@@ -189,7 +199,7 @@ public class TorrentUtil {
     }
 
 
-    public static void removeInjectionRequest(Peer peer, TrackedTorrent tt) throws IOException {
+    public static void removeInjectionRequest(Peer peer, TrackedTorrent tt, String group) throws IOException {
         //Send remove request
         int it = 0;
         for(URI tracker: tt.getAnnounceList().get(0)) {
@@ -202,6 +212,7 @@ public class TorrentUtil {
                         .setServerCliPort(peer.getPort())
                         .setTorrentHexId(ByteString.copyFromUtf8(tt.getHexInfoHash()))
                         .setPeerId(ByteString.copyFromUtf8(new String(peer.getPeerId().array())))
+                        .setGroup(group)
                         .build();
                 im.writeDelimitedTo(s.getOutputStream());
                 s.getOutputStream().flush();
