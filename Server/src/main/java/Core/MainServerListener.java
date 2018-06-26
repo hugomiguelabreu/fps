@@ -94,7 +94,6 @@ public class MainServerListener extends Thread{
             String hexId = request.getRequestTorrent().getId();
             Torrent t = FileUtils.loadTorrent(hexId, torrentGroups.get(hexId));
             if(t!=null) {
-                System.out.println("TENHO O TORRENT");
                 ServerWrapper.TorrentResponse tr = ServerWrapper.TorrentResponse.newBuilder()
                         .setContent(ByteString.copyFrom(t.getEncoded()))
                         .build();
@@ -102,8 +101,6 @@ public class MainServerListener extends Thread{
                         .setTorrentResponse(tr)
                         .build();
                 send(sm, s);
-                System.out.println("ENVIEI O TORRENT");
-                System.out.println(sm);
             }else {
                 ServerWrapper.TorrentResponse tr = ServerWrapper.TorrentResponse.newBuilder()
                         .setContent(ByteString.copyFrom("".getBytes()))

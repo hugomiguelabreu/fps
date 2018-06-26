@@ -55,9 +55,6 @@ public class TorrentUtil {
             TrackedPeer tp = (TrackedPeer) arg;
             synchronized (clients) {
 
-                for (TrackedPeer rp : tt.getInjectedPeers())
-                    System.out.println(rp.getIp() + ":" + rp.getPort());
-
                 if (!tp.getState().equals(TrackedPeer.PeerState.STOPPED) && !tp.getState().equals(TrackedPeer.PeerState.UNKNOWN)) {
                     if (tp.getLeft() == 0) {
                         boolean canDelete = false;
