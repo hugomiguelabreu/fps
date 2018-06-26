@@ -89,30 +89,27 @@ public class MainServerListener extends Thread{
             handleTorrent(t, group);
         }else{
             String hexId = request.getRequestTorrent().getId();
-            for(TrackedTorrent tt: tck.getTrackedTorrents()){
-                if(tt.getHexInfoHash().equals(hexId)){
-                    System.out.println("TENHO O TORRENT");
-                    ServerWrapper.TorrentResponse tr = ServerWrapper.TorrentResponse.newBuilder()
-                            .setContent(ByteString.copyFrom(tt.getEncoded()))
-                            .build();
-                    ServerWrapper.ServerMessage sm = ServerWrapper.ServerMessage.newBuilder()
-                            .setTorrentResponse(tr)
-                            .build();
-                    send(sm, s);
-                    System.out.println("ENVIEI O TORRENT");
-                    System.out.println(sm);
-                    return;
-                }
+            Torrent t = FileUtils.loadTorrent(hexId, "reddit");
+            if(t!=null) {
+                System.out.println("TENHO O TORRENT");
+                ServerWrapper.TorrentResponse tr = ServerWrapper.TorrentResponse.newBuilder()
+                        .setContent(ByteString.copyFrom(t.getEncoded()))
+                        .build();
+                ServerWrapper.ServerMessage sm = ServerWrapper.ServerMessage.newBuilder()
+                        .setTorrentResponse(tr)
+                        .build();
+                send(sm, s);
+                System.out.println("ENVIEI O TORRENT");
+                System.out.println(sm);
+            }else {
+                ServerWrapper.TorrentResponse tr = ServerWrapper.TorrentResponse.newBuilder()
+                        .setContent(ByteString.copyFrom("".getBytes()))
+                        .build();
+                ServerWrapper.ServerMessage sm = ServerWrapper.ServerMessage.newBuilder()
+                        .setTorrentResponse(tr)
+                        .build();
+                send(sm, s);
             }
-
-            ServerWrapper.TorrentResponse tr = ServerWrapper.TorrentResponse.newBuilder()
-                    .setContent(ByteString.copyFrom("".getBytes()))
-                    .build();
-            ServerWrapper.ServerMessage sm = ServerWrapper.ServerMessage.newBuilder()
-                    .setTorrentResponse(tr)
-                    .build();
-            send(sm, s);
-
         }
     }
 
