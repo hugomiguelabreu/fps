@@ -67,14 +67,15 @@ public class Client implements Runnable{
             send(socket, wrapper);
             Thread.sleep(2000);
 
-            ClientWrapper.GroupUsers cg = ClientWrapper.GroupUsers.newBuilder()
-                    .setGroupUsers(username)
-                    .build();
 
-            wrapper = ClientWrapper.ClientMessage.newBuilder()
-                    .setGroupUsers(cg).build();
+            CodedInputStream in = CodedInputStream.newInstance(socket.getInputStream());
 
-            send(socket,wrapper);
+            byte[] header = in.readRawBytes(4);
+            int l = ByteBuffer.wrap(header).getInt();
+            System.out.println(l);
+            byte[] data = in.readRawBytes(l);
+            System.out.println(username + ": " + ClientWrapper.ClientMessage.parseFrom(data));
+
 
 
             /*
@@ -130,10 +131,9 @@ public class Client implements Runnable{
 
 
 
-
-            if (username.equals("jib")){
+            if (username.equals("Vaarg")){
                 ClientWrapper.TorrentWrapper torr = ClientWrapper.TorrentWrapper.newBuilder()
-                        .setGroup("leddit")
+                        .setGroup("BGUM24")
                         .setId("JIB")
                         .setContent(ByteString.copyFromUtf8("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffasdasdasdasdaaaaaaaaaaaaaaaaaaaaaakc.xmqdslllllllllllllllllcccccccccccccccccccccccwooooooooooooooooooooooouuuuuuuuuuuuuuhhhhhhhhhhhhhhhhhhhhhhhhhffffffffffffffffffffvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv            wwwwwwwwwqqqqqqqqqqqrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr"))
                         .build();
@@ -147,17 +147,17 @@ public class Client implements Runnable{
 
                 socket.getOutputStream().write(ByteBuffer.allocate(4).putInt(wrapper.getSerializedSize()).array());
                 wrapper.writeTo(socket.getOutputStream());
+                send(socket,wrapper);
+            } else {
+                CodedInputStream in = CodedInputStream.newInstance(socket.getInputStream());
+
+                byte[] header = in.readRawBytes(4);
+                int l = ByteBuffer.wrap(header).getInt();
+                System.out.println(l);
+                byte[] data = in.readRawBytes(l);
+                System.out.println(username + ": " + ClientWrapper.ClientMessage.parseFrom(data));
             }
 
-            byte[] length_b = in.readRawBytes(4);
-            l = ByteBuffer.wrap(length_b).getInt();
-            System.out.println(l);
-
-
-            data = in.readRawBytes(l);
-BGUM24
-            System.out.println(ClientWrapper.ClientMessage.parseFrom(data).getTorrentWrapper());
-            socket.close();
 
             */
 
@@ -169,7 +169,7 @@ BGUM24
     public static void main(String[] args) {
 
         (new Thread(new Client("Melon", "asd"))).start();
-        (new Thread(new Client("Vaarg", "123"))).start();
-        (new Thread(new Client("Tsuman", "123"))).start();
+        //new Thread(new Client("Vaarg", "123"))).start();
+        //(new Thread(new Client("Tsuman", "123"))).start();
     }
 }

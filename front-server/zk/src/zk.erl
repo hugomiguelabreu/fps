@@ -231,12 +231,16 @@ get_new_content(User, PID) ->
 	R = erlzk:get_children(PID, Path),
 	case R of
 		{ok, L} ->
-			{ok, L};
+			{ok, lists:map(fun(X) -> {X, get_torrent_group(User, X, PID)} end, L)};
 		{error, no_node} ->
 			no_group;
 		_ ->
 			error
 	end.
+get_torrent_group(User,T, PID) ->
+	{ok,{R,_}} = erlzk:get_data(PID, "/users/" ++ User ++ "/missing/" ++ T),
+	binary_to_list(R).
+
 
 users_online_group(G) -> rpc({group_online, G}).
 users_online_group(Group, PID) ->
@@ -314,10 +318,6 @@ get_user_location(Users, Map, PID) ->
 			end
 
  	end.
-
-
-
-
 
 get_tracker_list() -> rpc({tracker_list}).
 get_tracker_list(PID) ->

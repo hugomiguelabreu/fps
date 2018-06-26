@@ -72,7 +72,7 @@ logged_loop(Socket, Username, ID) ->
 			T = client_wrapper:encode_msg(#'ClientMessage'{msg = {torrentWrapper, Data}}),
 			gen_tcp:send(Socket, T),
 			{'TorrentWrapper', Group, _ , TID} = Data,
-			set_received(TID, Username, binary_to_list(Group)),
+			set_received(binary_to_list(TID), Username, binary_to_list(Group)),
 			logged_loop(Socket, Username, ID);
 
 		{Username, unpacked_torrent, Group, Data, TID} ->
@@ -84,7 +84,7 @@ logged_loop(Socket, Username, ID) ->
 	end.
 
 set_received(TID, Username, Group) ->
-	case zk:received_torrent(binary_to_list(TID), Username, Group) of
+	case zk:received_torrent(TID, Username, Group) of
 					{ok, remove} ->
 						data:delete_file(TID),
 						io:format(">> torrent "  ++ binary_to_list(TID) ++ " removido.\n");
@@ -150,7 +150,7 @@ login(Username, Password, ID, Socket) ->
 			gen_tcp:send(Socket, MsgContainer),
 			io:format("> Client " ++ Username ++ " logged in.\n"),
 			
-			data:check_new_content(Username, ID),
+			check_new_content(Username, ID),
 			logged_loop(Socket, Username, ID);
 		false ->
 			MsgContainer = client_wrapper:encode_msg(#'ClientMessage'{msg = {response,#'Response'{rep=false}}}),
@@ -196,9 +196,21 @@ get_user_groups(User, Socket) ->
 %% Local functions
 %%====================================================================
 
+check_new_content(User, ID) ->
+	case zk:get_new_content(User) of
+		{ok, L} ->
+			lists:foreach(fun({Filename,G}) ->
+					io:format(G ++ "\n"),
+					ProtoTorrent = data:get_content(Filename, ID),
+					self() ! {User, unpacked_torrent, G ,ProtoTorrent, Filename}
+				end, L);
+		_ ->
+			error_new_Content
+	end.
+
 redirect(ProtoTorrent, ID, CurrentUser) ->
 	io:format("> starting to redirect to group " ++ binary_to_list(ProtoTorrent#'TorrentWrapper'.group) ++ "\n"),
-	server_comm:send_tracker(ID, ProtoTorrent#'TorrentWrapper'.content, ProtoTorrent#'TorrentWrapper'.group),
+	%server_comm:send_tracker(ID, ProtoTorrent#'TorrentWrapper'.content, ProtoTorrent#'TorrentWrapper'.group),
 	
 	case zk:get_group_location(binary_to_list(ProtoTorrent#'TorrentWrapper'.group)) of 
 		{ok, UsersMap, Length} ->
