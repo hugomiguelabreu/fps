@@ -7,18 +7,25 @@
 
 -define(server_wrapper_gpb_version, "4.1.1").
 
+-ifndef('REQUESTTORRENT_PB_H').
+-define('REQUESTTORRENT_PB_H', true).
+-record('RequestTorrent',
+        {id = <<>>              :: iodata() | undefined % = 1
+        }).
+-endif.
+
+-ifndef('TORRENTRESPONSE_PB_H').
+-define('TORRENTRESPONSE_PB_H', true).
+-record('TorrentResponse',
+        {content = <<>>         :: binary() | undefined % = 1
+        }).
+-endif.
+
 -ifndef('TRACKERTORRENT_PB_H').
 -define('TRACKERTORRENT_PB_H', true).
 -record('TrackerTorrent',
         {group = <<>>           :: iodata() | undefined, % = 1
          content = <<>>         :: binary() | undefined % = 2
-        }).
--endif.
-
--ifndef('REQUESTTORRENT_PB_H').
--define('REQUESTTORRENT_PB_H', true).
--record('RequestTorrent',
-        {id = <<>>              :: iodata() | undefined % = 1
         }).
 -endif.
 
@@ -35,7 +42,7 @@
 -ifndef('SERVERMESSAGE_PB_H').
 -define('SERVERMESSAGE_PB_H', true).
 -record('ServerMessage',
-        {msg                    :: {frontEndTorrent, #'FrontEndTorrent'{}} | {trackerTorrent, #'TrackerTorrent'{}} | {requestTorrent, #'RequestTorrent'{}} | undefined % oneof
+        {msg                    :: {frontEndTorrent, #'FrontEndTorrent'{}} | {trackerTorrent, #'TrackerTorrent'{}} | {requestTorrent, #'RequestTorrent'{}} | {torrentResponse, #'TorrentResponse'{}} | undefined % oneof
         }).
 -endif.
 

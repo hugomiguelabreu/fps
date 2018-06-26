@@ -7,13 +7,6 @@
 
 -define(client_wrapper_gpb_version, "4.1.1").
 
--ifndef('GROUPUSERS_PB_H').
--define('GROUPUSERS_PB_H', true).
--record('GroupUsers',
-        {groupUsers = <<>>      :: iodata() | undefined % = 1
-        }).
--endif.
-
 -ifndef('JOINGROUP_PB_H').
 -define('JOINGROUP_PB_H', true).
 -record('JoinGroup',
@@ -21,19 +14,24 @@
         }).
 -endif.
 
--ifndef('REGISTER_PB_H').
--define('REGISTER_PB_H', true).
--record('Register',
-        {username = <<>>        :: iodata() | undefined, % = 1
-         password = <<>>        :: iodata() | undefined, % = 2
-         name = <<>>            :: iodata() | undefined % = 3
-        }).
--endif.
-
 -ifndef('ONLINEUSERS_PB_H').
 -define('ONLINEUSERS_PB_H', true).
 -record('OnlineUsers',
         {onlineUsers = <<>>     :: iodata() | undefined % = 1
+        }).
+-endif.
+
+-ifndef('REMOVETORRENT_PB_H').
+-define('REMOVETORRENT_PB_H', true).
+-record('RemoveTorrent',
+        {id = <<>>              :: iodata() | undefined % = 1
+        }).
+-endif.
+
+-ifndef('GROUPUSERS_PB_H').
+-define('GROUPUSERS_PB_H', true).
+-record('GroupUsers',
+        {groupUsers = <<>>      :: iodata() | undefined % = 1
         }).
 -endif.
 
@@ -60,6 +58,15 @@
         }).
 -endif.
 
+-ifndef('REGISTER_PB_H').
+-define('REGISTER_PB_H', true).
+-record('Register',
+        {username = <<>>        :: iodata() | undefined, % = 1
+         password = <<>>        :: iodata() | undefined, % = 2
+         name = <<>>            :: iodata() | undefined % = 3
+        }).
+-endif.
+
 -ifndef('LOGIN_PB_H').
 -define('LOGIN_PB_H', true).
 -record('Login',
@@ -71,7 +78,7 @@
 -ifndef('CLIENTMESSAGE_PB_H').
 -define('CLIENTMESSAGE_PB_H', true).
 -record('ClientMessage',
-        {msg                    :: {login, #'Login'{}} | {register, #'Register'{}} | {response, #'Response'{}} | {createGroup, #'CreateGroup'{}} | {joinGroup, #'JoinGroup'{}} | {torrentWrapper, #'TorrentWrapper'{}} | {onlineUsers, #'OnlineUsers'{}} | {groupUsers, #'GroupUsers'{}} | undefined % oneof
+        {msg                    :: {login, #'Login'{}} | {register, #'Register'{}} | {response, #'Response'{}} | {createGroup, #'CreateGroup'{}} | {joinGroup, #'JoinGroup'{}} | {torrentWrapper, #'TorrentWrapper'{}} | {onlineUsers, #'OnlineUsers'{}} | {groupUsers, #'GroupUsers'{}} | {removeTorrent, #'RemoveTorrent'{}} | undefined % oneof
         }).
 -endif.
 
