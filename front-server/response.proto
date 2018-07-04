@@ -1,6 +1,0 @@
-syntax = "proto3";
-package network;
-
-message Response {
-  bool rep = 1;
-}
