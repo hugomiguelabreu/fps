@@ -1,4 +1,4 @@
-# Serviço distribuído de Publicação e Subscrição de Ficheiros
+# Pub-Sub based P2P file sharing system with offline support
 
 ## Compile in java
 ```
